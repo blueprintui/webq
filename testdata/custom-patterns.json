@@ -1,0 +1,366 @@
+{
+  "schemaVersion": "1.0.0",
+  "patterns": [
+    {
+      "name": "form-field",
+      "description": "Standard form field with label and validation messaging. Wraps a single form control with its label and optional validation feedback.",
+      "tags": ["form", "input", "validation"],
+      "structure": {
+        "root": "bp-field",
+        "children": [
+          {
+            "rule": "required",
+            "element": "label",
+            "description": "Visible label for the form control"
+          },
+          {
+            "rule": "oneOf",
+            "options": [
+              "bp-input",
+              "bp-select",
+              "bp-textarea",
+              "bp-search",
+              "bp-password",
+              "bp-time",
+              "bp-month",
+              "bp-range",
+              "bp-rating",
+              "bp-telephone"
+            ],
+            "description": "The form control element"
+          },
+          {
+            "rule": "optional",
+            "element": "bp-field-message",
+            "description": "Validation or help message"
+          }
+        ]
+      },
+      "relatedPatterns": ["form-group", "fieldset"],
+      "examples": [
+        {
+          "name": "text-input",
+          "description": "Basic text input with required validation",
+          "html": "<bp-field>\n  <label>Name</label>\n  <bp-input required></bp-input>\n  <bp-field-message error=\"valueMissing\">Required</bp-field-message>\n</bp-field>"
+        },
+        {
+          "name": "select",
+          "description": "Select dropdown within a form field",
+          "html": "<bp-field>\n  <label>Country</label>\n  <bp-select>\n    <bp-option value=\"us\">USA</bp-option>\n    <bp-option value=\"uk\">United Kingdom</bp-option>\n  </bp-select>\n  <bp-field-message>Select your country</bp-field-message>\n</bp-field>"
+        }
+      ]
+    },
+    {
+      "name": "fieldset",
+      "description": "Groups multiple related form controls like checkboxes, radios, or switches under a single label.",
+      "tags": ["form", "group", "selection"],
+      "structure": {
+        "root": "bp-fieldset",
+        "children": [
+          {
+            "rule": "required",
+            "element": "label",
+            "description": "Group label for the fieldset"
+          },
+          {
+            "rule": "oneOrMore",
+            "element": "label",
+            "description": "Individual labels for each control"
+          },
+          {
+            "rule": "oneOf",
+            "options": ["bp-checkbox", "bp-radio", "bp-switch"],
+            "description": "The repeated form control type (all controls in a fieldset should be the same type)"
+          },
+          {
+            "rule": "optional",
+            "element": "bp-field-message",
+            "description": "Validation or help message for the group"
+          }
+        ]
+      },
+      "relatedPatterns": ["form-field", "form-group"],
+      "examples": [
+        {
+          "name": "checkbox-group",
+          "description": "Group of checkboxes",
+          "html": "<bp-fieldset>\n  <label>Preferences</label>\n  <label>Email notifications</label>\n  <bp-checkbox checked></bp-checkbox>\n  <label>SMS notifications</label>\n  <bp-checkbox></bp-checkbox>\n</bp-fieldset>"
+        },
+        {
+          "name": "radio-group",
+          "description": "Group of radio buttons",
+          "html": "<bp-fieldset>\n  <label>Plan</label>\n  <label>Free</label>\n  <bp-radio value=\"free\" checked></bp-radio>\n  <label>Pro</label>\n  <bp-radio value=\"pro\"></bp-radio>\n  <label>Enterprise</label>\n  <bp-radio value=\"enterprise\"></bp-radio>\n</bp-fieldset>"
+        }
+      ]
+    },
+    {
+      "name": "form-group",
+      "description": "Container that provides consistent layout for multiple form fields.",
+      "tags": ["form", "layout"],
+      "structure": {
+        "root": "bp-form-group",
+        "children": [
+          {
+            "rule": "oneOrMore",
+            "element": "bp-field",
+            "description": "Form fields arranged by the group layout"
+          },
+          {
+            "rule": "zeroOrMore",
+            "element": "bp-fieldset",
+            "description": "Fieldsets for grouped controls"
+          }
+        ]
+      },
+      "relatedPatterns": ["form-field", "fieldset"],
+      "examples": [
+        {
+          "name": "horizontal",
+          "description": "Horizontal form layout",
+          "html": "<bp-form-group layout=\"horizontal\">\n  <bp-field>\n    <label>First Name</label>\n    <bp-input></bp-input>\n  </bp-field>\n  <bp-field>\n    <label>Last Name</label>\n    <bp-input></bp-input>\n  </bp-field>\n  <bp-button>Submit</bp-button>\n</bp-form-group>"
+        }
+      ]
+    },
+    {
+      "name": "select-options",
+      "description": "Select control populated with selectable options.",
+      "tags": ["form", "selection"],
+      "structure": {
+        "root": "bp-select",
+        "children": [
+          {
+            "rule": "oneOrMore",
+            "element": "bp-option",
+            "description": "Selectable option items"
+          }
+        ]
+      },
+      "relatedPatterns": ["form-field"],
+      "examples": [
+        {
+          "name": "basic",
+          "description": "Standard select with options",
+          "html": "<bp-select>\n  <bp-option value=\"1\">Option One</bp-option>\n  <bp-option value=\"2\">Option Two</bp-option>\n  <bp-option value=\"3\">Option Three</bp-option>\n</bp-select>"
+        },
+        {
+          "name": "with-default",
+          "description": "Select with a pre-selected option",
+          "html": "<bp-select>\n  <bp-option value=\"1\">Option One</bp-option>\n  <bp-option value=\"2\" selected>Option Two</bp-option>\n  <bp-option value=\"3\">Option Three</bp-option>\n</bp-select>"
+        }
+      ]
+    },
+    {
+      "name": "dialog-trigger",
+      "description": "A button that opens a dialog using the HTML Popover API. The trigger's popovertarget must reference the dialog's id.",
+      "tags": ["overlay", "modal", "popover"],
+      "structure": {
+        "siblings": [
+          {
+            "description": "Button triggers dialog via popovertarget/id binding",
+            "trigger": {
+              "tag": "bp-button",
+              "attributes": [{ "name": "popovertarget", "required": true }]
+            },
+            "target": {
+              "tag": "bp-dialog",
+              "attributes": [{ "name": "id", "required": true }]
+            },
+            "bindings": [
+              {
+                "triggerAttribute": "popovertarget",
+                "targetAttribute": "id"
+              }
+            ]
+          }
+        ]
+      },
+      "relatedPatterns": ["dialog-structure"],
+      "examples": [
+        {
+          "name": "basic",
+          "description": "Simple dialog with trigger button",
+          "html": "<bp-button popovertarget=\"my-dialog\">Open</bp-button>\n<bp-dialog id=\"my-dialog\" modal closable>\n  <h2 slot=\"header\" bp-text=\"section\">Dialog Title</h2>\n  <p>Dialog content goes here.</p>\n  <div slot=\"footer\" bp-layout=\"inline gap:xs inline:end\">\n    <bp-button action=\"secondary\">Cancel</bp-button>\n    <bp-button status=\"accent\">Confirm</bp-button>\n  </div>\n</bp-dialog>"
+        }
+      ]
+    },
+    {
+      "name": "dialog-structure",
+      "description": "Internal structure of a dialog with header, content, and footer slots.",
+      "tags": ["overlay", "modal", "layout"],
+      "structure": {
+        "root": "bp-dialog",
+        "children": [
+          {
+            "rule": "optional",
+            "element": { "tag": "*", "slot": "header" },
+            "description": "Dialog header content (typically a heading element)"
+          },
+          {
+            "rule": "optional",
+            "element": { "tag": "*", "slot": "footer" },
+            "description": "Dialog footer content (typically action buttons)"
+          }
+        ]
+      },
+      "relatedPatterns": ["dialog-trigger"],
+      "examples": [
+        {
+          "name": "full",
+          "description": "Dialog with header, body, and footer",
+          "html": "<bp-dialog modal closable>\n  <h2 slot=\"header\" bp-text=\"section\">Title</h2>\n  <div bp-layout=\"block gap:md\">\n    <p>Body content</p>\n  </div>\n  <div slot=\"footer\" bp-layout=\"inline gap:xs inline:end\">\n    <bp-button action=\"secondary\">Cancel</bp-button>\n    <bp-button status=\"accent\">Save</bp-button>\n  </div>\n</bp-dialog>"
+        }
+      ]
+    },
+    {
+      "name": "alert-group",
+      "description": "Container for related alert messages with shared status styling.",
+      "tags": ["feedback", "notification"],
+      "structure": {
+        "root": "bp-alert-group",
+        "children": [
+          {
+            "rule": "oneOrMore",
+            "element": "bp-alert",
+            "description": "Alert messages within the group"
+          }
+        ]
+      },
+      "relatedPatterns": ["alert-command"],
+      "examples": [
+        {
+          "name": "basic",
+          "description": "Alert group with closable alerts",
+          "html": "<bp-alert-group status=\"warning\">\n  <bp-alert closable>Warning message</bp-alert>\n</bp-alert-group>"
+        },
+        {
+          "name": "multiple",
+          "description": "Multiple alerts in a group",
+          "html": "<bp-alert-group>\n  <bp-alert closable>First alert</bp-alert>\n  <bp-alert closable>Second alert</bp-alert>\n</bp-alert-group>"
+        }
+      ]
+    },
+    {
+      "name": "alert-command",
+      "description": "An alert toggled by a button using the Invoker Command API.",
+      "tags": ["feedback", "notification", "command"],
+      "structure": {
+        "siblings": [
+          {
+            "description": "Button toggles alert via command/commandfor binding",
+            "trigger": {
+              "tag": "bp-button",
+              "attributes": [
+                { "name": "command", "required": true, "value": "--toggle" },
+                { "name": "commandfor", "required": true }
+              ]
+            },
+            "target": {
+              "tag": "bp-alert",
+              "attributes": [{ "name": "id", "required": true }]
+            },
+            "bindings": [
+              {
+                "triggerAttribute": "commandfor",
+                "targetAttribute": "id"
+              }
+            ]
+          }
+        ]
+      },
+      "relatedPatterns": ["alert-group"],
+      "examples": [
+        {
+          "name": "toggle",
+          "description": "Button that toggles an alert",
+          "html": "<bp-alert-group>\n  <bp-alert closable id=\"my-alert\">Alert message</bp-alert>\n</bp-alert-group>\n<bp-button command=\"--toggle\" commandfor=\"my-alert\" action=\"secondary\">Toggle</bp-button>"
+        }
+      ]
+    },
+    {
+      "name": "stepper",
+      "description": "Multi-step progress indicator guiding users through a sequential process.",
+      "tags": ["navigation", "progress", "workflow"],
+      "structure": {
+        "root": {
+          "tag": "bp-stepper",
+          "attributes": [{ "name": "aria-label", "required": true }]
+        },
+        "children": [
+          {
+            "rule": "oneOrMore",
+            "element": "bp-stepper-item",
+            "description": "Individual step in the process"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "description": "Horizontal stepper with active step",
+          "html": "<bp-stepper aria-label=\"setup process\">\n  <bp-stepper-item selected>Step 1</bp-stepper-item>\n  <bp-stepper-item>Step 2</bp-stepper-item>\n  <bp-stepper-item>Step 3</bp-stepper-item>\n</bp-stepper>"
+        },
+        {
+          "name": "with-links",
+          "description": "Stepper items as navigation links",
+          "html": "<bp-stepper aria-label=\"setup process\">\n  <bp-stepper-item selected><a href=\"#step1\">Setup</a></bp-stepper-item>\n  <bp-stepper-item><a href=\"#step2\">Account</a></bp-stepper-item>\n  <bp-stepper-item><a href=\"#step3\">Billing</a></bp-stepper-item>\n</bp-stepper>"
+        }
+      ]
+    },
+    {
+      "name": "menu",
+      "description": "Vertical list of actionable menu items.",
+      "tags": ["navigation", "action"],
+      "structure": {
+        "root": "bp-menu",
+        "children": [
+          {
+            "rule": "oneOrMore",
+            "element": "bp-menu-item",
+            "description": "Individual menu action"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "description": "Simple menu with selected and disabled states",
+          "html": "<bp-menu>\n  <bp-menu-item>Dashboard</bp-menu-item>\n  <bp-menu-item selected>Settings</bp-menu-item>\n  <bp-menu-item disabled>Admin</bp-menu-item>\n</bp-menu>"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-trigger",
+      "description": "A button that opens a dropdown panel using the HTML Popover API.",
+      "tags": ["overlay", "popover", "action"],
+      "structure": {
+        "siblings": [
+          {
+            "description": "Button triggers dropdown via popovertarget/id binding",
+            "trigger": {
+              "tag": "bp-button",
+              "attributes": [{ "name": "popovertarget", "required": true }]
+            },
+            "target": {
+              "tag": "bp-dropdown",
+              "attributes": [{ "name": "id", "required": true }]
+            },
+            "bindings": [
+              {
+                "triggerAttribute": "popovertarget",
+                "targetAttribute": "id"
+              }
+            ]
+          }
+        ]
+      },
+      "relatedPatterns": ["dialog-trigger"],
+      "examples": [
+        {
+          "name": "basic",
+          "description": "Button with dropdown panel containing a menu",
+          "html": "<bp-button popovertarget=\"my-dropdown\">Options</bp-button>\n<bp-dropdown id=\"my-dropdown\" position=\"bottom\">\n  <bp-menu>\n    <bp-menu-item>Edit</bp-menu-item>\n    <bp-menu-item>Delete</bp-menu-item>\n  </bp-menu>\n</bp-dropdown>"
+        }
+      ]
+    }
+  ]
+}

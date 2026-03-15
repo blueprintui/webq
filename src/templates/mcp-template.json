@@ -1,0 +1,5 @@
+{
+  "command": "webq",
+  "description": "Search and query for Web Components APIs via Custom Elements Manifest",
+  "args": ["mcp", "--path", "./node_modules"]
+}

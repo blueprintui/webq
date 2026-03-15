@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": ["Bash(bun run:*)", "Bash(find:*)", "Bash(grep:*)", "Bash(ls:*)", "Bash(xargs:*)"]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun install && bun run ci"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/quick-lint.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

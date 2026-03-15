@@ -1,0 +1,59 @@
+{
+  "name": "webq",
+  "version": "0.0.0",
+  "description": "CLI tool and MCP server for querying and validating Web Components against Custom Elements Manifest files.",
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "type": "module",
+  "bin": {
+    "webq": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "package.json"
+  ],
+  "scripts": {
+    "start": "bun src/index.ts",
+    "ci": "bun install && bun run format:fix && bun run lint && bun run test && bun run build",
+    "debug": "pnpm dlx @modelcontextprotocol/inspector bun src/index.ts mcp --path ./testdata",
+    "test": "bun test",
+    "format": "prettier . --check",
+    "format:fix": "prettier . --write",
+    "lint": "eslint .",
+    "build": "tsc && bun build --compile --minify src/index.ts --target=bun-darwin-arm64 --outfile dist/webq-macos-arm64 && bun build --compile --minify src/index.ts --target=bun-darwin-x64 --outfile dist/webq-macos-x64 && bun build --compile --minify src/index.ts --target=bun-linux-x64 --outfile dist/webq-linux-x64 && bun build --compile --minify src/index.ts --target=bun-linux-arm64 --outfile dist/webq-linux-arm64 && bun build --compile --minify src/index.ts --target=bun-windows-x64 --outfile dist/webq-windows-x64.exe",
+    "install:local": "bun run build && ./install.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coryrylan/webq.git"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "cem",
+    "mcp",
+    "cli",
+    "validation"
+  ],
+  "author": "Cory Rylan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coryrylan/webq/issues"
+  },
+  "homepage": "https://github.com/coryrylan/webq#readme",
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/yargs": "17.0.35",
+    "bun-types": "1.3.10",
+    "eslint": "10.0.3",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.57.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.27.1",
+    "yargs": "18.0.0",
+    "zod": "3.25.76"
+  }
+}

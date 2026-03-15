@@ -1,0 +1,155 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Custom Attributes Manifest",
+  "description": "A file format for describing custom HTML attributes that apply globally across elements in a web component design system. Complements custom-elements.json (per-element APIs) by describing system-level HTML attribute utilities.",
+  "type": "object",
+  "required": ["schemaVersion", "attributes"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Version of the custom attributes schema",
+      "const": "1.0.0"
+    },
+    "attributes": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/attribute" }
+    }
+  },
+  "definitions": {
+    "attribute": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The HTML attribute name as it appears in markup",
+          "examples": ["bp-layout", "bp-text", "data-theme"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human and agent-readable description of the attribute's purpose"
+        },
+        "syntax": {
+          "type": "string",
+          "enum": ["token-list", "enum", "boolean", "string"],
+          "description": "How the attribute value is structured. token-list: space-separated tokens from defined groups. enum: single value from a list. boolean: presence/absence. string: free-form.",
+          "default": "token-list"
+        },
+        "appliesTo": {
+          "oneOf": [
+            {
+              "type": "string",
+              "const": "*",
+              "description": "Applies to any HTML element"
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "List of tag names this attribute applies to"
+            }
+          ],
+          "description": "Which elements this attribute can be used on"
+        },
+        "tokenGroups": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/tokenGroup" },
+          "description": "Groups of related tokens. Only used when syntax is token-list."
+        },
+        "values": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Valid values. Only used when syntax is enum."
+        },
+        "examples": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/example" },
+          "description": "HTML examples demonstrating usage"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Categorical tags for discovery"
+        }
+      }
+    },
+
+    "tokenGroup": {
+      "type": "object",
+      "required": ["name", "values"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Group identifier",
+          "examples": ["type", "gap", "alignment", "columns"]
+        },
+        "description": {
+          "type": "string",
+          "description": "What this group of tokens controls"
+        },
+        "rule": {
+          "type": "string",
+          "enum": ["oneOf", "optional", "zeroOrMore"],
+          "description": "How tokens in this group compose. oneOf: exactly one from the group. optional: zero or one. zeroOrMore: any combination.",
+          "default": "optional"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether at least one token from this group must be present"
+        },
+        "requires": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Token values from other groups that must be present for this group to be valid. Enables conditional validity (e.g. column tokens require 'grid')."
+        },
+        "values": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/tokenValue" },
+          "description": "The valid tokens in this group. Each entry is either a plain string token or an object with a value and description."
+        }
+      }
+    },
+
+    "tokenValue": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A valid token value as it appears in the attribute"
+        },
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The token as it appears in the attribute value"
+            },
+            "description": {
+              "type": "string",
+              "description": "What this token does"
+            }
+          }
+        }
+      ]
+    },
+
+    "example": {
+      "type": "object",
+      "required": ["name", "html"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Identifier for this example"
+        },
+        "description": {
+          "type": "string",
+          "description": "When to use this combination"
+        },
+        "html": {
+          "type": "string",
+          "description": "Complete HTML snippet"
+        }
+      }
+    }
+  }
+}

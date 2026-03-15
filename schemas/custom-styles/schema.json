@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Custom Styles Manifest",
+  "description": "A file format for describing system-level CSS custom properties in a web component design system. Complements custom-elements.json (per-element CSS) by describing the global style foundation.",
+  "type": "object",
+  "required": ["schemaVersion"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Version of the custom styles schema",
+      "const": "1.0.0"
+    },
+    "cssCustomProperties": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/cssCustomProperty" },
+      "description": "Global CSS custom properties available for use on any element."
+    }
+  },
+  "definitions": {
+    "cssCustomProperty": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The CSS custom property name including -- prefix",
+          "examples": ["--bp-color-blue-0", "--bp-space-md", "--bp-text-size-300"]
+        },
+        "value": {
+          "type": "string",
+          "description": "Default resolved value. May reference other custom properties.",
+          "examples": ["oklch(0.62 0.2 265)", "24px", "var(--bp-space-md, 24px)"]
+        },
+        "description": {
+          "type": "string",
+          "description": "What this property is for"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "color",
+            "dimension",
+            "duration",
+            "number",
+            "font-family",
+            "font-weight",
+            "shadow",
+            "border",
+            "opacity",
+            "other"
+          ],
+          "description": "The kind of CSS value this property represents. Helps tooling provide appropriate UI."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Categorical tags for discovery and filtering",
+          "examples": [["color", "seed"], ["status", "accent"], ["space"], ["text", "size"]]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Custom Elements Patterns",
+  "description": "Defines compositional patterns for web component design systems. Describes how custom elements are used together — parent/child relationships, sibling trigger/target pairs, required children, and cross-element attribute bindings.",
+  "type": "object",
+  "required": ["schemaVersion", "patterns"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Version of the patterns schema",
+      "const": "1.0.0"
+    },
+    "patterns": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/pattern" }
+    }
+  },
+  "definitions": {
+    "pattern": {
+      "type": "object",
+      "required": ["name", "description", "structure"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique identifier for the pattern",
+          "examples": ["form-field", "dialog-trigger", "alert-group"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human and agent-readable description of when and why to use this pattern"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Categorical tags for discovery",
+          "examples": [
+            ["form", "input", "validation"],
+            ["overlay", "modal"]
+          ]
+        },
+        "structure": {
+          "$ref": "#/definitions/structure",
+          "description": "Structural rules for validation"
+        },
+        "examples": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/example" },
+          "description": "HTML examples demonstrating correct usage"
+        },
+        "relatedPatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Names of patterns commonly used alongside this one"
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "description": "Defines the valid compositional structure of a pattern",
+      "properties": {
+        "root": {
+          "$ref": "#/definitions/elementOrString",
+          "description": "The outermost element of the pattern"
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/childRule" },
+          "description": "Rules for child elements within the root"
+        },
+        "siblings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/siblingRule" },
+          "description": "Rules for sibling element relationships (e.g., trigger + target)"
+        }
+      }
+    },
+    "elementOrString": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Tag name shorthand when no attributes or slot constraints are needed"
+        },
+        {
+          "$ref": "#/definitions/elementRef"
+        }
+      ]
+    },
+    "elementRef": {
+      "type": "object",
+      "required": ["tag"],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "description": "Tag name. Custom elements contain a hyphen, native elements do not. Use * for any element.",
+          "examples": ["my-field", "my-dialog", "label", "form", "*"]
+        },
+        "attributes": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/attributeRule" },
+          "description": "Attribute requirements for this element"
+        },
+        "slot": {
+          "type": "string",
+          "description": "Required slot assignment on the parent element",
+          "examples": ["header", "footer", "prefix"]
+        }
+      }
+    },
+    "childRule": {
+      "type": "object",
+      "required": ["rule"],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "enum": ["required", "optional", "oneOf", "oneOrMore", "zeroOrMore"],
+          "description": "Cardinality and requirement rule for the child"
+        },
+        "element": {
+          "$ref": "#/definitions/elementOrString",
+          "description": "Single element. Used with required, optional, oneOrMore, zeroOrMore."
+        },
+        "options": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/elementOrString" },
+          "description": "Multiple element options. Used with oneOf — exactly one of these should be present."
+        },
+        "description": {
+          "type": "string",
+          "description": "Describes the role of this child within the pattern"
+        }
+      }
+    },
+    "siblingRule": {
+      "type": "object",
+      "required": ["trigger", "target"],
+      "description": "Defines a relationship between sibling elements, typically a trigger/target pair",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "trigger": {
+          "$ref": "#/definitions/elementRef"
+        },
+        "target": {
+          "$ref": "#/definitions/elementRef"
+        },
+        "bindings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/attributeBinding" },
+          "description": "Cross-element attribute relationships"
+        }
+      }
+    },
+    "attributeRule": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Attribute name",
+          "examples": ["popovertarget", "required", "modal"]
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this attribute must be present"
+        },
+        "value": {
+          "type": "string",
+          "description": "Expected literal value, if fixed",
+          "examples": ["--toggle"]
+        }
+      }
+    },
+    "attributeBinding": {
+      "type": "object",
+      "required": ["triggerAttribute", "targetAttribute"],
+      "description": "Declares that an attribute on the trigger must reference the same value as an attribute on the target",
+      "properties": {
+        "triggerAttribute": {
+          "type": "string",
+          "description": "Attribute on the trigger element",
+          "examples": ["popovertarget", "commandfor"]
+        },
+        "targetAttribute": {
+          "type": "string",
+          "description": "Attribute on the target element",
+          "examples": ["id"]
+        }
+      }
+    },
+    "example": {
+      "type": "object",
+      "required": ["name", "html"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Identifier for this example variant"
+        },
+        "description": {
+          "type": "string",
+          "description": "When to use this variant"
+        },
+        "html": {
+          "type": "string",
+          "description": "Complete HTML snippet demonstrating this pattern variant"
+        }
+      }
+    }
+  }
+}

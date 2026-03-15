@@ -1,0 +1,13 @@
+{
+  "name": "test-pkg",
+  "html": {
+    "customData": [
+      "./sample-html.json"
+    ]
+  },
+  "css": {
+    "customData": [
+      "./sample-css.json"
+    ]
+  }
+}

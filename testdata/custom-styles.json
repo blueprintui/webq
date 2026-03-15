@@ -1,0 +1,734 @@
+{
+  "schemaVersion": "1.0.0",
+  "cssCustomProperties": [
+    {
+      "name": "--bp-color-blue-0",
+      "value": "oklch(0.62 0.2 265)",
+      "type": "color",
+      "description": "Blue seed hue",
+      "tags": ["color", "seed"]
+    },
+    {
+      "name": "--bp-color-green-0",
+      "value": "oklch(0.72 0.19 155)",
+      "type": "color",
+      "description": "Green seed hue",
+      "tags": ["color", "seed"]
+    },
+    {
+      "name": "--bp-color-yellow-0",
+      "value": "oklch(0.89 0.17 95)",
+      "type": "color",
+      "description": "Yellow seed hue",
+      "tags": ["color", "seed"]
+    },
+    {
+      "name": "--bp-color-red-0",
+      "value": "oklch(0.64 0.24 25)",
+      "type": "color",
+      "description": "Red seed hue",
+      "tags": ["color", "seed"]
+    },
+    {
+      "name": "--bp-color-gray-0",
+      "value": "oklch(0.62 0.02 265)",
+      "type": "color",
+      "description": "Gray seed hue",
+      "tags": ["color", "seed"]
+    },
+    {
+      "name": "--bp-status-accent-background-100",
+      "type": "color",
+      "description": "Accent subtle background",
+      "tags": ["status", "accent"]
+    },
+    {
+      "name": "--bp-status-accent-background-200",
+      "type": "color",
+      "description": "Accent moderate background",
+      "tags": ["status", "accent"]
+    },
+    {
+      "name": "--bp-status-accent-background-300",
+      "type": "color",
+      "description": "Accent strong background",
+      "tags": ["status", "accent"]
+    },
+    {
+      "name": "--bp-status-accent-color-100",
+      "type": "color",
+      "description": "Accent foreground color",
+      "tags": ["status", "accent"]
+    },
+    {
+      "name": "--bp-status-success-background-100",
+      "type": "color",
+      "description": "Success subtle background",
+      "tags": ["status", "success"]
+    },
+    {
+      "name": "--bp-status-success-background-200",
+      "type": "color",
+      "description": "Success moderate background",
+      "tags": ["status", "success"]
+    },
+    {
+      "name": "--bp-status-success-background-300",
+      "type": "color",
+      "description": "Success strong background",
+      "tags": ["status", "success"]
+    },
+    {
+      "name": "--bp-status-success-color-100",
+      "type": "color",
+      "description": "Success foreground color",
+      "tags": ["status", "success"]
+    },
+    {
+      "name": "--bp-status-warning-background-100",
+      "type": "color",
+      "description": "Warning subtle background",
+      "tags": ["status", "warning"]
+    },
+    {
+      "name": "--bp-status-warning-background-200",
+      "type": "color",
+      "description": "Warning moderate background",
+      "tags": ["status", "warning"]
+    },
+    {
+      "name": "--bp-status-warning-background-300",
+      "type": "color",
+      "description": "Warning strong background",
+      "tags": ["status", "warning"]
+    },
+    {
+      "name": "--bp-status-warning-color-100",
+      "type": "color",
+      "description": "Warning foreground color",
+      "tags": ["status", "warning"]
+    },
+    {
+      "name": "--bp-status-danger-background-100",
+      "type": "color",
+      "description": "Danger subtle background",
+      "tags": ["status", "danger"]
+    },
+    {
+      "name": "--bp-status-danger-background-200",
+      "type": "color",
+      "description": "Danger moderate background",
+      "tags": ["status", "danger"]
+    },
+    {
+      "name": "--bp-status-danger-background-300",
+      "type": "color",
+      "description": "Danger strong background",
+      "tags": ["status", "danger"]
+    },
+    {
+      "name": "--bp-status-danger-color-100",
+      "type": "color",
+      "description": "Danger foreground color",
+      "tags": ["status", "danger"]
+    },
+    {
+      "name": "--bp-status-neutral-background-100",
+      "type": "color",
+      "description": "Neutral subtle background",
+      "tags": ["status", "neutral"]
+    },
+    {
+      "name": "--bp-status-neutral-background-200",
+      "type": "color",
+      "description": "Neutral moderate background",
+      "tags": ["status", "neutral"]
+    },
+    {
+      "name": "--bp-status-neutral-background-300",
+      "type": "color",
+      "description": "Neutral strong background",
+      "tags": ["status", "neutral"]
+    },
+    {
+      "name": "--bp-status-neutral-color-100",
+      "type": "color",
+      "description": "Neutral foreground color",
+      "tags": ["status", "neutral"]
+    },
+    {
+      "name": "--bp-status-disabled-background-100",
+      "type": "color",
+      "description": "Disabled subtle background",
+      "tags": ["status", "disabled"]
+    },
+    {
+      "name": "--bp-status-disabled-background-200",
+      "type": "color",
+      "description": "Disabled moderate background",
+      "tags": ["status", "disabled"]
+    },
+    {
+      "name": "--bp-status-disabled-background-300",
+      "type": "color",
+      "description": "Disabled strong background",
+      "tags": ["status", "disabled"]
+    },
+    {
+      "name": "--bp-status-disabled-color-100",
+      "type": "color",
+      "description": "Disabled foreground color",
+      "tags": ["status", "disabled"]
+    },
+    {
+      "name": "--bp-text-color-100",
+      "type": "color",
+      "description": "Lightest text color",
+      "tags": ["text", "color"]
+    },
+    {
+      "name": "--bp-text-color-200",
+      "type": "color",
+      "tags": ["text", "color"]
+    },
+    {
+      "name": "--bp-text-color-300",
+      "type": "color",
+      "tags": ["text", "color"]
+    },
+    {
+      "name": "--bp-text-color-400",
+      "type": "color",
+      "tags": ["text", "color"]
+    },
+    {
+      "name": "--bp-text-color-500",
+      "type": "color",
+      "description": "Primary text color",
+      "tags": ["text", "color"]
+    },
+    {
+      "name": "--bp-text-color-600",
+      "type": "color",
+      "description": "Darkest text color",
+      "tags": ["text", "color"]
+    },
+    {
+      "name": "--bp-text-size-100",
+      "value": "12px",
+      "type": "dimension",
+      "description": "Caption size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-size-200",
+      "value": "14px",
+      "type": "dimension",
+      "description": "Message size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-size-300",
+      "value": "16px",
+      "type": "dimension",
+      "description": "Content size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-size-400",
+      "value": "20px",
+      "type": "dimension",
+      "description": "Subsection size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-size-500",
+      "value": "24px",
+      "type": "dimension",
+      "description": "Section size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-size-600",
+      "value": "32px",
+      "type": "dimension",
+      "description": "Subheading size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-size-700",
+      "value": "36px",
+      "type": "dimension",
+      "description": "Heading size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-size-800",
+      "value": "48px",
+      "type": "dimension",
+      "description": "Banner size",
+      "tags": ["text", "size"]
+    },
+    {
+      "name": "--bp-text-weight-light",
+      "value": "300",
+      "type": "font-weight",
+      "tags": ["text", "weight"]
+    },
+    {
+      "name": "--bp-text-weight-regular",
+      "value": "400",
+      "type": "font-weight",
+      "tags": ["text", "weight"]
+    },
+    {
+      "name": "--bp-text-weight-bold",
+      "value": "600",
+      "type": "font-weight",
+      "tags": ["text", "weight"]
+    },
+    {
+      "name": "--bp-text-monospace-font",
+      "value": "'ui-monospace', Consolas, Menlo, Monaco, monospace",
+      "type": "font-family",
+      "tags": ["text", "font"]
+    },
+    {
+      "name": "--bp-layer-background-100",
+      "type": "color",
+      "description": "Base page background",
+      "tags": ["layer"]
+    },
+    {
+      "name": "--bp-layer-background-200",
+      "type": "color",
+      "description": "Card/surface background",
+      "tags": ["layer"]
+    },
+    {
+      "name": "--bp-layer-background-300",
+      "type": "color",
+      "description": "Elevated surface background",
+      "tags": ["layer"]
+    },
+    {
+      "name": "--bp-layer-background-400",
+      "type": "color",
+      "description": "Highest elevation background",
+      "tags": ["layer"]
+    },
+    {
+      "name": "--bp-layer-header-color",
+      "type": "color",
+      "description": "Header text color",
+      "tags": ["layer", "header"]
+    },
+    {
+      "name": "--bp-layer-header-background",
+      "type": "color",
+      "description": "Header background",
+      "tags": ["layer", "header"]
+    },
+    {
+      "name": "--bp-object-border-color-100",
+      "type": "color",
+      "description": "Subtle border",
+      "tags": ["object", "border"]
+    },
+    {
+      "name": "--bp-object-border-color-200",
+      "type": "color",
+      "description": "Default border",
+      "tags": ["object", "border"]
+    },
+    {
+      "name": "--bp-object-border-color-300",
+      "type": "color",
+      "description": "Strong border",
+      "tags": ["object", "border"]
+    },
+    {
+      "name": "--bp-object-border-color-400",
+      "type": "color",
+      "tags": ["object", "border"]
+    },
+    {
+      "name": "--bp-object-border-width-100",
+      "value": "1px",
+      "type": "dimension",
+      "description": "Default border width",
+      "tags": ["object", "border"]
+    },
+    {
+      "name": "--bp-object-border-width-200",
+      "value": "2px",
+      "type": "dimension",
+      "description": "Thick border width",
+      "tags": ["object", "border"]
+    },
+    {
+      "name": "--bp-object-border-radius-100",
+      "value": "4px",
+      "type": "dimension",
+      "description": "Default border radius",
+      "tags": ["object", "border-radius"]
+    },
+    {
+      "name": "--bp-object-border-radius-200",
+      "value": "8px",
+      "type": "dimension",
+      "tags": ["object", "border-radius"]
+    },
+    {
+      "name": "--bp-object-border-radius-300",
+      "value": "16px",
+      "type": "dimension",
+      "tags": ["object", "border-radius"]
+    },
+    {
+      "name": "--bp-object-shadow-100",
+      "type": "shadow",
+      "description": "Subtle shadow",
+      "tags": ["object", "shadow"]
+    },
+    {
+      "name": "--bp-object-shadow-200",
+      "type": "shadow",
+      "description": "Default shadow",
+      "tags": ["object", "shadow"]
+    },
+    {
+      "name": "--bp-object-shadow-300",
+      "type": "shadow",
+      "description": "Strong shadow",
+      "tags": ["object", "shadow"]
+    },
+    {
+      "name": "--bp-object-opacity-100",
+      "type": "opacity",
+      "tags": ["object", "opacity"]
+    },
+    {
+      "name": "--bp-object-opacity-200",
+      "type": "opacity",
+      "tags": ["object", "opacity"]
+    },
+    {
+      "name": "--bp-object-opacity-300",
+      "type": "opacity",
+      "tags": ["object", "opacity"]
+    },
+    {
+      "name": "--bp-object-opacity-400",
+      "type": "opacity",
+      "tags": ["object", "opacity"]
+    },
+    {
+      "name": "--bp-interaction-outline",
+      "type": "border",
+      "description": "Focus outline style",
+      "tags": ["interaction", "focus"]
+    },
+    {
+      "name": "--bp-interaction-outline-webkit",
+      "type": "border",
+      "description": "WebKit focus outline fallback",
+      "tags": ["interaction", "focus"]
+    },
+    {
+      "name": "--bp-interaction-outline-offset",
+      "value": "2px",
+      "type": "dimension",
+      "tags": ["interaction", "focus"]
+    },
+    {
+      "name": "--bp-interaction-touch-target",
+      "value": "36px",
+      "type": "dimension",
+      "description": "Minimum touch target size",
+      "tags": ["interaction"]
+    },
+    {
+      "name": "--bp-interaction-highlight-background",
+      "type": "color",
+      "description": "Selection highlight",
+      "tags": ["interaction"]
+    },
+    {
+      "name": "--bp-interaction-accent-background",
+      "type": "color",
+      "description": "Accent interactive background",
+      "tags": ["interaction", "accent"]
+    },
+    {
+      "name": "--bp-interaction-default-offset",
+      "value": "0%",
+      "type": "other",
+      "tags": ["interaction", "default"]
+    },
+    {
+      "name": "--bp-interaction-default-color",
+      "type": "color",
+      "tags": ["interaction", "default"]
+    },
+    {
+      "name": "--bp-interaction-hover-offset",
+      "value": "3.5%",
+      "type": "other",
+      "tags": ["interaction", "hover"]
+    },
+    {
+      "name": "--bp-interaction-hover-color",
+      "type": "color",
+      "tags": ["interaction", "hover"]
+    },
+    {
+      "name": "--bp-interaction-focused-offset",
+      "value": "0%",
+      "type": "other",
+      "tags": ["interaction", "focus"]
+    },
+    {
+      "name": "--bp-interaction-focused-color",
+      "type": "color",
+      "tags": ["interaction", "focus"]
+    },
+    {
+      "name": "--bp-interaction-active-offset",
+      "value": "7%",
+      "type": "other",
+      "tags": ["interaction", "active"]
+    },
+    {
+      "name": "--bp-interaction-active-color",
+      "type": "color",
+      "tags": ["interaction", "active"]
+    },
+    {
+      "name": "--bp-interaction-selected-offset",
+      "value": "3%",
+      "type": "other",
+      "tags": ["interaction", "selected"]
+    },
+    {
+      "name": "--bp-interaction-selected-color",
+      "type": "color",
+      "tags": ["interaction", "selected"]
+    },
+    {
+      "name": "--bp-interaction-disabled-offset",
+      "value": "10%",
+      "type": "other",
+      "tags": ["interaction", "disabled"]
+    },
+    {
+      "name": "--bp-interaction-disabled-color",
+      "type": "color",
+      "tags": ["interaction", "disabled"]
+    },
+    {
+      "name": "--bp-size-0",
+      "type": "dimension",
+      "description": "Size step 0",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-1",
+      "type": "dimension",
+      "description": "Size step 1",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-2",
+      "type": "dimension",
+      "description": "Size step 2",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-3",
+      "type": "dimension",
+      "description": "Size step 3",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-4",
+      "type": "dimension",
+      "description": "Size step 4",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-5",
+      "type": "dimension",
+      "description": "Size step 5",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-6",
+      "type": "dimension",
+      "description": "Size step 6",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-7",
+      "type": "dimension",
+      "description": "Size step 7",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-8",
+      "type": "dimension",
+      "description": "Size step 8",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-9",
+      "type": "dimension",
+      "description": "Size step 9",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-10",
+      "type": "dimension",
+      "description": "Size step 10",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-size-11",
+      "type": "dimension",
+      "description": "Size step 11",
+      "tags": ["size"]
+    },
+    {
+      "name": "--bp-space-xs",
+      "value": "8px",
+      "type": "dimension",
+      "description": "Extra small spacing",
+      "tags": ["space"]
+    },
+    {
+      "name": "--bp-space-sm",
+      "value": "16px",
+      "type": "dimension",
+      "description": "Small spacing",
+      "tags": ["space"]
+    },
+    {
+      "name": "--bp-space-md",
+      "value": "24px",
+      "type": "dimension",
+      "description": "Medium spacing",
+      "tags": ["space"]
+    },
+    {
+      "name": "--bp-space-lg",
+      "value": "48px",
+      "type": "dimension",
+      "description": "Large spacing",
+      "tags": ["space"]
+    },
+    {
+      "name": "--bp-space-xl",
+      "value": "64px",
+      "type": "dimension",
+      "description": "Extra large spacing",
+      "tags": ["space"]
+    },
+    {
+      "name": "--bp-width-xs",
+      "value": "320px",
+      "type": "dimension",
+      "description": "Extra small container width",
+      "tags": ["layout", "width"]
+    },
+    {
+      "name": "--bp-width-sm",
+      "value": "480px",
+      "type": "dimension",
+      "description": "Small container width",
+      "tags": ["layout", "width"]
+    },
+    {
+      "name": "--bp-width-md",
+      "value": "720px",
+      "type": "dimension",
+      "description": "Medium container width",
+      "tags": ["layout", "width"]
+    },
+    {
+      "name": "--bp-width-lg",
+      "value": "1024px",
+      "type": "dimension",
+      "description": "Large container width",
+      "tags": ["layout", "width"]
+    },
+    {
+      "name": "--bp-width-xl",
+      "value": "1168px",
+      "type": "dimension",
+      "description": "Extra large container width",
+      "tags": ["layout", "width"]
+    },
+    {
+      "name": "--bp-grid-cols",
+      "value": "12",
+      "type": "number",
+      "description": "Default grid column count",
+      "tags": ["layout", "grid"]
+    },
+    {
+      "name": "--bp-scale-text",
+      "value": "1",
+      "type": "number",
+      "description": "Global text scale multiplier",
+      "tags": ["scale"]
+    },
+    {
+      "name": "--bp-scale-space",
+      "value": "1",
+      "type": "number",
+      "description": "Global spacing scale multiplier",
+      "tags": ["scale"]
+    },
+    {
+      "name": "--bp-animation-easing",
+      "value": "ease-in-out",
+      "type": "other",
+      "description": "Default easing function",
+      "tags": ["animation"]
+    },
+    {
+      "name": "--bp-animation-duration-100",
+      "value": "0.1s",
+      "type": "duration",
+      "description": "Fast animation",
+      "tags": ["animation"]
+    },
+    {
+      "name": "--bp-animation-duration-200",
+      "value": "0.2s",
+      "type": "duration",
+      "description": "Default animation",
+      "tags": ["animation"]
+    },
+    {
+      "name": "--bp-animation-duration-300",
+      "value": "0.3s",
+      "type": "duration",
+      "description": "Slow animation",
+      "tags": ["animation"]
+    },
+    {
+      "name": "--bp-scrollbar-color",
+      "type": "color",
+      "description": "Scrollbar thumb color",
+      "tags": ["scrollbar"]
+    },
+    {
+      "name": "--bp-scrollbar-width",
+      "value": "thin",
+      "type": "other",
+      "description": "Scrollbar width",
+      "tags": ["scrollbar"]
+    }
+  ]
+}

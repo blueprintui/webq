@@ -1,0 +1,1785 @@
+{
+  "schemaVersion": "1.0.0",
+  "attributes": [
+    {
+      "name": "bp-layout",
+      "description": "Declarative layout utility. Applies block, inline, or grid layouts with gap, alignment, responsive column/row controls, and margin spacing to any element.",
+      "syntax": "token-list",
+      "appliesTo": "*",
+      "tags": ["layout", "grid", "flexbox", "responsive", "spacing"],
+      "tokenGroups": [
+        {
+          "name": "type",
+          "description": "The layout mode. Exactly one is required per element.",
+          "rule": "oneOf",
+          "required": true,
+          "values": [
+            {
+              "value": "block",
+              "description": "Vertical stack layout (CSS flexbox column)"
+            },
+            {
+              "value": "inline",
+              "description": "Horizontal flow layout (CSS flexbox row)"
+            },
+            {
+              "value": "grid",
+              "description": "CSS Grid with 12-column system and container queries"
+            }
+          ]
+        },
+        {
+          "name": "gap",
+          "description": "Space between child items. Uses t-shirt sizing mapped to design tokens.",
+          "rule": "optional",
+          "values": [
+            {
+              "value": "gap:none",
+              "description": "Gap none"
+            },
+            {
+              "value": "gap:xs",
+              "description": "Gap xs"
+            },
+            {
+              "value": "gap:sm",
+              "description": "Gap sm"
+            },
+            {
+              "value": "gap:md",
+              "description": "Gap md"
+            },
+            {
+              "value": "gap:lg",
+              "description": "Gap lg"
+            },
+            {
+              "value": "gap:xl",
+              "description": "Gap xl"
+            },
+            "gap:none@xs",
+            "gap:xs@xs",
+            "gap:sm@xs",
+            "gap:md@xs",
+            "gap:lg@xs",
+            "gap:xl@xs",
+            "gap:none@sm",
+            "gap:xs@sm",
+            "gap:sm@sm",
+            "gap:md@sm",
+            "gap:lg@sm",
+            "gap:xl@sm",
+            "gap:none@md",
+            "gap:xs@md",
+            "gap:sm@md",
+            "gap:md@md",
+            "gap:lg@md",
+            "gap:xl@md",
+            "gap:none@lg",
+            "gap:xs@lg",
+            "gap:sm@lg",
+            "gap:md@lg",
+            "gap:lg@lg",
+            "gap:xl@lg",
+            "gap:none@xl",
+            "gap:xs@xl",
+            "gap:sm@xl",
+            "gap:md@xl",
+            "gap:lg@xl",
+            "gap:xl@xl"
+          ]
+        },
+        {
+          "name": "alignment",
+          "description": "Container-level alignment of children along block (vertical) and inline (horizontal) axes.",
+          "rule": "zeroOrMore",
+          "values": [
+            {
+              "value": "center",
+              "description": "Center children on both axes"
+            },
+            {
+              "value": "stretch",
+              "description": "Stretch children on both axes"
+            },
+            {
+              "value": "block:start",
+              "description": "Align children to block start (top)"
+            },
+            {
+              "value": "block:end",
+              "description": "Align children to block end (bottom)"
+            },
+            {
+              "value": "block:center",
+              "description": "Center children along block axis"
+            },
+            {
+              "value": "block:stretch",
+              "description": "Stretch children along block axis"
+            },
+            {
+              "value": "inline:start",
+              "description": "Align children to inline start (left in LTR)"
+            },
+            {
+              "value": "inline:end",
+              "description": "Align children to inline end (right in LTR)"
+            },
+            {
+              "value": "inline:center",
+              "description": "Center children along inline axis"
+            },
+            {
+              "value": "inline:stretch",
+              "description": "Stretch children along inline axis"
+            },
+            "center@xs",
+            "stretch@xs",
+            "block:start@xs",
+            "block:end@xs",
+            "block:center@xs",
+            "block:stretch@xs",
+            "inline:start@xs",
+            "inline:end@xs",
+            "inline:center@xs",
+            "inline:stretch@xs",
+            "center@sm",
+            "stretch@sm",
+            "block:start@sm",
+            "block:end@sm",
+            "block:center@sm",
+            "block:stretch@sm",
+            "inline:start@sm",
+            "inline:end@sm",
+            "inline:center@sm",
+            "inline:stretch@sm",
+            "center@md",
+            "stretch@md",
+            "block:start@md",
+            "block:end@md",
+            "block:center@md",
+            "block:stretch@md",
+            "inline:start@md",
+            "inline:end@md",
+            "inline:center@md",
+            "inline:stretch@md",
+            "center@lg",
+            "stretch@lg",
+            "block:start@lg",
+            "block:end@lg",
+            "block:center@lg",
+            "block:stretch@lg",
+            "inline:start@lg",
+            "inline:end@lg",
+            "inline:center@lg",
+            "inline:stretch@lg",
+            "center@xl",
+            "stretch@xl",
+            "block:start@xl",
+            "block:end@xl",
+            "block:center@xl",
+            "block:stretch@xl",
+            "inline:start@xl",
+            "inline:end@xl",
+            "inline:center@xl",
+            "inline:stretch@xl"
+          ]
+        },
+        {
+          "name": "columns-implicit",
+          "description": "Uniform column span applied to all grid children. Only valid with grid layout type.",
+          "rule": "zeroOrMore",
+          "requires": ["grid"],
+          "values": [
+            {
+              "value": "cols:1",
+              "description": "All children span 1 of 12 columns"
+            },
+            {
+              "value": "cols:2",
+              "description": "All children span 2 of 12 columns"
+            },
+            {
+              "value": "cols:3",
+              "description": "All children span 3 of 12 columns"
+            },
+            {
+              "value": "cols:4",
+              "description": "All children span 4 of 12 columns"
+            },
+            {
+              "value": "cols:5",
+              "description": "All children span 5 of 12 columns"
+            },
+            {
+              "value": "cols:6",
+              "description": "All children span 6 of 12 columns"
+            },
+            {
+              "value": "cols:7",
+              "description": "All children span 7 of 12 columns"
+            },
+            {
+              "value": "cols:8",
+              "description": "All children span 8 of 12 columns"
+            },
+            {
+              "value": "cols:9",
+              "description": "All children span 9 of 12 columns"
+            },
+            {
+              "value": "cols:10",
+              "description": "All children span 10 of 12 columns"
+            },
+            {
+              "value": "cols:11",
+              "description": "All children span 11 of 12 columns"
+            },
+            {
+              "value": "cols:12",
+              "description": "All children span 12 of 12 columns"
+            },
+            {
+              "value": "cols:auto",
+              "description": "Auto-flow columns, evenly distributed"
+            },
+            "cols:1@xs",
+            "cols:2@xs",
+            "cols:3@xs",
+            "cols:4@xs",
+            "cols:5@xs",
+            "cols:6@xs",
+            "cols:7@xs",
+            "cols:8@xs",
+            "cols:9@xs",
+            "cols:10@xs",
+            "cols:11@xs",
+            "cols:12@xs",
+            "cols:auto@xs",
+            "cols:1@sm",
+            "cols:2@sm",
+            "cols:3@sm",
+            "cols:4@sm",
+            "cols:5@sm",
+            "cols:6@sm",
+            "cols:7@sm",
+            "cols:8@sm",
+            "cols:9@sm",
+            "cols:10@sm",
+            "cols:11@sm",
+            "cols:12@sm",
+            "cols:auto@sm",
+            "cols:1@md",
+            "cols:2@md",
+            "cols:3@md",
+            "cols:4@md",
+            "cols:5@md",
+            "cols:6@md",
+            "cols:7@md",
+            "cols:8@md",
+            "cols:9@md",
+            "cols:10@md",
+            "cols:11@md",
+            "cols:12@md",
+            "cols:auto@md",
+            "cols:1@lg",
+            "cols:2@lg",
+            "cols:3@lg",
+            "cols:4@lg",
+            "cols:5@lg",
+            "cols:6@lg",
+            "cols:7@lg",
+            "cols:8@lg",
+            "cols:9@lg",
+            "cols:10@lg",
+            "cols:11@lg",
+            "cols:12@lg",
+            "cols:auto@lg",
+            "cols:1@xl",
+            "cols:2@xl",
+            "cols:3@xl",
+            "cols:4@xl",
+            "cols:5@xl",
+            "cols:6@xl",
+            "cols:7@xl",
+            "cols:8@xl",
+            "cols:9@xl",
+            "cols:10@xl",
+            "cols:11@xl",
+            "cols:12@xl",
+            "cols:auto@xl"
+          ]
+        },
+        {
+          "name": "columns-explicit",
+          "description": "Explicit column span on an individual child element. Only valid on children of a grid.",
+          "rule": "zeroOrMore",
+          "requires": ["grid"],
+          "values": [
+            {
+              "value": "col:1",
+              "description": "Span 1 of 12 columns"
+            },
+            {
+              "value": "col:2",
+              "description": "Span 2 of 12 columns"
+            },
+            {
+              "value": "col:3",
+              "description": "Span 3 of 12 columns"
+            },
+            {
+              "value": "col:4",
+              "description": "Span 4 of 12 columns"
+            },
+            {
+              "value": "col:5",
+              "description": "Span 5 of 12 columns"
+            },
+            {
+              "value": "col:6",
+              "description": "Span 6 of 12 columns"
+            },
+            {
+              "value": "col:7",
+              "description": "Span 7 of 12 columns"
+            },
+            {
+              "value": "col:8",
+              "description": "Span 8 of 12 columns"
+            },
+            {
+              "value": "col:9",
+              "description": "Span 9 of 12 columns"
+            },
+            {
+              "value": "col:10",
+              "description": "Span 10 of 12 columns"
+            },
+            {
+              "value": "col:11",
+              "description": "Span 11 of 12 columns"
+            },
+            {
+              "value": "col:12",
+              "description": "Span 12 of 12 columns"
+            },
+            "col:1@xs",
+            "col:2@xs",
+            "col:3@xs",
+            "col:4@xs",
+            "col:5@xs",
+            "col:6@xs",
+            "col:7@xs",
+            "col:8@xs",
+            "col:9@xs",
+            "col:10@xs",
+            "col:11@xs",
+            "col:12@xs",
+            "col:1@sm",
+            "col:2@sm",
+            "col:3@sm",
+            "col:4@sm",
+            "col:5@sm",
+            "col:6@sm",
+            "col:7@sm",
+            "col:8@sm",
+            "col:9@sm",
+            "col:10@sm",
+            "col:11@sm",
+            "col:12@sm",
+            "col:1@md",
+            "col:2@md",
+            "col:3@md",
+            "col:4@md",
+            "col:5@md",
+            "col:6@md",
+            "col:7@md",
+            "col:8@md",
+            "col:9@md",
+            "col:10@md",
+            "col:11@md",
+            "col:12@md",
+            "col:1@lg",
+            "col:2@lg",
+            "col:3@lg",
+            "col:4@lg",
+            "col:5@lg",
+            "col:6@lg",
+            "col:7@lg",
+            "col:8@lg",
+            "col:9@lg",
+            "col:10@lg",
+            "col:11@lg",
+            "col:12@lg",
+            "col:1@xl",
+            "col:2@xl",
+            "col:3@xl",
+            "col:4@xl",
+            "col:5@xl",
+            "col:6@xl",
+            "col:7@xl",
+            "col:8@xl",
+            "col:9@xl",
+            "col:10@xl",
+            "col:11@xl",
+            "col:12@xl"
+          ]
+        },
+        {
+          "name": "column-position",
+          "description": "Grid column start/end positions for explicit placement. Only valid on children of a grid.",
+          "rule": "zeroOrMore",
+          "requires": ["grid"],
+          "values": [
+            {
+              "value": "col:start-1",
+              "description": "Column starts at line 1"
+            },
+            {
+              "value": "col:start-2",
+              "description": "Column starts at line 2"
+            },
+            {
+              "value": "col:start-3",
+              "description": "Column starts at line 3"
+            },
+            {
+              "value": "col:start-4",
+              "description": "Column starts at line 4"
+            },
+            {
+              "value": "col:start-5",
+              "description": "Column starts at line 5"
+            },
+            {
+              "value": "col:start-6",
+              "description": "Column starts at line 6"
+            },
+            {
+              "value": "col:start-7",
+              "description": "Column starts at line 7"
+            },
+            {
+              "value": "col:start-8",
+              "description": "Column starts at line 8"
+            },
+            {
+              "value": "col:start-9",
+              "description": "Column starts at line 9"
+            },
+            {
+              "value": "col:start-10",
+              "description": "Column starts at line 10"
+            },
+            {
+              "value": "col:start-11",
+              "description": "Column starts at line 11"
+            },
+            {
+              "value": "col:start-12",
+              "description": "Column starts at line 12"
+            },
+            {
+              "value": "col:start-13",
+              "description": "Column starts at line 13"
+            },
+            {
+              "value": "col:end-1",
+              "description": "Column ends at line 1"
+            },
+            {
+              "value": "col:end-2",
+              "description": "Column ends at line 2"
+            },
+            {
+              "value": "col:end-3",
+              "description": "Column ends at line 3"
+            },
+            {
+              "value": "col:end-4",
+              "description": "Column ends at line 4"
+            },
+            {
+              "value": "col:end-5",
+              "description": "Column ends at line 5"
+            },
+            {
+              "value": "col:end-6",
+              "description": "Column ends at line 6"
+            },
+            {
+              "value": "col:end-7",
+              "description": "Column ends at line 7"
+            },
+            {
+              "value": "col:end-8",
+              "description": "Column ends at line 8"
+            },
+            {
+              "value": "col:end-9",
+              "description": "Column ends at line 9"
+            },
+            {
+              "value": "col:end-10",
+              "description": "Column ends at line 10"
+            },
+            {
+              "value": "col:end-11",
+              "description": "Column ends at line 11"
+            },
+            {
+              "value": "col:end-12",
+              "description": "Column ends at line 12"
+            },
+            {
+              "value": "col:end-13",
+              "description": "Column ends at line 13"
+            },
+            "col:start-1@xs",
+            "col:start-2@xs",
+            "col:start-3@xs",
+            "col:start-4@xs",
+            "col:start-5@xs",
+            "col:start-6@xs",
+            "col:start-7@xs",
+            "col:start-8@xs",
+            "col:start-9@xs",
+            "col:start-10@xs",
+            "col:start-11@xs",
+            "col:start-12@xs",
+            "col:start-13@xs",
+            "col:end-1@xs",
+            "col:end-2@xs",
+            "col:end-3@xs",
+            "col:end-4@xs",
+            "col:end-5@xs",
+            "col:end-6@xs",
+            "col:end-7@xs",
+            "col:end-8@xs",
+            "col:end-9@xs",
+            "col:end-10@xs",
+            "col:end-11@xs",
+            "col:end-12@xs",
+            "col:end-13@xs",
+            "col:start-1@sm",
+            "col:start-2@sm",
+            "col:start-3@sm",
+            "col:start-4@sm",
+            "col:start-5@sm",
+            "col:start-6@sm",
+            "col:start-7@sm",
+            "col:start-8@sm",
+            "col:start-9@sm",
+            "col:start-10@sm",
+            "col:start-11@sm",
+            "col:start-12@sm",
+            "col:start-13@sm",
+            "col:end-1@sm",
+            "col:end-2@sm",
+            "col:end-3@sm",
+            "col:end-4@sm",
+            "col:end-5@sm",
+            "col:end-6@sm",
+            "col:end-7@sm",
+            "col:end-8@sm",
+            "col:end-9@sm",
+            "col:end-10@sm",
+            "col:end-11@sm",
+            "col:end-12@sm",
+            "col:end-13@sm",
+            "col:start-1@md",
+            "col:start-2@md",
+            "col:start-3@md",
+            "col:start-4@md",
+            "col:start-5@md",
+            "col:start-6@md",
+            "col:start-7@md",
+            "col:start-8@md",
+            "col:start-9@md",
+            "col:start-10@md",
+            "col:start-11@md",
+            "col:start-12@md",
+            "col:start-13@md",
+            "col:end-1@md",
+            "col:end-2@md",
+            "col:end-3@md",
+            "col:end-4@md",
+            "col:end-5@md",
+            "col:end-6@md",
+            "col:end-7@md",
+            "col:end-8@md",
+            "col:end-9@md",
+            "col:end-10@md",
+            "col:end-11@md",
+            "col:end-12@md",
+            "col:end-13@md",
+            "col:start-1@lg",
+            "col:start-2@lg",
+            "col:start-3@lg",
+            "col:start-4@lg",
+            "col:start-5@lg",
+            "col:start-6@lg",
+            "col:start-7@lg",
+            "col:start-8@lg",
+            "col:start-9@lg",
+            "col:start-10@lg",
+            "col:start-11@lg",
+            "col:start-12@lg",
+            "col:start-13@lg",
+            "col:end-1@lg",
+            "col:end-2@lg",
+            "col:end-3@lg",
+            "col:end-4@lg",
+            "col:end-5@lg",
+            "col:end-6@lg",
+            "col:end-7@lg",
+            "col:end-8@lg",
+            "col:end-9@lg",
+            "col:end-10@lg",
+            "col:end-11@lg",
+            "col:end-12@lg",
+            "col:end-13@lg",
+            "col:start-1@xl",
+            "col:start-2@xl",
+            "col:start-3@xl",
+            "col:start-4@xl",
+            "col:start-5@xl",
+            "col:start-6@xl",
+            "col:start-7@xl",
+            "col:start-8@xl",
+            "col:start-9@xl",
+            "col:start-10@xl",
+            "col:start-11@xl",
+            "col:start-12@xl",
+            "col:start-13@xl",
+            "col:end-1@xl",
+            "col:end-2@xl",
+            "col:end-3@xl",
+            "col:end-4@xl",
+            "col:end-5@xl",
+            "col:end-6@xl",
+            "col:end-7@xl",
+            "col:end-8@xl",
+            "col:end-9@xl",
+            "col:end-10@xl",
+            "col:end-11@xl",
+            "col:end-12@xl",
+            "col:end-13@xl"
+          ]
+        },
+        {
+          "name": "rows-implicit",
+          "description": "Uniform row span applied to all grid children. Only valid with grid layout type.",
+          "rule": "zeroOrMore",
+          "requires": ["grid"],
+          "values": [
+            {
+              "value": "rows:1",
+              "description": "All children span 1 rows"
+            },
+            {
+              "value": "rows:2",
+              "description": "All children span 2 rows"
+            },
+            {
+              "value": "rows:3",
+              "description": "All children span 3 rows"
+            },
+            {
+              "value": "rows:4",
+              "description": "All children span 4 rows"
+            },
+            {
+              "value": "rows:5",
+              "description": "All children span 5 rows"
+            },
+            {
+              "value": "rows:6",
+              "description": "All children span 6 rows"
+            },
+            {
+              "value": "rows:7",
+              "description": "All children span 7 rows"
+            },
+            {
+              "value": "rows:8",
+              "description": "All children span 8 rows"
+            },
+            {
+              "value": "rows:9",
+              "description": "All children span 9 rows"
+            },
+            {
+              "value": "rows:10",
+              "description": "All children span 10 rows"
+            },
+            {
+              "value": "rows:11",
+              "description": "All children span 11 rows"
+            },
+            {
+              "value": "rows:12",
+              "description": "All children span 12 rows"
+            },
+            "rows:1@xs",
+            "rows:2@xs",
+            "rows:3@xs",
+            "rows:4@xs",
+            "rows:5@xs",
+            "rows:6@xs",
+            "rows:7@xs",
+            "rows:8@xs",
+            "rows:9@xs",
+            "rows:10@xs",
+            "rows:11@xs",
+            "rows:12@xs",
+            "rows:1@sm",
+            "rows:2@sm",
+            "rows:3@sm",
+            "rows:4@sm",
+            "rows:5@sm",
+            "rows:6@sm",
+            "rows:7@sm",
+            "rows:8@sm",
+            "rows:9@sm",
+            "rows:10@sm",
+            "rows:11@sm",
+            "rows:12@sm",
+            "rows:1@md",
+            "rows:2@md",
+            "rows:3@md",
+            "rows:4@md",
+            "rows:5@md",
+            "rows:6@md",
+            "rows:7@md",
+            "rows:8@md",
+            "rows:9@md",
+            "rows:10@md",
+            "rows:11@md",
+            "rows:12@md",
+            "rows:1@lg",
+            "rows:2@lg",
+            "rows:3@lg",
+            "rows:4@lg",
+            "rows:5@lg",
+            "rows:6@lg",
+            "rows:7@lg",
+            "rows:8@lg",
+            "rows:9@lg",
+            "rows:10@lg",
+            "rows:11@lg",
+            "rows:12@lg",
+            "rows:1@xl",
+            "rows:2@xl",
+            "rows:3@xl",
+            "rows:4@xl",
+            "rows:5@xl",
+            "rows:6@xl",
+            "rows:7@xl",
+            "rows:8@xl",
+            "rows:9@xl",
+            "rows:10@xl",
+            "rows:11@xl",
+            "rows:12@xl"
+          ]
+        },
+        {
+          "name": "rows-explicit",
+          "description": "Explicit row span on an individual child element. Only valid on children of a grid.",
+          "rule": "zeroOrMore",
+          "requires": ["grid"],
+          "values": [
+            {
+              "value": "row:1",
+              "description": "Span 1 rows"
+            },
+            {
+              "value": "row:2",
+              "description": "Span 2 rows"
+            },
+            {
+              "value": "row:3",
+              "description": "Span 3 rows"
+            },
+            {
+              "value": "row:4",
+              "description": "Span 4 rows"
+            },
+            {
+              "value": "row:5",
+              "description": "Span 5 rows"
+            },
+            {
+              "value": "row:6",
+              "description": "Span 6 rows"
+            },
+            {
+              "value": "row:7",
+              "description": "Span 7 rows"
+            },
+            {
+              "value": "row:8",
+              "description": "Span 8 rows"
+            },
+            {
+              "value": "row:9",
+              "description": "Span 9 rows"
+            },
+            {
+              "value": "row:10",
+              "description": "Span 10 rows"
+            },
+            {
+              "value": "row:11",
+              "description": "Span 11 rows"
+            },
+            {
+              "value": "row:12",
+              "description": "Span 12 rows"
+            },
+            "row:1@xs",
+            "row:2@xs",
+            "row:3@xs",
+            "row:4@xs",
+            "row:5@xs",
+            "row:6@xs",
+            "row:7@xs",
+            "row:8@xs",
+            "row:9@xs",
+            "row:10@xs",
+            "row:11@xs",
+            "row:12@xs",
+            "row:1@sm",
+            "row:2@sm",
+            "row:3@sm",
+            "row:4@sm",
+            "row:5@sm",
+            "row:6@sm",
+            "row:7@sm",
+            "row:8@sm",
+            "row:9@sm",
+            "row:10@sm",
+            "row:11@sm",
+            "row:12@sm",
+            "row:1@md",
+            "row:2@md",
+            "row:3@md",
+            "row:4@md",
+            "row:5@md",
+            "row:6@md",
+            "row:7@md",
+            "row:8@md",
+            "row:9@md",
+            "row:10@md",
+            "row:11@md",
+            "row:12@md",
+            "row:1@lg",
+            "row:2@lg",
+            "row:3@lg",
+            "row:4@lg",
+            "row:5@lg",
+            "row:6@lg",
+            "row:7@lg",
+            "row:8@lg",
+            "row:9@lg",
+            "row:10@lg",
+            "row:11@lg",
+            "row:12@lg",
+            "row:1@xl",
+            "row:2@xl",
+            "row:3@xl",
+            "row:4@xl",
+            "row:5@xl",
+            "row:6@xl",
+            "row:7@xl",
+            "row:8@xl",
+            "row:9@xl",
+            "row:10@xl",
+            "row:11@xl",
+            "row:12@xl"
+          ]
+        },
+        {
+          "name": "row-position",
+          "description": "Grid row start/end positions for explicit placement. Only valid on children of a grid.",
+          "rule": "zeroOrMore",
+          "requires": ["grid"],
+          "values": [
+            {
+              "value": "row:start-1",
+              "description": "Row starts at line 1"
+            },
+            {
+              "value": "row:start-2",
+              "description": "Row starts at line 2"
+            },
+            {
+              "value": "row:start-3",
+              "description": "Row starts at line 3"
+            },
+            {
+              "value": "row:start-4",
+              "description": "Row starts at line 4"
+            },
+            {
+              "value": "row:start-5",
+              "description": "Row starts at line 5"
+            },
+            {
+              "value": "row:start-6",
+              "description": "Row starts at line 6"
+            },
+            {
+              "value": "row:start-7",
+              "description": "Row starts at line 7"
+            },
+            {
+              "value": "row:start-8",
+              "description": "Row starts at line 8"
+            },
+            {
+              "value": "row:start-9",
+              "description": "Row starts at line 9"
+            },
+            {
+              "value": "row:start-10",
+              "description": "Row starts at line 10"
+            },
+            {
+              "value": "row:start-11",
+              "description": "Row starts at line 11"
+            },
+            {
+              "value": "row:start-12",
+              "description": "Row starts at line 12"
+            },
+            {
+              "value": "row:start-13",
+              "description": "Row starts at line 13"
+            },
+            {
+              "value": "row:end-1",
+              "description": "Row ends at line 1"
+            },
+            {
+              "value": "row:end-2",
+              "description": "Row ends at line 2"
+            },
+            {
+              "value": "row:end-3",
+              "description": "Row ends at line 3"
+            },
+            {
+              "value": "row:end-4",
+              "description": "Row ends at line 4"
+            },
+            {
+              "value": "row:end-5",
+              "description": "Row ends at line 5"
+            },
+            {
+              "value": "row:end-6",
+              "description": "Row ends at line 6"
+            },
+            {
+              "value": "row:end-7",
+              "description": "Row ends at line 7"
+            },
+            {
+              "value": "row:end-8",
+              "description": "Row ends at line 8"
+            },
+            {
+              "value": "row:end-9",
+              "description": "Row ends at line 9"
+            },
+            {
+              "value": "row:end-10",
+              "description": "Row ends at line 10"
+            },
+            {
+              "value": "row:end-11",
+              "description": "Row ends at line 11"
+            },
+            {
+              "value": "row:end-12",
+              "description": "Row ends at line 12"
+            },
+            {
+              "value": "row:end-13",
+              "description": "Row ends at line 13"
+            },
+            "row:start-1@xs",
+            "row:start-2@xs",
+            "row:start-3@xs",
+            "row:start-4@xs",
+            "row:start-5@xs",
+            "row:start-6@xs",
+            "row:start-7@xs",
+            "row:start-8@xs",
+            "row:start-9@xs",
+            "row:start-10@xs",
+            "row:start-11@xs",
+            "row:start-12@xs",
+            "row:start-13@xs",
+            "row:end-1@xs",
+            "row:end-2@xs",
+            "row:end-3@xs",
+            "row:end-4@xs",
+            "row:end-5@xs",
+            "row:end-6@xs",
+            "row:end-7@xs",
+            "row:end-8@xs",
+            "row:end-9@xs",
+            "row:end-10@xs",
+            "row:end-11@xs",
+            "row:end-12@xs",
+            "row:end-13@xs",
+            "row:start-1@sm",
+            "row:start-2@sm",
+            "row:start-3@sm",
+            "row:start-4@sm",
+            "row:start-5@sm",
+            "row:start-6@sm",
+            "row:start-7@sm",
+            "row:start-8@sm",
+            "row:start-9@sm",
+            "row:start-10@sm",
+            "row:start-11@sm",
+            "row:start-12@sm",
+            "row:start-13@sm",
+            "row:end-1@sm",
+            "row:end-2@sm",
+            "row:end-3@sm",
+            "row:end-4@sm",
+            "row:end-5@sm",
+            "row:end-6@sm",
+            "row:end-7@sm",
+            "row:end-8@sm",
+            "row:end-9@sm",
+            "row:end-10@sm",
+            "row:end-11@sm",
+            "row:end-12@sm",
+            "row:end-13@sm",
+            "row:start-1@md",
+            "row:start-2@md",
+            "row:start-3@md",
+            "row:start-4@md",
+            "row:start-5@md",
+            "row:start-6@md",
+            "row:start-7@md",
+            "row:start-8@md",
+            "row:start-9@md",
+            "row:start-10@md",
+            "row:start-11@md",
+            "row:start-12@md",
+            "row:start-13@md",
+            "row:end-1@md",
+            "row:end-2@md",
+            "row:end-3@md",
+            "row:end-4@md",
+            "row:end-5@md",
+            "row:end-6@md",
+            "row:end-7@md",
+            "row:end-8@md",
+            "row:end-9@md",
+            "row:end-10@md",
+            "row:end-11@md",
+            "row:end-12@md",
+            "row:end-13@md",
+            "row:start-1@lg",
+            "row:start-2@lg",
+            "row:start-3@lg",
+            "row:start-4@lg",
+            "row:start-5@lg",
+            "row:start-6@lg",
+            "row:start-7@lg",
+            "row:start-8@lg",
+            "row:start-9@lg",
+            "row:start-10@lg",
+            "row:start-11@lg",
+            "row:start-12@lg",
+            "row:start-13@lg",
+            "row:end-1@lg",
+            "row:end-2@lg",
+            "row:end-3@lg",
+            "row:end-4@lg",
+            "row:end-5@lg",
+            "row:end-6@lg",
+            "row:end-7@lg",
+            "row:end-8@lg",
+            "row:end-9@lg",
+            "row:end-10@lg",
+            "row:end-11@lg",
+            "row:end-12@lg",
+            "row:end-13@lg",
+            "row:start-1@xl",
+            "row:start-2@xl",
+            "row:start-3@xl",
+            "row:start-4@xl",
+            "row:start-5@xl",
+            "row:start-6@xl",
+            "row:start-7@xl",
+            "row:start-8@xl",
+            "row:start-9@xl",
+            "row:start-10@xl",
+            "row:start-11@xl",
+            "row:start-12@xl",
+            "row:start-13@xl",
+            "row:end-1@xl",
+            "row:end-2@xl",
+            "row:end-3@xl",
+            "row:end-4@xl",
+            "row:end-5@xl",
+            "row:end-6@xl",
+            "row:end-7@xl",
+            "row:end-8@xl",
+            "row:end-9@xl",
+            "row:end-10@xl",
+            "row:end-11@xl",
+            "row:end-12@xl",
+            "row:end-13@xl"
+          ]
+        },
+        {
+          "name": "margin",
+          "description": "Margin spacing utilities using t-shirt sizing.",
+          "rule": "zeroOrMore",
+          "values": [
+            {
+              "value": "m:none",
+              "description": "Margin all sides none"
+            },
+            {
+              "value": "m:xs",
+              "description": "Margin all sides xs"
+            },
+            {
+              "value": "m:sm",
+              "description": "Margin all sides sm"
+            },
+            {
+              "value": "m:md",
+              "description": "Margin all sides md"
+            },
+            {
+              "value": "m:lg",
+              "description": "Margin all sides lg"
+            },
+            {
+              "value": "m:xl",
+              "description": "Margin all sides xl"
+            },
+            {
+              "value": "m-x:none",
+              "description": "Margin inline (horizontal) none"
+            },
+            {
+              "value": "m-x:xs",
+              "description": "Margin inline (horizontal) xs"
+            },
+            {
+              "value": "m-x:sm",
+              "description": "Margin inline (horizontal) sm"
+            },
+            {
+              "value": "m-x:md",
+              "description": "Margin inline (horizontal) md"
+            },
+            {
+              "value": "m-x:lg",
+              "description": "Margin inline (horizontal) lg"
+            },
+            {
+              "value": "m-x:xl",
+              "description": "Margin inline (horizontal) xl"
+            },
+            {
+              "value": "m-y:none",
+              "description": "Margin block (vertical) none"
+            },
+            {
+              "value": "m-y:xs",
+              "description": "Margin block (vertical) xs"
+            },
+            {
+              "value": "m-y:sm",
+              "description": "Margin block (vertical) sm"
+            },
+            {
+              "value": "m-y:md",
+              "description": "Margin block (vertical) md"
+            },
+            {
+              "value": "m-y:lg",
+              "description": "Margin block (vertical) lg"
+            },
+            {
+              "value": "m-y:xl",
+              "description": "Margin block (vertical) xl"
+            },
+            {
+              "value": "m-t:none",
+              "description": "Margin top none"
+            },
+            {
+              "value": "m-t:xs",
+              "description": "Margin top xs"
+            },
+            {
+              "value": "m-t:sm",
+              "description": "Margin top sm"
+            },
+            {
+              "value": "m-t:md",
+              "description": "Margin top md"
+            },
+            {
+              "value": "m-t:lg",
+              "description": "Margin top lg"
+            },
+            {
+              "value": "m-t:xl",
+              "description": "Margin top xl"
+            },
+            {
+              "value": "m-r:none",
+              "description": "Margin right none"
+            },
+            {
+              "value": "m-r:xs",
+              "description": "Margin right xs"
+            },
+            {
+              "value": "m-r:sm",
+              "description": "Margin right sm"
+            },
+            {
+              "value": "m-r:md",
+              "description": "Margin right md"
+            },
+            {
+              "value": "m-r:lg",
+              "description": "Margin right lg"
+            },
+            {
+              "value": "m-r:xl",
+              "description": "Margin right xl"
+            },
+            {
+              "value": "m-b:none",
+              "description": "Margin bottom none"
+            },
+            {
+              "value": "m-b:xs",
+              "description": "Margin bottom xs"
+            },
+            {
+              "value": "m-b:sm",
+              "description": "Margin bottom sm"
+            },
+            {
+              "value": "m-b:md",
+              "description": "Margin bottom md"
+            },
+            {
+              "value": "m-b:lg",
+              "description": "Margin bottom lg"
+            },
+            {
+              "value": "m-b:xl",
+              "description": "Margin bottom xl"
+            },
+            {
+              "value": "m-l:none",
+              "description": "Margin left none"
+            },
+            {
+              "value": "m-l:xs",
+              "description": "Margin left xs"
+            },
+            {
+              "value": "m-l:sm",
+              "description": "Margin left sm"
+            },
+            {
+              "value": "m-l:md",
+              "description": "Margin left md"
+            },
+            {
+              "value": "m-l:lg",
+              "description": "Margin left lg"
+            },
+            {
+              "value": "m-l:xl",
+              "description": "Margin left xl"
+            },
+            "m:none@xs",
+            "m:none@sm",
+            "m:none@md",
+            "m:none@lg",
+            "m:none@xl",
+            "m:xs@xs",
+            "m:xs@sm",
+            "m:xs@md",
+            "m:xs@lg",
+            "m:xs@xl",
+            "m:sm@xs",
+            "m:sm@sm",
+            "m:sm@md",
+            "m:sm@lg",
+            "m:sm@xl",
+            "m:md@xs",
+            "m:md@sm",
+            "m:md@md",
+            "m:md@lg",
+            "m:md@xl",
+            "m:lg@xs",
+            "m:lg@sm",
+            "m:lg@md",
+            "m:lg@lg",
+            "m:lg@xl",
+            "m:xl@xs",
+            "m:xl@sm",
+            "m:xl@md",
+            "m:xl@lg",
+            "m:xl@xl",
+            "m-x:none@xs",
+            "m-x:none@sm",
+            "m-x:none@md",
+            "m-x:none@lg",
+            "m-x:none@xl",
+            "m-x:xs@xs",
+            "m-x:xs@sm",
+            "m-x:xs@md",
+            "m-x:xs@lg",
+            "m-x:xs@xl",
+            "m-x:sm@xs",
+            "m-x:sm@sm",
+            "m-x:sm@md",
+            "m-x:sm@lg",
+            "m-x:sm@xl",
+            "m-x:md@xs",
+            "m-x:md@sm",
+            "m-x:md@md",
+            "m-x:md@lg",
+            "m-x:md@xl",
+            "m-x:lg@xs",
+            "m-x:lg@sm",
+            "m-x:lg@md",
+            "m-x:lg@lg",
+            "m-x:lg@xl",
+            "m-x:xl@xs",
+            "m-x:xl@sm",
+            "m-x:xl@md",
+            "m-x:xl@lg",
+            "m-x:xl@xl",
+            "m-y:none@xs",
+            "m-y:none@sm",
+            "m-y:none@md",
+            "m-y:none@lg",
+            "m-y:none@xl",
+            "m-y:xs@xs",
+            "m-y:xs@sm",
+            "m-y:xs@md",
+            "m-y:xs@lg",
+            "m-y:xs@xl",
+            "m-y:sm@xs",
+            "m-y:sm@sm",
+            "m-y:sm@md",
+            "m-y:sm@lg",
+            "m-y:sm@xl",
+            "m-y:md@xs",
+            "m-y:md@sm",
+            "m-y:md@md",
+            "m-y:md@lg",
+            "m-y:md@xl",
+            "m-y:lg@xs",
+            "m-y:lg@sm",
+            "m-y:lg@md",
+            "m-y:lg@lg",
+            "m-y:lg@xl",
+            "m-y:xl@xs",
+            "m-y:xl@sm",
+            "m-y:xl@md",
+            "m-y:xl@lg",
+            "m-y:xl@xl",
+            "m-t:none@xs",
+            "m-t:none@sm",
+            "m-t:none@md",
+            "m-t:none@lg",
+            "m-t:none@xl",
+            "m-t:xs@xs",
+            "m-t:xs@sm",
+            "m-t:xs@md",
+            "m-t:xs@lg",
+            "m-t:xs@xl",
+            "m-t:sm@xs",
+            "m-t:sm@sm",
+            "m-t:sm@md",
+            "m-t:sm@lg",
+            "m-t:sm@xl",
+            "m-t:md@xs",
+            "m-t:md@sm",
+            "m-t:md@md",
+            "m-t:md@lg",
+            "m-t:md@xl",
+            "m-t:lg@xs",
+            "m-t:lg@sm",
+            "m-t:lg@md",
+            "m-t:lg@lg",
+            "m-t:lg@xl",
+            "m-t:xl@xs",
+            "m-t:xl@sm",
+            "m-t:xl@md",
+            "m-t:xl@lg",
+            "m-t:xl@xl",
+            "m-r:none@xs",
+            "m-r:none@sm",
+            "m-r:none@md",
+            "m-r:none@lg",
+            "m-r:none@xl",
+            "m-r:xs@xs",
+            "m-r:xs@sm",
+            "m-r:xs@md",
+            "m-r:xs@lg",
+            "m-r:xs@xl",
+            "m-r:sm@xs",
+            "m-r:sm@sm",
+            "m-r:sm@md",
+            "m-r:sm@lg",
+            "m-r:sm@xl",
+            "m-r:md@xs",
+            "m-r:md@sm",
+            "m-r:md@md",
+            "m-r:md@lg",
+            "m-r:md@xl",
+            "m-r:lg@xs",
+            "m-r:lg@sm",
+            "m-r:lg@md",
+            "m-r:lg@lg",
+            "m-r:lg@xl",
+            "m-r:xl@xs",
+            "m-r:xl@sm",
+            "m-r:xl@md",
+            "m-r:xl@lg",
+            "m-r:xl@xl",
+            "m-b:none@xs",
+            "m-b:none@sm",
+            "m-b:none@md",
+            "m-b:none@lg",
+            "m-b:none@xl",
+            "m-b:xs@xs",
+            "m-b:xs@sm",
+            "m-b:xs@md",
+            "m-b:xs@lg",
+            "m-b:xs@xl",
+            "m-b:sm@xs",
+            "m-b:sm@sm",
+            "m-b:sm@md",
+            "m-b:sm@lg",
+            "m-b:sm@xl",
+            "m-b:md@xs",
+            "m-b:md@sm",
+            "m-b:md@md",
+            "m-b:md@lg",
+            "m-b:md@xl",
+            "m-b:lg@xs",
+            "m-b:lg@sm",
+            "m-b:lg@md",
+            "m-b:lg@lg",
+            "m-b:lg@xl",
+            "m-b:xl@xs",
+            "m-b:xl@sm",
+            "m-b:xl@md",
+            "m-b:xl@lg",
+            "m-b:xl@xl",
+            "m-l:none@xs",
+            "m-l:none@sm",
+            "m-l:none@md",
+            "m-l:none@lg",
+            "m-l:none@xl",
+            "m-l:xs@xs",
+            "m-l:xs@sm",
+            "m-l:xs@md",
+            "m-l:xs@lg",
+            "m-l:xs@xl",
+            "m-l:sm@xs",
+            "m-l:sm@sm",
+            "m-l:sm@md",
+            "m-l:sm@lg",
+            "m-l:sm@xl",
+            "m-l:md@xs",
+            "m-l:md@sm",
+            "m-l:md@md",
+            "m-l:md@lg",
+            "m-l:md@xl",
+            "m-l:lg@xs",
+            "m-l:lg@sm",
+            "m-l:lg@md",
+            "m-l:lg@lg",
+            "m-l:lg@xl",
+            "m-l:xl@xs",
+            "m-l:xl@sm",
+            "m-l:xl@md",
+            "m-l:xl@lg",
+            "m-l:xl@xl"
+          ]
+        }
+      ],
+      "examples": [
+        {
+          "name": "block-layout",
+          "description": "Vertical stack with medium gap",
+          "html": "<div bp-layout=\"block gap:md\">\n  <div>1</div>\n  <div>2</div>\n  <div>3</div>\n</div>"
+        },
+        {
+          "name": "inline-centered",
+          "description": "Horizontal row with small gap, centered",
+          "html": "<div bp-layout=\"inline gap:sm center\">\n  <div>1</div>\n  <div>2</div>\n  <div>3</div>\n</div>"
+        },
+        {
+          "name": "responsive-grid",
+          "description": "12-column grid with responsive breakpoints using container queries",
+          "html": "<div bp-layout=\"grid gap:md cols:12 cols:6@sm cols:3@md\">\n  <div>1</div>\n  <div>2</div>\n  <div>3</div>\n  <div>4</div>\n</div>"
+        },
+        {
+          "name": "explicit-columns",
+          "description": "Grid with explicit column spans per child",
+          "html": "<div bp-layout=\"grid gap:sm\">\n  <div bp-layout=\"col:4\">sidebar</div>\n  <div bp-layout=\"col:8\">main</div>\n</div>"
+        },
+        {
+          "name": "responsive-explicit-columns",
+          "description": "Explicit columns with responsive breakpoints",
+          "html": "<div bp-layout=\"grid gap:md\">\n  <div bp-layout=\"col:4@sm\">sidebar</div>\n  <div bp-layout=\"col:8@sm\">main</div>\n</div>"
+        },
+        {
+          "name": "column-position",
+          "description": "Grid with explicit column start/end positions",
+          "html": "<div bp-layout=\"grid gap:md\">\n  <div bp-layout=\"col:start-3 col:8\">offset item</div>\n  <div bp-layout=\"col:start-1 col:end-5\">positioned item</div>\n  <div bp-layout=\"col:start-1 col:end-13\">full width</div>\n</div>"
+        },
+        {
+          "name": "nested-grid",
+          "description": "Grid containing a nested grid",
+          "html": "<div bp-layout=\"grid gap:md cols:6\">\n  <div bp-layout=\"grid gap:sm cols:4\">\n    <div>1a</div>\n    <div>1b</div>\n    <div>1c</div>\n  </div>\n  <div>2</div>\n</div>"
+        },
+        {
+          "name": "block-alignment",
+          "description": "Block layout centered vertically and horizontally",
+          "html": "<div bp-layout=\"block gap:md center\" style=\"min-height: 300px\">\n  <div>1</div>\n  <div>2</div>\n</div>"
+        },
+        {
+          "name": "inline-end-alignment",
+          "description": "Inline layout aligned to the end",
+          "html": "<div bp-layout=\"inline gap:sm inline:end\">\n  <div>1</div>\n  <div>2</div>\n</div>"
+        },
+        {
+          "name": "margin-spacing",
+          "description": "Layout with top margin spacing",
+          "html": "<h2 bp-text=\"heading\" bp-layout=\"m-t:md\">Section Title</h2>"
+        }
+      ]
+    },
+    {
+      "name": "bp-text",
+      "description": "Typography utility. Applies semantic text styles, alignment, transforms, and sizing to any element. Features automatic contrast adjustment and responsive fluid scaling.",
+      "syntax": "token-list",
+      "appliesTo": "*",
+      "tags": ["typography", "text", "font", "heading", "content"],
+      "tokenGroups": [
+        {
+          "name": "type",
+          "description": "Semantic text scale. Sets font-size, font-weight, and line-height. Headings use balanced text wrapping.",
+          "rule": "oneOf",
+          "required": true,
+          "values": [
+            {
+              "value": "banner",
+              "description": "Largest display text (48px). Light weight."
+            },
+            {
+              "value": "heading",
+              "description": "Page heading (36px). Light weight."
+            },
+            {
+              "value": "subheading",
+              "description": "Section heading (32px). Light weight."
+            },
+            {
+              "value": "section",
+              "description": "Subsection heading (24px). Light weight."
+            },
+            {
+              "value": "subsection",
+              "description": "Minor heading (20px). Light weight."
+            },
+            {
+              "value": "content",
+              "description": "Body text (16px). 1.4em line-height."
+            },
+            {
+              "value": "message",
+              "description": "Secondary text (14px). 1.4em line-height."
+            },
+            {
+              "value": "caption",
+              "description": "Small text (12px). 1.4em line-height."
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "description": "Text style modifiers that can be combined with any type.",
+          "rule": "zeroOrMore",
+          "values": [
+            {
+              "value": "bold",
+              "description": "Bold weight (600)"
+            },
+            {
+              "value": "italic",
+              "description": "Italic style"
+            },
+            {
+              "value": "code",
+              "description": "Inline monospace with subtle background. Inherits surrounding text flow."
+            },
+            {
+              "value": "code:block",
+              "description": "Block-level monospace with background, padding, border, and shadow. Use with <pre>."
+            },
+            {
+              "value": "link",
+              "description": "Link styling with underline. Inherits parent font-size and weight."
+            },
+            {
+              "value": "list",
+              "description": "Vertical list layout with consistent gap. Apply to <ul> or <ol>."
+            }
+          ]
+        },
+        {
+          "name": "alignment",
+          "description": "Text alignment within the element.",
+          "rule": "optional",
+          "values": [
+            {
+              "value": "start",
+              "description": "Align text to start (left in LTR)"
+            },
+            {
+              "value": "center",
+              "description": "Center text"
+            },
+            {
+              "value": "end",
+              "description": "Align text to end (right in LTR)"
+            }
+          ]
+        },
+        {
+          "name": "transform",
+          "description": "CSS text-transform applied to the element.",
+          "rule": "optional",
+          "values": [
+            {
+              "value": "capitalize",
+              "description": "Capitalize first letter of each word"
+            },
+            {
+              "value": "uppercase",
+              "description": "Transform all text to uppercase"
+            },
+            {
+              "value": "lowercase",
+              "description": "Transform all text to lowercase"
+            }
+          ]
+        },
+        {
+          "name": "size",
+          "description": "Responsive size scaling modifier. Overrides default fluid scaling behavior.",
+          "rule": "optional",
+          "values": [
+            {
+              "value": "size:sm",
+              "description": "Smaller scale factor (0.8x)"
+            },
+            {
+              "value": "size:lg",
+              "description": "Larger scale factor (1.2x)"
+            },
+            {
+              "value": "size:static",
+              "description": "Disable fluid/responsive scaling, use fixed size"
+            },
+            {
+              "value": "fill",
+              "description": "Scale text to fill container width (max scale 100)"
+            }
+          ]
+        },
+        {
+          "name": "contrast",
+          "description": "Override automatic contrast adjustment behavior.",
+          "rule": "optional",
+          "values": [
+            {
+              "value": "contrast:none",
+              "description": "Disable automatic contrast adjustment for colored backgrounds"
+            }
+          ]
+        }
+      ],
+      "examples": [
+        {
+          "name": "semantic-scale",
+          "description": "Full typography scale from banner to caption",
+          "html": "<div bp-layout=\"block gap:md\">\n  <p bp-text=\"banner\">Banner text</p>\n  <p bp-text=\"heading\">Heading text</p>\n  <p bp-text=\"subheading\">Subheading text</p>\n  <p bp-text=\"section\">Section text</p>\n  <p bp-text=\"subsection\">Subsection text</p>\n  <p bp-text=\"content\">Content text</p>\n  <p bp-text=\"message\">Message text</p>\n  <p bp-text=\"caption\">Caption text</p>\n</div>"
+        },
+        {
+          "name": "semantic-headings",
+          "description": "Typography scale applied to heading elements",
+          "html": "<div bp-layout=\"block gap:md\">\n  <h1 bp-text=\"heading\">Page Heading</h1>\n  <h2 bp-text=\"subheading\">Section Heading</h2>\n  <h3 bp-text=\"section\">Subsection Heading</h3>\n  <h4 bp-text=\"subsection\">Minor Heading</h4>\n</div>"
+        },
+        {
+          "name": "inline-code",
+          "description": "Inline code within content text",
+          "html": "<p bp-text=\"content\">Run <span bp-text=\"code\">npm install</span> to get started.</p>"
+        },
+        {
+          "name": "code-block",
+          "description": "Block-level code display",
+          "html": "<pre bp-text=\"code:block\"><code>npm install @blueprintui/components</code></pre>"
+        },
+        {
+          "name": "text-alignment",
+          "description": "Text alignment options",
+          "html": "<div bp-layout=\"block gap:md inline:stretch\">\n  <p bp-text=\"content start\">Left aligned</p>\n  <p bp-text=\"content center\">Center aligned</p>\n  <p bp-text=\"content end\">Right aligned</p>\n</div>"
+        },
+        {
+          "name": "styled-list",
+          "description": "Vertical list with consistent spacing",
+          "html": "<ul bp-text=\"list\">\n  <li>First item</li>\n  <li>Second item</li>\n  <li>Third item</li>\n</ul>"
+        },
+        {
+          "name": "size-variants",
+          "description": "Typography with size modifiers",
+          "html": "<div bp-layout=\"block gap:md\">\n  <p bp-text=\"heading size:sm\">Small heading</p>\n  <p bp-text=\"heading\">Default heading</p>\n  <p bp-text=\"heading size:lg\">Large heading</p>\n</div>"
+        },
+        {
+          "name": "auto-contrast",
+          "description": "Text on dark background with automatic contrast",
+          "html": "<div style=\"background: #2d2d2d; padding: 24px\">\n  <p bp-text=\"heading\">Auto-contrasted heading</p>\n  <p bp-text=\"content\">Auto-contrasted body text</p>\n</div>"
+        },
+        {
+          "name": "link-styles",
+          "description": "Links within various text contexts",
+          "html": "<div bp-layout=\"block gap:md\">\n  <a href=\"#\" bp-text=\"link\">Standalone link</a>\n  <p bp-text=\"content\">Text with an <a href=\"#\" bp-text=\"link\">inline link</a> inside.</p>\n</div>"
+        }
+      ]
+    }
+  ]
+}

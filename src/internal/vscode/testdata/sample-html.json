@@ -1,0 +1,26 @@
+{
+  "version": 1.1,
+  "tags": [
+    {
+      "name": "my-component",
+      "description": "A sample custom element",
+      "attributes": [
+        { "name": "variant", "valueSet": "variant-values" },
+        {
+          "name": "disabled",
+          "description": {
+            "kind": "markdown",
+            "value": "Disables the component"
+          }
+        }
+      ]
+    }
+  ],
+  "globalAttributes": [{ "name": "bp-theme", "values": [{ "name": "light" }, { "name": "dark" }] }],
+  "valueSets": [
+    {
+      "name": "variant-values",
+      "values": [{ "name": "primary" }, { "name": "secondary" }]
+    }
+  ]
+}

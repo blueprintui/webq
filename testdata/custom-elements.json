@@ -1,0 +1,588 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "BlueprintUI Design System Components",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/button/button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BpButton",
+          "tagName": "bp-button",
+          "description": "A customizable button component with various styles and states",
+          "customElement": true,
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "attributes": [
+            {
+              "name": "type",
+              "type": { "text": "'button' | 'submit' | 'reset'" },
+              "default": "'button'",
+              "description": "The type of button"
+            },
+            {
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the button is disabled"
+            },
+            {
+              "name": "variant",
+              "type": { "text": "'primary' | 'secondary' | 'danger'" },
+              "default": "'primary'",
+              "description": "The visual variant of the button"
+            },
+            {
+              "name": "size",
+              "type": { "text": "'sm' | 'md' | 'lg'" },
+              "default": "'md'",
+              "description": "The size of the button"
+            },
+            {
+              "name": "loading",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Shows a loading spinner when true"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "type",
+              "type": { "text": "string" },
+              "default": "'button'",
+              "privacy": "public"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "privacy": "public"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": { "text": "string" },
+              "default": "'primary'",
+              "privacy": "public"
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "description": "Sets focus on the button",
+              "privacy": "public",
+              "return": {
+                "type": { "text": "void" }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "click",
+              "description": "Programmatically clicks the button",
+              "privacy": "public",
+              "return": {
+                "type": { "text": "void" }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "bp-click",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the button is clicked"
+            },
+            {
+              "name": "bp-focus",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the button receives focus"
+            },
+            {
+              "name": "bp-blur",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the button loses focus"
+            }
+          ],
+          "commands": [],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot for button content"
+            },
+            {
+              "name": "prefix",
+              "description": "Slot for content before the main text"
+            },
+            {
+              "name": "suffix",
+              "description": "Slot for content after the main text"
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--bp-button-background",
+              "description": "Background color of the button",
+              "default": "var(--bp-color-primary)"
+            },
+            {
+              "name": "--bp-button-color",
+              "description": "Text color of the button",
+              "default": "var(--bp-color-white)"
+            },
+            {
+              "name": "--bp-button-border-radius",
+              "description": "Border radius of the button",
+              "default": "4px"
+            },
+            {
+              "name": "--bp-button-padding",
+              "description": "Padding inside the button",
+              "default": "8px 16px"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The base button element"
+            },
+            {
+              "name": "label",
+              "description": "The button label container"
+            },
+            {
+              "name": "spinner",
+              "description": "The loading spinner element"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BpButton",
+          "declaration": {
+            "name": "BpButton",
+            "module": "src/button/button.js"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "bp-button",
+          "declaration": {
+            "name": "BpButton",
+            "module": "src/button/button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input/input.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BpInput",
+          "tagName": "bp-input",
+          "description": "A text input component with validation and styling support",
+          "customElement": true,
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "attributes": [
+            {
+              "name": "type",
+              "type": {
+                "text": "'text' | 'email' | 'password' | 'number' | 'tel' | 'url'"
+              },
+              "default": "'text'",
+              "description": "The type of input"
+            },
+            {
+              "name": "value",
+              "type": { "text": "string" },
+              "default": "''",
+              "description": "The current value of the input"
+            },
+            {
+              "name": "placeholder",
+              "type": { "text": "string" },
+              "description": "Placeholder text shown when empty"
+            },
+            {
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the input is disabled"
+            },
+            {
+              "name": "readonly",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the input is read-only"
+            },
+            {
+              "name": "required",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the input is required"
+            },
+            {
+              "name": "error",
+              "type": { "text": "string" },
+              "description": "Error message to display"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "default": "''",
+              "privacy": "public"
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "description": "Sets focus on the input",
+              "privacy": "public",
+              "return": {
+                "type": { "text": "void" }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "description": "Selects all text in the input",
+              "privacy": "public",
+              "return": {
+                "type": { "text": "void" }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "validate",
+              "description": "Validates the input and returns validity state",
+              "privacy": "public",
+              "return": {
+                "type": { "text": "boolean" }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setCustomValidity",
+              "description": "Sets a custom validation message on the input",
+              "privacy": "public",
+              "parameters": [
+                {
+                  "name": "message",
+                  "type": { "text": "string" },
+                  "description": "The validation message to display"
+                }
+              ],
+              "return": {
+                "type": { "text": "void" }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "bp-input",
+              "type": { "text": "CustomEvent<{ value: string }>" },
+              "description": "Fired when the input value changes"
+            },
+            {
+              "name": "bp-change",
+              "type": { "text": "CustomEvent<{ value: string }>" },
+              "description": "Fired when the input value is committed"
+            },
+            {
+              "name": "bp-focus",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the input receives focus"
+            },
+            {
+              "name": "bp-blur",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the input loses focus"
+            }
+          ],
+          "commands": [],
+          "slots": [
+            {
+              "name": "prefix",
+              "description": "Content to show before the input"
+            },
+            {
+              "name": "suffix",
+              "description": "Content to show after the input"
+            },
+            {
+              "name": "help-text",
+              "description": "Help text shown below the input"
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--bp-input-background",
+              "description": "Background color of the input",
+              "default": "var(--bp-color-white)"
+            },
+            {
+              "name": "--bp-input-border-color",
+              "description": "Border color of the input",
+              "default": "var(--bp-color-gray-300)"
+            },
+            {
+              "name": "--bp-input-border-radius",
+              "description": "Border radius of the input",
+              "default": "4px"
+            },
+            {
+              "name": "--bp-input-error-color",
+              "description": "Color used for error states",
+              "default": "var(--bp-color-danger)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The base input container"
+            },
+            {
+              "name": "input",
+              "description": "The native input element"
+            },
+            {
+              "name": "error",
+              "description": "The error message element"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BpInput",
+          "declaration": {
+            "name": "BpInput",
+            "module": "src/input/input.js"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "bp-input",
+          "declaration": {
+            "name": "BpInput",
+            "module": "src/input/input.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/card/card.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BpCard",
+          "tagName": "bp-card",
+          "description": "A card component for grouping related content",
+          "customElement": true,
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "attributes": [
+            {
+              "name": "elevated",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the card has an elevated shadow"
+            },
+            {
+              "name": "interactive",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the card is interactive (clickable)"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "elevated",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "privacy": "public"
+            },
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "privacy": "public"
+            }
+          ],
+          "events": [
+            {
+              "name": "bp-click",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when an interactive card is clicked"
+            }
+          ],
+          "commands": [
+            {
+              "name": "--close",
+              "description": "close the element"
+            },
+            {
+              "name": "--dismiss",
+              "description": "dismiss the element",
+              "deprecated": "Use --close instead"
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot for card content"
+            },
+            {
+              "name": "header",
+              "description": "Slot for card header content"
+            },
+            {
+              "name": "footer",
+              "description": "Slot for card footer content"
+            },
+            {
+              "name": "media",
+              "description": "Slot for media content (images, videos)",
+              "deprecated": "Use default slot instead"
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--bp-card-background",
+              "description": "Background color of the card",
+              "default": "var(--bp-color-white)"
+            },
+            {
+              "name": "--bp-card-border-radius",
+              "description": "Border radius of the card",
+              "default": "8px"
+            },
+            {
+              "name": "--bp-card-padding",
+              "description": "Padding inside the card",
+              "default": "16px"
+            },
+            {
+              "name": "--bp-card-shadow",
+              "description": "Box shadow of the card",
+              "default": "0 1px 3px rgba(0,0,0,0.12)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The base card container"
+            },
+            {
+              "name": "header",
+              "description": "The card header section"
+            },
+            {
+              "name": "body",
+              "description": "The card body section"
+            },
+            {
+              "name": "footer",
+              "description": "The card footer section"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BpCard",
+          "declaration": {
+            "name": "BpCard",
+            "module": "src/card/card.js"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "bp-card",
+          "declaration": {
+            "name": "BpCard",
+            "module": "src/card/card.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/alert/alert.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BpAlert",
+          "tagName": "bp-alert",
+          "description": "An alert component for displaying messages",
+          "deprecated": "Use bp-card with status attribute instead",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "status",
+              "type": { "text": "'success' | 'warning' | 'danger'" },
+              "default": "'success'",
+              "description": "The status type of the alert"
+            },
+            {
+              "name": "closable",
+              "type": { "text": "boolean" },
+              "default": "false",
+              "description": "Whether the alert can be closed",
+              "deprecated": "Use dismissible instead"
+            }
+          ],
+          "events": [
+            {
+              "name": "bp-close",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when the alert is closed",
+              "deprecated": "Use bp-dismiss event instead"
+            }
+          ],
+          "commands": [],
+          "slots": [],
+          "cssProperties": [],
+          "cssParts": [],
+          "members": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BpAlert",
+          "declaration": {
+            "name": "BpAlert",
+            "module": "src/alert/alert.js"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "bp-alert",
+          "declaration": {
+            "name": "BpAlert",
+            "module": "src/alert/alert.js"
+          }
+        }
+      ]
+    }
+  ]
+}
