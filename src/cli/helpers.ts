@@ -1,6 +1,5 @@
 import { Store } from '../internal/elements/store.js';
 import { parseManifest, resolvePaths } from '../internal/elements/index.js';
-import { ErrElementNotFound } from '../internal/elements/errors.js';
 import { load as loadConfigFile } from '../internal/config/config.js';
 import { parseSeverity } from '../internal/config/config.js';
 import type { Config } from '../internal/config/config.js';
@@ -14,8 +13,9 @@ import { CustomStyleStore } from '../internal/styles/store.js';
 import { parseCustomStyles } from '../internal/styles/parser.js';
 import { resolve as resolveStyles } from '../internal/styles/resolver.js';
 import { load as loadVSCode } from '../internal/vscode/load.js';
+import { load as loadDTCG } from '../internal/dtcg/load.js';
 import type { VSCodeResult } from '../internal/vscode/load.js';
-import type { Manifest, Declaration } from '../internal/elements/types.js';
+import type { Manifest } from '../internal/elements/types.js';
 import type { ValidateConfig } from '../internal/validate/types.js';
 
 const errPathRequired = '--path flag, webq.config.json, or WEBQ_PATH environment variable is required';
@@ -28,7 +28,7 @@ export async function loadConfig(configFlag?: string): Promise<Config> {
 export function resolvedPath(cfg: Config, pathFlag?: string): string {
   if (pathFlag) return pathFlag;
   if (cfg.global.path.length > 0) return cfg.global.path.join(',');
-  return process.env.WEBQ_PATH ?? '';
+  return process.env.WEBQ_PATH ?? process.cwd();
 }
 
 export async function parseManifestsFromPath(path: string): Promise<Manifest[]> {
@@ -58,12 +58,6 @@ export async function createStoreFromConfig(cfg: Config, pathFlag?: string): Pro
 export async function createStore(pathFlag?: string, configFlag?: string): Promise<Store> {
   const cfg = await loadConfig(configFlag);
   return createStoreFromConfig(cfg, pathFlag);
-}
-
-export function getElementOrError(store: Store, tagName: string): Declaration {
-  const element = store.getElement(tagName);
-  if (!element) throw new ErrElementNotFound(tagName);
-  return element;
 }
 
 export function printJSON(data: unknown): void {
@@ -143,6 +137,17 @@ export async function loadCustomStylesStore(cfg: Config, pathFlag?: string): Pro
       csf.cssCustomProperties.push(...vscodeData.styles.cssCustomProperties);
     } else {
       csf = vscodeData.styles;
+    }
+  }
+
+  if (cfg.global.tokensPath) {
+    const dtcgResult = await loadDTCG(cfg.global.tokensPath);
+    if (dtcgResult) {
+      if (csf) {
+        csf.cssCustomProperties.push(...dtcgResult.cssCustomProperties);
+      } else {
+        csf = dtcgResult;
+      }
     }
   }
 

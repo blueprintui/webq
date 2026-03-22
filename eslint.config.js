@@ -20,7 +20,8 @@ const typescriptConfig = {
       process: 'readonly',
       console: 'readonly',
       NodeJS: 'readonly',
-      Headers: 'readonly'
+      Headers: 'readonly',
+      Bun: 'readonly'
     }
   },
   files,

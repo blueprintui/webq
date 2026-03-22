@@ -1,8 +1,9 @@
 import type { Store } from '../../elements/store.js';
 import type { CSSPart } from '../../elements/types.js';
-import { Severity, type Rule, type LintMessage, type HTMLDocument, type HTMLStyleTag } from '../types.js';
+import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../types.js';
 import { isCustomElement } from '../schema.js';
 import { formatSuggestion } from './suggestion.js';
+import { computeStylePosition } from './css-helpers.js';
 
 export class NoUnknownCSSPart implements Rule {
   id() {
@@ -51,15 +52,4 @@ function formatCSSPartNames(parts: CSSPart[]): string {
     'CSS parts',
     'Valid parts'
   );
-}
-
-export function computeStylePosition(style: HTMLStyleTag, offset: number): { line: number; col: number } {
-  const content = style.content.slice(0, offset);
-  const newlines = (content.match(/\n/g) || []).length;
-  const line = style.contentLine + newlines;
-  const lastNewline = content.lastIndexOf('\n');
-  if (lastNewline < 0) {
-    return { line, col: style.contentColumn + offset };
-  }
-  return { line, col: offset - lastNewline };
 }

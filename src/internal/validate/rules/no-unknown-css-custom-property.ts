@@ -3,8 +3,7 @@ import type { CSSProperty } from '../../elements/types.js';
 import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../types.js';
 import { isCustomElement } from '../schema.js';
 import { formatSuggestion } from './suggestion.js';
-import { computeStylePosition } from './no-unknown-css-part.js';
-import { cssRuleBlockRegex, cssCustomPropRegex, extractTagName } from './css-helpers.js';
+import { computeStylePosition, cssRuleBlockRegex, cssCustomPropRegex, extractTagName } from './css-helpers.js';
 
 export class NoUnknownCSSCustomProperty implements Rule {
   id() {

@@ -1,25 +1,22 @@
 {
-  "permissions": {
-    "allow": ["Bash(bun run:*)", "Bash(find:*)", "Bash(grep:*)", "Bash(ls:*)", "Bash(xargs:*)"]
-  },
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bun install && bun run ci"
+            "command": ".claude/hooks/session-start.sh"
           }
         ]
       }
     ],
-    "Stop": [
+    "TaskCompleted": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/quick-lint.sh",
+            "command": ".claude/hooks/task-completed.sh",
             "timeout": 30
           }
         ]

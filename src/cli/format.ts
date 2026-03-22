@@ -1,3 +1,6 @@
+import { marked, MarkedExtension } from 'marked';
+import { markedTerminal } from 'marked-terminal';
+
 import type {
   Attribute,
   Member,
@@ -18,19 +21,87 @@ import type { CustomAttribute } from '../internal/attributes/types.js';
 import type { CSSCustomPropertySummary } from '../internal/styles/store.js';
 import type { CSSCustomProperty } from '../internal/styles/types.js';
 
-function escapeTableCell(s: string): string {
-  return s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+export const colorize = {
+  error: (msg: string) => `${Bun.color('#e62f2f', 'ansi')}${msg}\x1b[0m`,
+  warning: (msg: string) => `${Bun.color('yellow', 'ansi')}${msg}\x1b[0m`,
+  success: (msg: string) => `${Bun.color('green', 'ansi')}${msg}\x1b[0m`,
+  info: (msg: string) => `${Bun.color('blue', 'ansi')}${msg}\x1b[0m`,
+  debug: (msg: string) => `${Bun.color('gray', 'ansi')}${msg}\x1b[0m`,
+  blue: (msg: string) => `${Bun.color('#008fff', 'ansi')}${msg}\x1b[0m`,
+  green: (msg: string) => `${Bun.color('#51da51', 'ansi')}${msg}\x1b[0m`,
+  pink: (msg: string) => `${Bun.color('#e796e7', 'ansi')}${msg}\x1b[0m`
+};
+
+export const ansi = {
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  dim: '\x1b[2m',
+  italic: '\x1b[3m',
+  underline: '\x1b[4m',
+  colors: {
+    blue: Bun.color('#1888df', 'ansi'),
+    green: Bun.color('#51da51', 'ansi'),
+    pink: Bun.color('#e796e7', 'ansi')
+  }
+};
+
+const mdRenderer = marked.use(
+  markedTerminal({
+    firstHeading: (msg: string) => colorize.green(msg),
+    heading: (msg: string) => colorize.green(msg),
+    codespan: (msg: string) => colorize.green(msg),
+    tableOptions: {
+      style: {
+        head: ['\x1b[0m']
+      }
+    }
+  }) as unknown as MarkedExtension<string, string>
+);
+
+export function printMarkdown(md: string): void {
+  process.stderr.write(mdRenderer.parse(md) as string);
+}
+
+/** Wraps plain text to a maximum column width; breaks at spaces, splits words longer than `maxWidth`. */
+export function wrapText(text: string, maxWidth: number): string {
+  if (maxWidth < 1) return text;
+  const words = text.trim().split(/\s+/);
+  if (words.length === 0 || (words.length === 1 && words[0] === '')) return '';
+  const lines: string[] = [];
+  let line = '';
+
+  for (const word of words) {
+    if (word.length > maxWidth) {
+      if (line) {
+        lines.push(line);
+        line = '';
+      }
+      for (let i = 0; i < word.length; i += maxWidth) {
+        lines.push(word.slice(i, i + maxWidth));
+      }
+      continue;
+    }
+    const next = line ? `${line} ${word}` : word;
+    if (next.length <= maxWidth) {
+      line = next;
+    } else {
+      if (line) lines.push(line);
+      line = word;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.join('\n');
 }
 
 function formatTypeText(t?: Type): string {
   if (!t) return '';
-  return '`' + escapeTableCell(t.text) + '`';
+  return '`' + t.text + '`';
 }
 
 export function formatElementSummaries(elements: ElementSummary[]): string {
   let sb = '# Custom Elements\n\n';
   for (const elem of elements) {
-    sb += `### \`<${elem.tagName}>\`\n\n`;
+    sb += `## \`<${elem.tagName}>\`\n\n`;
     if (elem.description) sb += elem.description + '\n\n';
   }
   return sb;
@@ -41,22 +112,34 @@ export function formatElement(elem: Declaration): string {
   if (elem.description) sb += elem.description + '\n\n';
 
   if (elem.attributes?.length) {
-    sb += '## Attributes\n\n| Name | Type | Default | Description |\n|------|------|---------|-------------|\n';
-    for (const attr of elem.attributes) {
-      sb += `| \`${attr.name}\` | ${formatTypeText(attr.type)} | ${escapeTableCell(attr.default ?? '')} | ${escapeTableCell(attr.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '## Attributes\n\n' +
+      renderFormattedMarkdownTable(
+        ['Name', 'Type', 'Default', 'Description'],
+        elem.attributes.map(attr => [
+          `\`${attr.name}\``,
+          `${formatTypeText(attr.type)}`,
+          attr.default ?? '',
+          attr.description ?? ''
+        ])
+      );
   }
 
   const fields = (elem.members ?? []).filter(m => m.kind === KindField);
   const methods = (elem.members ?? []).filter(m => m.kind === KindMethod);
 
   if (fields.length) {
-    sb += '## Properties\n\n| Name | Type | Default | Description |\n|------|------|---------|-------------|\n';
-    for (const prop of fields) {
-      sb += `| \`${prop.name}\` | ${formatTypeText(prop.type)} | ${escapeTableCell(prop.default ?? '')} | ${escapeTableCell(prop.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '## Properties\n\n' +
+      renderFormattedMarkdownTable(
+        ['Name', 'Type', 'Default', 'Description'],
+        fields.map(prop => [
+          `\`${prop.name}\``,
+          `${formatTypeText(prop.type)}`,
+          prop.default ?? '',
+          prop.description ?? ''
+        ])
+      );
   }
 
   if (methods.length) {
@@ -64,83 +147,99 @@ export function formatElement(elem: Declaration): string {
   }
 
   if (elem.events?.length) {
-    sb += '## Events\n\n| Name | Type | Description |\n|------|------|-------------|\n';
-    for (const event of elem.events) {
-      sb += `| \`${event.name}\` | ${formatTypeText(event.type)} | ${escapeTableCell(event.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '## Events\n\n' +
+      renderFormattedMarkdownTable(
+        ['Name', 'Type', 'Description'],
+        elem.events.map(event => [`\`${event.name}\``, `${formatTypeText(event.type)}`, event.description ?? ''])
+      );
   }
 
   if (elem.slots?.length) {
-    sb += '## Slots\n\n| Name | Description |\n|------|-------------|\n';
-    for (const slot of elem.slots) {
-      const name = slot.name === '' ? '*(default)*' : '`' + slot.name + '`';
-      sb += `| ${name} | ${escapeTableCell(slot.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '## Slots\n\n' +
+      renderFormattedMarkdownTable(
+        ['Name', 'Description'],
+        elem.slots.map(slot => [slot.name === '' ? '*(default)*' : '`' + slot.name + '`', slot.description ?? ''])
+      );
   }
 
   if (elem.cssProperties?.length) {
-    sb += '## CSS Custom Properties\n\n| Property | Default | Description |\n|----------|---------|-------------|\n';
-    for (const prop of elem.cssProperties) {
-      sb += `| \`${prop.name}\` | ${escapeTableCell(prop.default ?? '')} | ${escapeTableCell(prop.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '## CSS Custom Properties\n\n' +
+      renderFormattedMarkdownTable(
+        ['Property', 'Default', 'Description'],
+        elem.cssProperties.map(prop => [`\`${prop.name}\``, prop.default ?? '', prop.description ?? ''])
+      );
   }
 
   if (elem.commands?.length) {
-    sb += '## Commands\n\n| Name | Description |\n|------|-------------|\n';
-    for (const cmd of elem.commands) {
-      sb += `| \`${cmd.name}\` | ${escapeTableCell(cmd.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '## Commands\n\n' +
+      renderFormattedMarkdownTable(
+        ['Name', 'Description'],
+        elem.commands.map(cmd => [`\`${cmd.name}\``, cmd.description ?? ''])
+      );
   }
 
   if (elem.cssParts?.length) {
-    sb += '## CSS Parts\n\n| Part | Description |\n|------|-------------|\n';
-    for (const part of elem.cssParts) {
-      sb += `| \`${part.name}\` | ${escapeTableCell(part.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '## CSS Parts\n\n' +
+      renderFormattedMarkdownTable(
+        ['Part', 'Description'],
+        elem.cssParts.map(part => [`\`${part.name}\``, part.description ?? ''])
+      );
   }
 
+  return sb;
+}
+
+export function renderFormattedMarkdownTable(headers: string[], rows: string[][]): string {
+  let sb = '| ' + headers.join(' | ') + ' |\n';
+  sb += '| ' + headers.map(() => '---').join(' | ') + ' |\n';
+  for (const cells of rows) {
+    sb += '| ' + cells.map(cell => cell.replace(/\|/g, '\\|').replace(/\n/g, ' ')).join(' | ') + ' |\n';
+  }
   return sb;
 }
 
 export function formatAttributesValue(attrs: Attribute[], tagName: string): string {
   let sb = `# \`<${tagName}>\` Attributes\n\n`;
   if (!attrs.length) return sb + 'No attributes defined.\n';
-  sb += '| Name | Type | Default | Description |\n|------|------|---------|-------------|\n';
-  for (const attr of attrs) {
-    sb += `| \`${attr.name}\` | ${formatTypeText(attr.type)} | ${escapeTableCell(attr.default ?? '')} | ${escapeTableCell(attr.description ?? '')} |\n`;
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Name', 'Type', 'Default', 'Description'],
+    attrs.map(attr => [`\`${attr.name}\``, `${formatTypeText(attr.type)}`, attr.default ?? '', attr.description ?? ''])
+  );
   return sb;
 }
 
 export function formatMembersValue(members: Member[], tagName: string, title: string): string {
   let sb = `# \`<${tagName}>\` ${title}\n\n`;
   if (!members.length) return sb + `No ${title.toLowerCase()} defined.\n`;
-  sb += '| Name | Type | Default | Description |\n|------|------|---------|-------------|\n';
-  for (const m of members) {
-    sb += `| \`${m.name}\` | ${formatTypeText(m.type)} | ${escapeTableCell(m.default ?? '')} | ${escapeTableCell(m.description ?? '')} |\n`;
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Name', 'Type', 'Default', 'Description'],
+    members.map(m => [`\`${m.name}\``, `${formatTypeText(m.type)}`, m.default ?? '', m.description ?? ''])
+  );
   return sb;
 }
 
 function formatMethodsTable(methods: Member[]): string {
-  let sb = '| Name | Parameters | Return | Description |\n|------|------------|--------|-------------|\n';
-  for (const method of methods) {
-    const params = (method.parameters ?? []).map(p => {
-      let s = p.name;
-      if (p.type) s += ': ' + p.type.text;
-      return s;
-    });
-    const paramText = params.length > 0 ? escapeTableCell(params.join(', ')) : '';
-    const returnType = method.return?.type?.text ?? 'void';
-    sb += `| \`${method.name}\` | ${paramText} | \`${returnType}\` | ${escapeTableCell(method.description ?? '')} |\n`;
-  }
-  sb += '\n';
-  return sb;
+  return renderFormattedMarkdownTable(
+    ['Name', 'Parameters', 'Return', 'Description'],
+    methods.map(method => {
+      const params = (method.parameters ?? []).map(p => {
+        let s = p.name;
+        if (p.type) s += ': ' + p.type.text;
+        return s;
+      });
+      return [
+        `\`${method.name}\``,
+        params.length > 0 ? params.join(', ') : '',
+        `\`${method.return?.type?.text ?? 'void'}\``,
+        method.description ?? ''
+      ];
+    })
+  );
 }
 
 export function formatMethodsValue(methods: Member[], tagName: string): string {
@@ -153,58 +252,57 @@ export function formatMethodsValue(methods: Member[], tagName: string): string {
 export function formatEventsValue(events: Event[], tagName: string): string {
   let sb = `# \`<${tagName}>\` Events\n\n`;
   if (!events.length) return sb + 'No events defined.\n';
-  sb += '| Name | Type | Description |\n|------|------|-------------|\n';
-  for (const event of events) {
-    sb += `| \`${event.name}\` | ${formatTypeText(event.type)} | ${escapeTableCell(event.description ?? '')} |\n`;
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Name', 'Type', 'Description'],
+    events.map(event => [`\`${event.name}\``, `${formatTypeText(event.type)}`, event.description ?? ''])
+  );
   return sb;
 }
 
 export function formatSlotsValue(slots: Slot[], tagName: string): string {
   let sb = `# \`<${tagName}>\` Slots\n\n`;
   if (!slots.length) return sb + 'No slots defined.\n';
-  sb += '| Name | Description |\n|------|-------------|\n';
-  for (const slot of slots) {
-    const name = slot.name === '' ? '*(default)*' : '`' + slot.name + '`';
-    sb += `| ${name} | ${escapeTableCell(slot.description ?? '')} |\n`;
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Name', 'Description'],
+    slots.map(slot => [slot.name === '' ? '*(default)*' : '`' + slot.name + '`', slot.description ?? ''])
+  );
   return sb;
 }
 
 export function formatCSSPropertiesValue(props: CSSProperty[], tagName: string): string {
   let sb = `# \`<${tagName}>\` CSS Custom Properties\n\n`;
   if (!props.length) return sb + 'No CSS custom properties defined.\n';
-  sb += '| Property | Default | Description |\n|----------|---------|-------------|\n';
-  for (const prop of props) {
-    sb += `| \`${prop.name}\` | ${escapeTableCell(prop.default ?? '')} | ${escapeTableCell(prop.description ?? '')} |\n`;
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Property', 'Default', 'Description'],
+    props.map(prop => [`\`${prop.name}\``, prop.default ?? '', prop.description ?? ''])
+  );
   return sb;
 }
 
 export function formatCommandsValue(commands: Command[], tagName: string): string {
   let sb = `# \`<${tagName}>\` Commands\n\n`;
   if (!commands.length) return sb + 'No commands defined.\n';
-  sb += '| Name | Description |\n|------|-------------|\n';
-  for (const cmd of commands) {
-    sb += `| \`${cmd.name}\` | ${escapeTableCell(cmd.description ?? '')} |\n`;
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Name', 'Description'],
+    commands.map(cmd => [`\`${cmd.name}\``, cmd.description ?? ''])
+  );
   return sb;
 }
 
 export function formatCSSPartsValue(parts: CSSPart[], tagName: string): string {
   let sb = `# \`<${tagName}>\` CSS Parts\n\n`;
   if (!parts.length) return sb + 'No CSS parts defined.\n';
-  sb += '| Part | Description |\n|------|-------------|\n';
-  for (const part of parts) {
-    sb += `| \`${part.name}\` | ${escapeTableCell(part.description ?? '')} |\n`;
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Part', 'Description'],
+    parts.map(part => [`\`${part.name}\``, part.description ?? ''])
+  );
   return sb;
 }
 
 export function formatPatternSummaries(summaries: PatternSummary[]): string {
   let sb = '# Patterns\n\n';
   for (const s of summaries) {
-    sb += `### ${s.name}\n\n`;
+    sb += `## ${s.name}\n\n`;
     if (s.description) sb += s.description + '\n\n';
     if (s.tags?.length) sb += 'Tags: ' + s.tags.join(', ') + '\n\n';
   }
@@ -225,19 +323,22 @@ export function formatPattern(p: Pattern): string {
   }
 
   if (p.structure.children?.length) {
-    sb += '### Children\n\n| Rule | Element | Description |\n|------|---------|-------------|\n';
-    for (const child of p.structure.children) {
-      let elem = '';
-      if (child.element) {
-        elem = '`<' + child.element.tag + '>`';
-        if (child.element.slot) elem += ' (slot: ' + child.element.slot + ')';
-      }
-      if (child.options?.length) {
-        elem = child.options.map(o => o.tag).join(', ');
-      }
-      sb += `| ${child.rule} | ${escapeTableCell(elem)} | ${escapeTableCell(child.description ?? '')} |\n`;
-    }
-    sb += '\n';
+    sb +=
+      '### Children\n\n' +
+      renderFormattedMarkdownTable(
+        ['Rule', 'Element', 'Description'],
+        p.structure.children.map(child => {
+          let elem = '';
+          if (child.element) {
+            elem = '`<' + child.element.tag + '>`';
+            if (child.element.slot) elem += ' (slot: ' + child.element.slot + ')';
+          }
+          if (child.options?.length) {
+            elem = child.options.map(o => o.tag).join(', ');
+          }
+          return [child.rule, elem, child.description ?? ''];
+        })
+      );
   }
 
   if (p.structure.siblings?.length) {
@@ -279,7 +380,7 @@ export function formatPattern(p: Pattern): string {
 export function formatCustomAttributeSummaries(summaries: CustomAttributeSummary[]): string {
   let sb = '# Custom Attributes\n\n';
   for (const s of summaries) {
-    sb += `### \`${s.name}\`\n\n`;
+    sb += `## \`${s.name}\`\n\n`;
     if (s.description) sb += s.description + '\n\n';
     if (s.syntax) sb += 'Syntax: `' + s.syntax + '`\n\n';
     if (s.tags?.length) sb += 'Tags: ' + s.tags.join(', ') + '\n\n';
@@ -309,11 +410,10 @@ export function formatCustomAttribute(a: CustomAttribute): string {
       }
       if (tg.requires?.length) sb += '**Requires:** ' + tg.requires.join(', ') + '\n\n';
       if (tg.values?.length) {
-        sb += '| Value | Description |\n|-------|-------------|\n';
-        for (const v of tg.values) {
-          sb += `| \`${v.value}\` | ${escapeTableCell(v.description ?? '')} |\n`;
-        }
-        sb += '\n';
+        sb += renderFormattedMarkdownTable(
+          ['Value', 'Description'],
+          tg.values.map(v => [`\`${v.value}\``, v.description ?? ''])
+        );
       }
     }
   }
@@ -332,12 +432,10 @@ export function formatCustomAttribute(a: CustomAttribute): string {
 
 export function formatCSSCustomPropertySummaries(summaries: CSSCustomPropertySummary[]): string {
   let sb = '# CSS Custom Properties\n\n';
-  for (const s of summaries) {
-    sb += `### \`${s.name}\`\n\n`;
-    if (s.description) sb += s.description + '\n\n';
-    if (s.type) sb += 'Type: `' + s.type + '`\n\n';
-    if (s.tags?.length) sb += 'Tags: ' + s.tags.join(', ') + '\n\n';
-  }
+  sb += renderFormattedMarkdownTable(
+    ['Name', 'Type', 'Description', 'Tags'],
+    summaries.map(s => [`\`${s.name}\``, s.type ?? '', s.description ?? '', s.tags?.join(', ') ?? ''])
+  );
   return sb;
 }
 

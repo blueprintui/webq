@@ -2,8 +2,7 @@ import type { Store } from '../../elements/store.js';
 import type { CustomStyleStore } from '../../styles/store.js';
 import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../types.js';
 import { isCustomElement } from '../schema.js';
-import { computeStylePosition } from './no-unknown-css-part.js';
-import { cssRuleBlockRegex, cssVarRefRegex, extractTagName } from './css-helpers.js';
+import { computeStylePosition, cssRuleBlockRegex, cssVarRefRegex, extractTagName } from './css-helpers.js';
 
 export class NoUnknownStyleValue implements Rule {
   #customStyleStore?: CustomStyleStore;
@@ -27,25 +26,15 @@ export class NoUnknownStyleValue implements Rule {
 
     // Check <style> tags
     for (const style of doc.styleTags) {
-      cssRuleBlockRegex.lastIndex = 0;
-      let ruleMatch: RegExpExecArray | null;
-      while ((ruleMatch = cssRuleBlockRegex.exec(style.content)) !== null) {
+      for (const ruleMatch of style.content.matchAll(cssRuleBlockRegex)) {
         const selector = ruleMatch[1];
         const blockContent = ruleMatch[2];
         const blockStart = ruleMatch.index + ruleMatch[0].indexOf(blockContent);
 
         const tagName = extractTagName(selector);
-        let elemPropSet: Set<string> | undefined;
-        if (isCustomElement(tagName)) {
-          const decl = store.getElement(tagName);
-          if (decl) {
-            elemPropSet = new Set((decl.cssProperties ?? []).map(p => p.name));
-          }
-        }
+        const elemPropSet = buildCSSPropSet(store, tagName);
 
-        cssVarRefRegex.lastIndex = 0;
-        let varMatch: RegExpExecArray | null;
-        while ((varMatch = cssVarRefRegex.exec(blockContent)) !== null) {
+        for (const varMatch of blockContent.matchAll(cssVarRefRegex)) {
           const tokenName = varMatch[1];
 
           if (customStyleStore.getCSSCustomProperty(tokenName)) continue;
@@ -71,15 +60,9 @@ export class NoUnknownStyleValue implements Rule {
       for (const attr of elem.attributes) {
         if (attr.name !== 'style' || !attr.hasValue) continue;
 
-        let elemPropSet: Set<string> | undefined;
-        const decl = store.getElement(elem.tagName);
-        if (decl) {
-          elemPropSet = new Set((decl.cssProperties ?? []).map(p => p.name));
-        }
+        const elemPropSet = buildCSSPropSet(store, elem.tagName);
 
-        cssVarRefRegex.lastIndex = 0;
-        let varMatch: RegExpExecArray | null;
-        while ((varMatch = cssVarRefRegex.exec(attr.value)) !== null) {
+        for (const varMatch of attr.value.matchAll(cssVarRefRegex)) {
           const tokenName = varMatch[1];
 
           if (customStyleStore.getCSSCustomProperty(tokenName)) continue;
@@ -98,4 +81,11 @@ export class NoUnknownStyleValue implements Rule {
 
     return msgs;
   }
+}
+
+function buildCSSPropSet(store: Store, tagName: string): Set<string> | undefined {
+  if (!isCustomElement(tagName)) return undefined;
+  const decl = store.getElement(tagName);
+  if (!decl) return undefined;
+  return new Set((decl.cssProperties ?? []).map(p => p.name));
 }

@@ -1,13 +1,30 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { z } from 'zod';
 import type { Store } from '../elements/store.js';
 import type { ValidateConfig } from '../validate/types.js';
 import type { PatternStore } from '../patterns/store.js';
 import type { CustomAttributeStore } from '../attributes/store.js';
 import type { CustomStyleStore } from '../styles/store.js';
+import type { ToolContext, ToolModule } from '../tools.js';
 import '../validate/rules/index.js';
-import * as tools from './tools.js';
+
+import * as elementList from '../elements/tools/list.js';
+import * as elementGet from '../elements/tools/get.js';
+import * as elementAttributes from '../elements/tools/attributes.js';
+import * as elementProperties from '../elements/tools/properties.js';
+import * as elementMethods from '../elements/tools/methods.js';
+import * as elementEvents from '../elements/tools/events.js';
+import * as elementSlots from '../elements/tools/slots.js';
+import * as elementCommands from '../elements/tools/commands.js';
+import * as elementCSSProperties from '../elements/tools/css-properties.js';
+import * as elementCSSParts from '../elements/tools/css-parts.js';
+import * as patternList from '../patterns/tools/list.js';
+import * as patternGet from '../patterns/tools/get.js';
+import * as attributeList from '../attributes/tools/list.js';
+import * as attributeGet from '../attributes/tools/get.js';
+import * as stylePropertyList from '../styles/tools/list.js';
+import * as stylePropertyGet from '../styles/tools/get.js';
+import * as validateHTML from '../validate/tools/validate-html.js';
 
 export interface ServerConfig {
   store: Store;
@@ -18,26 +35,38 @@ export interface ServerConfig {
   customStyleStore?: CustomStyleStore;
 }
 
-const readOnlyAnnotations = {
-  readOnlyHint: true as const,
-  destructiveHint: false as const,
-  openWorldHint: false as const
-};
+const allTools: ToolModule[] = [
+  elementList,
+  elementGet,
+  elementAttributes,
+  elementProperties,
+  elementMethods,
+  elementEvents,
+  elementSlots,
+  elementCommands,
+  elementCSSProperties,
+  elementCSSParts,
+  patternList,
+  patternGet,
+  attributeList,
+  attributeGet,
+  stylePropertyList,
+  stylePropertyGet,
+  validateHTML
+];
 
 export class Server {
   #mcpServer: McpServer;
-  #store: Store;
-  #validateCfg?: ValidateConfig;
-  #patternStore?: PatternStore;
-  #customAttrStore?: CustomAttributeStore;
-  #customStyleStore?: CustomStyleStore;
+  #ctx: ToolContext;
 
   constructor(cfg: ServerConfig) {
-    this.#store = cfg.store;
-    this.#validateCfg = cfg.validateCfg;
-    this.#patternStore = cfg.patternStore;
-    this.#customAttrStore = cfg.customAttrStore;
-    this.#customStyleStore = cfg.customStyleStore;
+    this.#ctx = {
+      store: cfg.store,
+      patternStore: cfg.patternStore,
+      customAttrStore: cfg.customAttrStore,
+      customStyleStore: cfg.customStyleStore,
+      validateCfg: cfg.validateCfg
+    };
 
     this.#mcpServer = new McpServer({
       name: 'webq',
@@ -54,354 +83,29 @@ export class Server {
   }
 
   #registerTools(): void {
-    this.#mcpServer.registerTool(
-      'element_get_list',
-      {
-        description:
-          'List all custom elements with their tag names. Use this first to discover available components before querying specific elements.',
-        inputSchema: {},
-        annotations: readOnlyAnnotations
-      },
-      async () => {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(tools.handleListElements(this.#store), null, 2)
-            }
-          ]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get',
-      {
-        description:
-          'Get full details for a specific custom element including attributes, properties, methods, events, slots, commands, CSS properties, and CSS parts.',
-        inputSchema: {
-          tagName: z.string().describe("The tag name of the custom element (e.g. 'my-button')")
+    for (const tool of allTools) {
+      this.#mcpServer.registerTool(
+        tool.metadata.toolName,
+        {
+          description: tool.metadata.description,
+          inputSchema: tool.metadata.inputSchema,
+          annotations: tool.metadata.annotations
         },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetElement(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_attributes',
-      {
-        description: 'Get HTML attributes for a custom element.',
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetAttributes(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_properties',
-      {
-        description: 'Get JavaScript properties (fields) for a custom element.',
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetProperties(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_methods',
-      {
-        description: 'Get methods for a custom element.',
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetMethods(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_events',
-      {
-        description: 'Get events that a custom element can fire.',
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetEvents(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_slots',
-      {
-        description: "Get slots available in a custom element's shadow DOM.",
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetSlots(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_commands',
-      {
-        description: 'Get invoker commands for a custom element.',
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetCommands(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_css_properties',
-      {
-        description: 'Get CSS custom properties (CSS variables) for a custom element.',
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetCSSProperties(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'element_get_css_parts',
-      {
-        description: 'Get CSS parts exposed by a custom element for styling via ::part() selector.',
-        inputSchema: { tagName: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ tagName }) => {
-        const result = tools.handleGetCSSParts(this.#store, tagName);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'validate_html',
-      {
-        description:
-          'Validate an HTML string against the Custom Elements Manifest. Returns ESLint-compatible lint results.',
-        inputSchema: { html: z.string(), rule: z.string().optional() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ html, rule }) => {
-        const result = tools.handleValidateHTML(
-          html,
-          this.#store,
-          this.#validateCfg,
-          this.#patternStore,
-          this.#customStyleStore,
-          this.#customAttrStore,
-          rule
-        );
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'pattern_get_list',
-      {
-        description: 'List all compositional patterns.',
-        inputSchema: {},
-        annotations: readOnlyAnnotations
-      },
-      async () => {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(tools.handleListPatterns(this.#patternStore), null, 2)
-            }
-          ]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'pattern_get',
-      {
-        description: 'Get full details for a compositional pattern including structural rules and HTML examples.',
-        inputSchema: { name: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ name }) => {
-        const result = tools.handleGetPattern(this.#patternStore, name);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'attribute_get_list',
-      {
-        description: 'List all custom attributes.',
-        inputSchema: {},
-        annotations: readOnlyAnnotations
-      },
-      async () => {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(tools.handleListCustomAttributes(this.#customAttrStore), null, 2)
-            }
-          ]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'attribute_get',
-      {
-        description: 'Get full details for a custom attribute including token groups, values, and HTML examples.',
-        inputSchema: { name: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ name }) => {
-        const result = tools.handleGetCustomAttribute(this.#customAttrStore, name);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'style_property_list',
-      {
-        description: 'List all CSS custom properties defined in custom styles.',
-        inputSchema: {},
-        annotations: readOnlyAnnotations
-      },
-      async () => {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(tools.handleListCustomStyles(this.#customStyleStore), null, 2)
-            }
-          ]
-        };
-      }
-    );
-
-    this.#mcpServer.registerTool(
-      'style_property_get',
-      {
-        description: 'Get full details for a CSS custom property from custom styles.',
-        inputSchema: { name: z.string() },
-        annotations: readOnlyAnnotations
-      },
-      async ({ name }) => {
-        const result = tools.handleGetCustomStyle(this.#customStyleStore, name);
-        if (typeof result === 'string')
-          return {
-            content: [{ type: 'text' as const, text: result }],
-            isError: true
-          };
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
-        };
-      }
-    );
+        async (input: Record<string, unknown>) => {
+          try {
+            const result = tool.toJSON(this.#ctx, input);
+            return {
+              content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
+            };
+          } catch (e) {
+            return {
+              content: [{ type: 'text' as const, text: (e as Error).message }],
+              isError: true
+            };
+          }
+        }
+      );
+    }
   }
 
   #registerResources(): void {
@@ -417,7 +121,7 @@ export class Server {
           {
             uri: uri.href,
             mimeType: 'application/json',
-            text: JSON.stringify(this.#store.getManifests(), null, 2)
+            text: JSON.stringify(this.#ctx.store.getManifests(), null, 2)
           }
         ]
       })

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO="coryrylan/webq-cli"
-INSTALL_DIR="/usr/local/bin"
+INSTALL_DIR="/usr/.local/bin"
 BINARY_NAME="webq"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 

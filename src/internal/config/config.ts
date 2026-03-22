@@ -14,6 +14,7 @@ export interface GlobalConfig {
   patternsPath?: string;
   attributesPath?: string;
   stylesPath?: string;
+  tokensPath?: string;
 }
 
 export interface ValidateHTMLConfig {
@@ -80,6 +81,7 @@ function normalizeConfig(raw: unknown): Config {
     cfg.global.patternsPath = global.patternsPath as string | undefined;
     cfg.global.attributesPath = global.attributesPath as string | undefined;
     cfg.global.stylesPath = global.stylesPath as string | undefined;
+    cfg.global.tokensPath = global.tokensPath as string | undefined;
   }
 
   const validateHTML = obj['validate-html'] as Record<string, unknown> | undefined;
