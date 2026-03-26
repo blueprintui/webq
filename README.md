@@ -14,10 +14,14 @@ Tools for querying and validating Web Components against [Custom Elements Manife
 
 ### CLI
 
-Download a pre-built binary from the [releases page](https://github.com/blueprintui/webq/releases), or install via npm:
+```bash
+curl -fsSL https://raw.githubusercontent.com/blueprintui/webq/main/projects/cli/install.sh | bash
+```
+
+Or install via Bun:
 
 ```bash
-npm install -g @webq/cli
+bun add -g @webq/cli
 ```
 
 ```bash

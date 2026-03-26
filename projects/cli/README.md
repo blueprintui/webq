@@ -4,10 +4,16 @@ A CLI tool for querying and validating Custom Elements Manifest (CEM) JSON files
 
 ## Installation
 
-Requires [Bun](https://bun.sh) 1.0+.
+### Install Script (macOS/Linux)
 
 ```bash
-bun install
+curl -fsSL https://raw.githubusercontent.com/blueprintui/webq/main/projects/cli/install.sh | bash
+```
+
+### Bun
+
+```bash
+bun add -g @webq/cli
 ```
 
 ### Pre-built Binaries
