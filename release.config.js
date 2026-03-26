@@ -41,6 +41,7 @@ export default {
         changelogFile: 'CHANGELOG.md'
       }
     ],
+    ['@semantic-release/npm', { npmPublish: false }],
     [
       '@semantic-release/exec',
       {
