@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/my-alert.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyAlert",
+          "customElement": true,
+          "tagName": "my-alert",
+          "description": "An alert component",
+          "attributes": [
+            {
+              "name": "status",
+              "type": { "text": "'success' | 'warning' | 'danger'" },
+              "default": "'success'"
+            },
+            {
+              "name": "closable",
+              "type": { "text": "boolean" }
+            },
+            {
+              "name": "type",
+              "type": { "text": "string" },
+              "deprecated": "Use 'status' attribute instead."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot for alert content"
+            },
+            {
+              "name": "header",
+              "description": "Header content"
+            },
+            {
+              "name": "actions",
+              "description": "Action buttons"
+            },
+            {
+              "name": "icon",
+              "description": "Icon slot",
+              "deprecated": "Use the header slot instead."
+            }
+          ],
+          "events": [
+            {
+              "name": "close",
+              "type": { "text": "CustomEvent" }
+            },
+            {
+              "name": "dismiss",
+              "type": { "text": "CustomEvent" },
+              "deprecated": "Use the 'close' event instead."
+            }
+          ],
+          "commands": [
+            {
+              "name": "--close",
+              "description": "close the alert"
+            },
+            {
+              "name": "--dismiss",
+              "description": "dismiss the alert",
+              "deprecated": "Use --close command instead."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "base",
+              "description": "The base wrapper element"
+            },
+            {
+              "name": "content",
+              "description": "The content area"
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--alert-color",
+              "description": "The alert text color",
+              "syntax": "<color>"
+            },
+            {
+              "name": "--alert-background",
+              "description": "The alert background color",
+              "syntax": "<color>"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "my-alert",
+          "declaration": {
+            "name": "MyAlert",
+            "module": "src/my-alert.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/my-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyButton",
+          "customElement": true,
+          "tagName": "my-button",
+          "description": "A button component",
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": { "text": "boolean" }
+            },
+            {
+              "name": "action",
+              "type": { "text": "'primary' | 'secondary' | 'flat'" },
+              "default": "'primary'"
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Button label content"
+            }
+          ],
+          "events": [
+            {
+              "name": "click",
+              "type": { "text": "Event" }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "my-button",
+          "declaration": {
+            "name": "MyButton",
+            "module": "src/my-button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/my-old-card.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MyOldCard",
+          "customElement": true,
+          "tagName": "my-old-card",
+          "description": "A deprecated card component",
+          "deprecated": "Use <my-card> instead.",
+          "attributes": [
+            {
+              "name": "heading",
+              "type": { "text": "string" }
+            }
+          ],
+          "slots": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "my-old-card",
+          "declaration": {
+            "name": "MyOldCard",
+            "module": "src/my-old-card.js"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "name": "@webq/eslint",
+  "version": "0.0.0",
+  "description": "eslint rules for custom-elements-manifest",
+  "private": true,
+  "keywords": [
+    "eslint",
+    "custom-elements",
+    "web-components",
+    "custom-elements-manifest"
+  ],
+  "homepage": "https://github.com/blueprintui/webq#readme",
+  "bugs": {
+    "url": "https://github.com/blueprintui/webq/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blueprintui/webq.git"
+  },
+  "license": "MIT",
+  "author": "Cory Rylan",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "package.json",
+    "dist/**/*"
+  ],
+  "scripts": {
+    "ci": "wireit",
+    "build": "wireit",
+    "test": "wireit",
+    "test:watch": "vitest"
+  },
+  "wireit": {
+    "ci": {
+      "dependencies": [
+        "build",
+        "test"
+      ]
+    },
+    "build": {
+      "command": "tsc",
+      "files": [
+        "src/**/*.ts",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/**"
+      ]
+    },
+    "test": {
+      "command": "vitest run",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "vitest.config.ts"
+      ],
+      "output": []
+    }
+  },
+  "peerDependencies": {
+    "eslint": ">=9"
+  },
+  "devDependencies": {
+    "@html-eslint/eslint-plugin": "^0.54.2",
+    "@html-eslint/parser": "^0.54.0",
+    "@html-eslint/types": "^0.54.0",
+    "@types/node": "^25.2.3",
+    "es-html-parser": "^0.3.1",
+    "eslint": "^9.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0",
+    "wireit": "^0.14.12"
+  }
+}

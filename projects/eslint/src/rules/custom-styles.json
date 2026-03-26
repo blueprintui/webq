@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "cssCustomProperties": [
+    {
+      "name": "--space-md",
+      "value": "16px",
+      "description": "Medium spacing token"
+    },
+    {
+      "name": "--color-blue-0",
+      "value": "#0066cc",
+      "description": "Primary blue color"
+    },
+    {
+      "name": "--font-size-base",
+      "value": "16px",
+      "description": "Base font size"
+    }
+  ]
+}
