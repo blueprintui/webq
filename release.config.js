@@ -41,10 +41,10 @@ export default {
         changelogFile: 'CHANGELOG.md'
       }
     ],
-    ['@semantic-release/npm', { npmPublish: false }],
     [
       '@semantic-release/exec',
       {
+        prepareCmd: 'npm pkg set version=${nextRelease.version}',
         publishCmd: `bun publish --provenance --registry=https://registry.npmjs.org ${DRY_RUN ? '--dry-run' : ''} --access=public`
       }
     ],
