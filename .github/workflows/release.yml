@@ -1,0 +1,28 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      deployments: write
+      pull-requests: write
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+      - uses: google/wireit@setup-github-actions-caching/v2
+      - run: bun install
+      - run: bun run ci
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: WIREIT_PARALLEL=1 WIREIT_LOGGER=metrics bun run release

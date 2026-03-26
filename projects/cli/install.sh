@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-REPO="coryrylan/webq-cli"
-INSTALL_DIR="/usr/.local/bin"
+REPO="blueprintui/webq"
+INSTALL_DIR="$HOME/.local/bin"
 BINARY_NAME="webq"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -48,13 +48,20 @@ fi
 
 chmod +x "$SOURCE"
 
-if [ -w "$INSTALL_DIR" ]; then
-  cp "$SOURCE" "$INSTALL_DIR/$BINARY_NAME"
-else
-  echo "Installing to $INSTALL_DIR (requires sudo)..."
-  sudo cp "$SOURCE" "$INSTALL_DIR/$BINARY_NAME"
+# Applying ad-hoc code signature for MacOS
+if [ "$OS" = "Darwin" ]; then
+  codesign --sign - --force "$SOURCE"
 fi
 
-echo "Installed $BINARY_NAME to $INSTALL_DIR/$BINARY_NAME"
+DEST="$INSTALL_DIR/$BINARY_NAME"
+
+if [ -w "$INSTALL_DIR" ]; then
+  cp "$SOURCE" "$DEST"
+else
+  echo "Installing to $INSTALL_DIR (requires sudo)..."
+  sudo cp "$SOURCE" "$DEST"
+fi
+
+echo "Installed $BINARY_NAME to $DEST"
 echo ""
 echo "Run 'webq --help' to get started."

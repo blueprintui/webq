@@ -1,0 +1,200 @@
+{
+  "name": "@webq/cli",
+  "version": "0.0.0",
+  "description": "CLI tool and MCP server for querying and validating Web Components against Custom Elements Manifest files.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "type": "module",
+  "bin": {
+    "webq": "./dist/index.js"
+  },
+  "files": [
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "package.json",
+    "dist/index.js"
+  ],
+  "scripts": {
+    "start": "wireit",
+    "ci": "wireit",
+    "debug": "wireit",
+    "test": "wireit",
+    "lint": "wireit",
+    "build": "wireit",
+    "install:local": "wireit",
+    "uninstall:local": "wireit"
+  },
+  "wireit": {
+    "start": {
+      "command": "bun src/index.ts",
+      "cache": false
+    },
+    "ci": {
+      "dependencies": [
+        "lint",
+        "test",
+        "build"
+      ]
+    },
+    "debug": {
+      "command": "pnpm dlx @modelcontextprotocol/inspector bun src/index.ts mcp --path ./testdata",
+      "cache": false
+    },
+    "test": {
+      "command": "bun test",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "testdata/**/*",
+        "tsconfig.json"
+      ],
+      "output": []
+    },
+    "lint": {
+      "command": "eslint .",
+      "files": [
+        "src/**/*.ts",
+        "eslint.config.js",
+        "package.json"
+      ],
+      "output": []
+    },
+    "build": {
+      "dependencies": [
+        "build:js",
+        "build:tsc",
+        "build:darwin-arm64",
+        "build:darwin-x64",
+        "build:linux-x64",
+        "build:linux-arm64",
+        "build:windows-x64"
+      ]
+    },
+    "build:js": {
+      "command": "bun build ./src/index.ts --outdir=./dist --target=bun --format=esm --minify",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/index.js"
+      ]
+    },
+    "build:tsc": {
+      "command": "tsc",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json",
+        "src/global.d.ts"
+      ],
+      "output": []
+    },
+    "build:darwin-arm64": {
+      "command": "bun build --compile --minify src/index.ts --target=bun-darwin-arm64 --outfile dist/webq-macos-arm64",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/webq-macos-arm64"
+      ]
+    },
+    "build:darwin-x64": {
+      "command": "bun build --compile --minify src/index.ts --target=bun-darwin-x64 --outfile dist/webq-macos-x64",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/webq-macos-x64"
+      ]
+    },
+    "build:linux-x64": {
+      "command": "bun build --compile --minify src/index.ts --target=bun-linux-x64 --outfile dist/webq-linux-x64",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/webq-linux-x64"
+      ]
+    },
+    "build:linux-arm64": {
+      "command": "bun build --compile --minify src/index.ts --target=bun-linux-arm64 --outfile dist/webq-linux-arm64",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/webq-linux-arm64"
+      ]
+    },
+    "build:windows-x64": {
+      "command": "bun build --compile --minify src/index.ts --target=bun-windows-x64 --outfile dist/webq-windows-x64.exe",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/webq-windows-x64.exe"
+      ]
+    },
+    "install:local": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "mkdir -p \"$HOME/.local/bin\" && cp dist/webq-macos-arm64 \"$HOME/.local/bin/webq\" && codesign --sign - --force $HOME/.local/bin/webq",
+      "cache": false
+    },
+    "uninstall:local": {
+      "command": "rm -f \"$HOME/.local/bin/webq\"",
+      "cache": false
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blueprintui/webq.git"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "cem",
+    "mcp",
+    "cli",
+    "validation"
+  ],
+  "author": "Cory Rylan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/blueprintui/webq/issues"
+  },
+  "homepage": "https://github.com/blueprintui/webq#readme",
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@typescript-eslint/eslint-plugin": "8.57.0",
+    "@typescript-eslint/parser": "8.57.0",
+    "@types/marked-terminal": "6.1.1",
+    "@types/yargs": "17.0.35",
+    "bun-types": "1.3.10",
+    "eslint": "10.0.3",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.57.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.28.0",
+    "marked": "17.0.5",
+    "marked-terminal": "7.3.0",
+    "yargs": "18.0.0",
+    "zod": "3.25.76"
+  }
+}

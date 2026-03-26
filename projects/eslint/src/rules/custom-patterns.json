@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0.0",
+  "patterns": [
+    {
+      "name": "alert-with-header",
+      "description": "Alert with a required header slot",
+      "structure": {
+        "root": "my-alert",
+        "children": [
+          {
+            "rule": "required",
+            "element": { "tag": "*", "slot": "header" },
+            "description": "Header content for the alert"
+          }
+        ]
+      }
+    },
+    {
+      "name": "alert-command",
+      "description": "Button triggers alert via command binding",
+      "structure": {
+        "siblings": [
+          {
+            "description": "Button triggers alert via commandfor/id binding",
+            "trigger": {
+              "tag": "my-button",
+              "attributes": [{ "name": "commandfor", "required": true }]
+            },
+            "target": {
+              "tag": "my-alert",
+              "attributes": [{ "name": "id", "required": true }]
+            },
+            "bindings": [
+              {
+                "triggerAttribute": "commandfor",
+                "targetAttribute": "id"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

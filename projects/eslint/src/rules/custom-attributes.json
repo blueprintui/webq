@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "attributes": [
+    {
+      "name": "bp-layout",
+      "description": "Declarative layout utility",
+      "syntax": "token-list",
+      "appliesTo": "*",
+      "tokenGroups": [
+        {
+          "name": "type",
+          "rule": "oneOf",
+          "required": true,
+          "values": ["block", "inline", "grid"]
+        },
+        {
+          "name": "gap",
+          "rule": "optional",
+          "values": ["gap:none", "gap:sm", "gap:md", "gap:lg"]
+        }
+      ]
+    },
+    {
+      "name": "bp-theme",
+      "description": "Theme attribute",
+      "syntax": "enum",
+      "appliesTo": "*",
+      "values": ["light", "dark", "auto"]
+    }
+  ]
+}
