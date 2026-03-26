@@ -44,7 +44,8 @@ export default {
     [
       '@semantic-release/exec',
       {
-        publishCmd: `bun publish --provenance --registry=https://registry.npmjs.org ${DRY_RUN ? '--dry-run' : ''} --access=public`
+        prepareCmd: 'npm pkg set version=${nextRelease.version}',
+        publishCmd: `npm publish --provenance --registry=https://registry.npmjs.org ${DRY_RUN ? '--dry-run' : ''} --access=public`
       }
     ],
     [

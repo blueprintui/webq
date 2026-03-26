@@ -6,7 +6,7 @@
   "module": "./dist/index.js",
   "type": "module",
   "bin": {
-    "webq": "./dist/index.js"
+    "webq": "dist/index.js"
   },
   "files": [
     "README.md",
