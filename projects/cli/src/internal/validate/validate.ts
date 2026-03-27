@@ -15,7 +15,7 @@ import { parseHTML } from './html.js';
 const defaultRules: Rule[] = [];
 
 export function registerRule(r: Rule): void {
-  if (defaultRules.some(existing => existing.id() === r.id())) return;
+  if (defaultRules.some(existing => existing.id === r.id)) return;
   defaultRules.push(r);
 }
 
@@ -24,7 +24,7 @@ export function allRules(): Rule[] {
 }
 
 export function getRule(id: string): Rule | undefined {
-  return defaultRules.find(r => r.id() === id);
+  return defaultRules.find(r => r.id === id);
 }
 
 export function verify(
@@ -46,14 +46,14 @@ export function verify(
   for (const rule of rules) {
     // Check if rule is turned off via config
     if (cfg) {
-      const sev = cfg.ruleSeverities.get(rule.id());
+      const sev = cfg.ruleSeverities.get(rule.id);
       if (sev !== undefined && sev === Severity.Off) continue;
     }
 
     // Always reset configurable rules
     if (isConfigurableRule(rule)) {
       if (cfg) {
-        rule.configure(cfg.ruleOptions.get(rule.id()) ?? {});
+        rule.configure(cfg.ruleOptions.get(rule.id) ?? {});
       } else {
         rule.configure({});
       }

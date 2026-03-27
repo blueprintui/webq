@@ -3,12 +3,9 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement, parseAttrValues } from '../schema.js';
 
 export class NoUnknownAttrValue implements Rule {
-  id() {
-    return 'no-unknown-attr-value';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-attr-value';
+
+  readonly severity = Severity.Error;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -32,8 +29,8 @@ export class NoUnknownAttrValue implements Rule {
 
         if (!allowed.includes(attr.value)) {
           msgs.push({
-            ruleId: this.id(),
-            severity: this.severity(),
+            ruleId: this.id,
+            severity: this.severity,
             message: `Invalid value "${attr.value}" for attribute "${attr.name}" on <${elem.tagName}>. Valid values: ${allowed.join(', ')}`,
             line: attr.line,
             column: attr.column

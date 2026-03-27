@@ -3,12 +3,9 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement } from '../schema.js';
 
 export class NoDeprecatedAttr implements Rule {
-  id() {
-    return 'no-deprecated-attr';
-  }
-  severity() {
-    return Severity.Warning;
-  }
+  readonly id = 'no-deprecated-attr';
+
+  readonly severity = Severity.Warning;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -29,8 +26,8 @@ export class NoDeprecatedAttr implements Rule {
         if (!reason) continue;
 
         msgs.push({
-          ruleId: this.id(),
-          severity: this.severity(),
+          ruleId: this.id,
+          severity: this.severity,
           message: `Attribute "${attr.name}" on <${elem.tagName}> is deprecated. ${reason}`,
           line: attr.line,
           column: attr.column

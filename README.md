@@ -18,10 +18,10 @@ Tools for querying and validating Web Components against [Custom Elements Manife
 curl -fsSL https://raw.githubusercontent.com/blueprintui/webq/main/projects/cli/install.sh | bash
 ```
 
-Or install via Bun:
+Or install via NodeJS:
 
 ```bash
-bun add -g @webq/cli
+npm install -g @webq/cli
 ```
 
 ```bash

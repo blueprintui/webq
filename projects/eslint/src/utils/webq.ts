@@ -19,7 +19,8 @@ let webqMissingWarned = false;
 
 export function runWebqValidation(html: string, path: string): WebqMessage[] {
   const key = `${path}\0${html}`;
-  if (cache.has(key)) return cache.get(key)!;
+  const cached = cache.get(key);
+  if (cached) return cached;
 
   try {
     const stdout = execFileSync('webq', ['validate-html', html, '--path', path, '--json'], {
@@ -29,10 +30,11 @@ export function runWebqValidation(html: string, path: string): WebqMessage[] {
     const result: WebqResult = JSON.parse(stdout);
     cache.set(key, result.messages);
     return result.messages;
-  } catch (e: any) {
-    if (e.stdout) {
+  } catch (e: unknown) {
+    const err = e as Record<string, unknown>;
+    if (typeof err.stdout === 'string') {
       try {
-        const result: WebqResult = JSON.parse(e.stdout);
+        const result: WebqResult = JSON.parse(err.stdout);
         cache.set(key, result.messages);
         return result.messages;
       } catch {
@@ -40,7 +42,7 @@ export function runWebqValidation(html: string, path: string): WebqMessage[] {
       }
     }
 
-    if (e.code === 'ENOENT' && !webqMissingWarned) {
+    if (err.code === 'ENOENT' && !webqMissingWarned) {
       webqMissingWarned = true;
       console.error(
         '[@webq/eslint] The "webq" CLI tool is not installed or not on PATH.\n' +

@@ -7,12 +7,9 @@ import { computeStylePosition, cssRuleBlockRegex, cssVarRefRegex, extractTagName
 export class NoUnknownStyleValue implements Rule {
   #customStyleStore?: CustomStyleStore;
 
-  id() {
-    return 'no-unknown-style-value';
-  }
-  severity() {
-    return Severity.Warning;
-  }
+  readonly id = 'no-unknown-style-value';
+
+  readonly severity = Severity.Warning;
 
   setCustomStyleStore(store: CustomStyleStore | undefined): void {
     this.#customStyleStore = store;
@@ -43,8 +40,8 @@ export class NoUnknownStyleValue implements Rule {
           const absOffset = blockStart + varMatch.index;
           const { line, col } = computeStylePosition(style, absOffset);
           msgs.push({
-            ruleId: this.id(),
-            severity: this.severity(),
+            ruleId: this.id,
+            severity: this.severity,
             message: `Unknown CSS custom property value "${tokenName}" is not defined in custom styles or element CSS properties.`,
             line,
             column: col
@@ -69,8 +66,8 @@ export class NoUnknownStyleValue implements Rule {
           if (elemPropSet?.has(tokenName)) continue;
 
           msgs.push({
-            ruleId: this.id(),
-            severity: this.severity(),
+            ruleId: this.id,
+            severity: this.severity,
             message: `Unknown CSS custom property value "${tokenName}" is not defined in custom styles or element CSS properties.`,
             line: attr.line,
             column: attr.column

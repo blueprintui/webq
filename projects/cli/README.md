@@ -10,10 +10,10 @@ A CLI tool for querying and validating Custom Elements Manifest (CEM) JSON files
 curl -fsSL https://raw.githubusercontent.com/blueprintui/webq/main/projects/cli/install.sh | bash
 ```
 
-### Bun
+### NodeJS
 
 ```bash
-bun add -g @webq/cli
+npm install -g @webq/cli
 ```
 
 ### Pre-built Binaries

@@ -3,12 +3,9 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement } from '../schema.js';
 
 export class NoDeprecatedSlot implements Rule {
-  id() {
-    return 'no-deprecated-slot';
-  }
-  severity() {
-    return Severity.Warning;
-  }
+  readonly id = 'no-deprecated-slot';
+
+  readonly severity = Severity.Warning;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -26,8 +23,8 @@ export class NoDeprecatedSlot implements Rule {
         for (const s of decl.slots ?? []) {
           if (s.name === attr.value && s.deprecated) {
             msgs.push({
-              ruleId: this.id(),
-              severity: this.severity(),
+              ruleId: this.id,
+              severity: this.severity,
               message: `Slot "${attr.value}" on <${parent.tagName}> is deprecated. ${s.deprecated}`,
               line: attr.line,
               column: attr.column

@@ -6,12 +6,9 @@ import { formatSuggestion } from './suggestion.js';
 import { computeStylePosition } from './css-helpers.js';
 
 export class NoUnknownCSSPart implements Rule {
-  id() {
-    return 'no-unknown-css-part';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-css-part';
+
+  readonly severity = Severity.Error;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -32,8 +29,8 @@ export class NoUnknownCSSPart implements Rule {
           const { line, col } = computeStylePosition(style, match.index);
           const suggestion = formatCSSPartNames(decl.cssParts ?? []);
           msgs.push({
-            ruleId: this.id(),
-            severity: this.severity(),
+            ruleId: this.id,
+            severity: this.severity,
             message: `Unknown CSS part "${partName}" on <${tagName}>. ${suggestion}`,
             line,
             column: col

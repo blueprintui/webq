@@ -6,12 +6,9 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument, type HTMLElem
 export class NoMissingRequiredChild implements Rule {
   #patternStore?: PatternStore;
 
-  id() {
-    return 'no-missing-required-child';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-missing-required-child';
+
+  readonly severity = Severity.Error;
 
   setPatternStore(store: PatternStore | undefined): void {
     this.#patternStore = store;
@@ -34,8 +31,8 @@ export class NoMissingRequiredChild implements Rule {
               if (!child.element) continue;
               if (!hasMatchingChild(elem, child.element)) {
                 msgs.push({
-                  ruleId: this.id(),
-                  severity: this.severity(),
+                  ruleId: this.id,
+                  severity: this.severity,
                   message: `Pattern "${pat.name}": <${elem.tagName}> requires a ${describeChildElement(child.element)} child`,
                   line: elem.line,
                   column: elem.column
@@ -47,8 +44,8 @@ export class NoMissingRequiredChild implements Rule {
               if (!child.options.some(opt => hasMatchingChild(elem, opt))) {
                 const descs = child.options.map(opt => describeChildElement(opt));
                 msgs.push({
-                  ruleId: this.id(),
-                  severity: this.severity(),
+                  ruleId: this.id,
+                  severity: this.severity,
                   message: `Pattern "${pat.name}": <${elem.tagName}> requires one of: ${descs.join(', ')}`,
                   line: elem.line,
                   column: elem.column
@@ -59,8 +56,8 @@ export class NoMissingRequiredChild implements Rule {
               if (!child.element) continue;
               if (!hasMatchingChild(elem, child.element)) {
                 msgs.push({
-                  ruleId: this.id(),
-                  severity: this.severity(),
+                  ruleId: this.id,
+                  severity: this.severity,
                   message: `Pattern "${pat.name}": <${elem.tagName}> requires at least one ${describeChildElement(child.element)} child`,
                   line: elem.line,
                   column: elem.column

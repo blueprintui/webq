@@ -6,7 +6,7 @@ describe('Rule Registry', () => {
   test('getRule returns known rule', () => {
     const rule = getRule('no-unknown-attr');
     expect(rule).toBeDefined();
-    expect(rule?.id()).toBe('no-unknown-attr');
+    expect(rule?.id).toBe('no-unknown-attr');
   });
 
   test('getRule returns undefined for unknown', () => {
@@ -20,7 +20,7 @@ describe('Rule Registry', () => {
 
   test('all rules have unique IDs', () => {
     const rules = allRules();
-    const ids = new Set(rules.map(r => r.id()));
+    const ids = new Set(rules.map(r => r.id));
     expect(ids.size).toBe(rules.length);
   });
 });

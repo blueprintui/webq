@@ -6,12 +6,9 @@ import { formatSuggestion } from './suggestion.js';
 import { computeStylePosition, cssRuleBlockRegex, cssCustomPropRegex, extractTagName } from './css-helpers.js';
 
 export class NoUnknownCSSCustomProperty implements Rule {
-  id() {
-    return 'no-unknown-css-custom-property';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-css-custom-property';
+
+  readonly severity = Severity.Error;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -38,8 +35,8 @@ export class NoUnknownCSSCustomProperty implements Rule {
             const { line, col } = computeStylePosition(style, absOffset);
             const suggestion = formatCSSPropNames(decl.cssProperties ?? []);
             msgs.push({
-              ruleId: this.id(),
-              severity: this.severity(),
+              ruleId: this.id,
+              severity: this.severity,
               message: `Unknown CSS custom property "${propName}" on <${tagName}>. ${suggestion}`,
               line,
               column: col
@@ -66,8 +63,8 @@ export class NoUnknownCSSCustomProperty implements Rule {
           if (!propSet.has(propName)) {
             const suggestion = formatCSSPropNames(decl.cssProperties ?? []);
             msgs.push({
-              ruleId: this.id(),
-              severity: this.severity(),
+              ruleId: this.id,
+              severity: this.severity,
               message: `Unknown CSS custom property "${propName}" on <${elem.tagName}>. ${suggestion}`,
               line: attr.line,
               column: attr.column

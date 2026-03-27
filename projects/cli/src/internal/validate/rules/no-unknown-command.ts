@@ -5,12 +5,9 @@ import { resolveCommandPairs } from './command-helper.js';
 import { formatSuggestion } from './suggestion.js';
 
 export class NoUnknownCommand implements Rule {
-  id() {
-    return 'no-unknown-command';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-command';
+
+  readonly severity = Severity.Error;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -21,8 +18,8 @@ export class NoUnknownCommand implements Rule {
       if (!cmdSet.has(pair.commandAttr.value)) {
         const suggestion = formatCommandNames(pair.declaration.commands ?? []);
         msgs.push({
-          ruleId: this.id(),
-          severity: this.severity(),
+          ruleId: this.id,
+          severity: this.severity,
           message: `Unknown command "${pair.commandAttr.value}" for <${pair.targetTag}>. ${suggestion}`,
           line: pair.commandAttr.line,
           column: pair.commandAttr.column

@@ -153,15 +153,16 @@ const cli = yargs(hideBin(process.argv))
   .option('config', { type: 'string', description: 'Path to webq.config.json' })
   .command('$0', 'About WebQ', {}, async () => {
     process.stderr.write(
-      colorize.blue(`__        __   _      ___
-\\ \\      / /__| |__  / _ \\
- \\ \\ /\\ / / _ \\ '_ \\| | | |
-  \\ V  V /  __/ |_) | |_| |
-   \\_/\\_/ \\___|_.__/ \\__\\_\\`)
+      colorize.blue(`██     ██ ███████ ██████   ██████  
+██     ██ ██      ██   ██ ██    ██ 
+██  █  ██ █████   ██████  ██    ██ 
+██ ███ ██ ██      ██   ██ ██ ▄▄ ██ 
+ ███ ███  ███████ ██████   ██████  
+                              ▀▀`)
     );
 
     process.stderr.write(
-      `\n\n${wrapText(
+      `\n${wrapText(
         "WebQ is a CLI tool for querying Custom Elements Manifest (CEM) files and other Web UI schema files. Use 'mcp' to start the MCP (Model Context Protocol) server for AI assistants.",
         MAX_WIDTH
       )}\nhttps://github.com/blueprintui/webq\n\n`

@@ -38,15 +38,26 @@
   "scripts": {
     "ci": "wireit",
     "build": "wireit",
+    "lint": "wireit",
     "test": "wireit",
-    "test:watch": "vitest"
+    "test:watch": "bun test --watch"
   },
   "wireit": {
     "ci": {
       "dependencies": [
         "build",
+        "lint",
         "test"
       ]
+    },
+    "lint": {
+      "command": "eslint .",
+      "files": [
+        "src/**/*.ts",
+        "eslint.config.js",
+        "package.json"
+      ],
+      "output": []
     },
     "build": {
       "command": "tsc",
@@ -59,11 +70,13 @@
       ]
     },
     "test": {
-      "command": "vitest run",
+      "command": "ln -sf $(cd ../cli && pwd)/dist/index.js /tmp/webq && chmod +x /tmp/webq && PATH=\"/tmp:$PATH\" bun test src/",
+      "dependencies": [
+        "../cli:build"
+      ],
       "files": [
         "src/**/*.ts",
-        "src/**/*.json",
-        "vitest.config.ts"
+        "src/**/*.json"
       ],
       "output": []
     }
@@ -72,14 +85,14 @@
     "eslint": ">=9"
   },
   "devDependencies": {
-    "@html-eslint/eslint-plugin": "^0.54.2",
-    "@html-eslint/parser": "^0.54.0",
-    "@html-eslint/types": "^0.54.0",
-    "@types/node": "^25.2.3",
-    "es-html-parser": "^0.3.1",
-    "eslint": "^9.0.0",
-    "typescript": "^5.7.0",
-    "vitest": "^3.0.0",
-    "wireit": "^0.14.12"
+    "@eslint/js": "catalog:",
+    "@html-eslint/eslint-plugin": "0.54.2",
+    "@html-eslint/parser": "0.54.0",
+    "@html-eslint/types": "0.54.0",
+    "@types/node": "catalog:",
+    "es-html-parser": "0.3.1",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "8.57.2"
   }
 }

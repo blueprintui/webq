@@ -9,12 +9,9 @@ import { formatSuggestion } from './suggestion.js';
 export class NoUnknownAttr implements Rule {
   #customAttrStore?: CustomAttributeStore;
 
-  id() {
-    return 'no-unknown-attr';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-attr';
+
+  readonly severity = Severity.Error;
 
   setCustomAttributeStore(store: CustomAttributeStore | undefined): void {
     this.#customAttrStore = store;
@@ -41,8 +38,8 @@ export class NoUnknownAttr implements Rule {
 
           const suggestion = formatAttrNames(decl.attributes ?? []);
           msgs.push({
-            ruleId: this.id(),
-            severity: this.severity(),
+            ruleId: this.id,
+            severity: this.severity,
             message: `Unknown attribute "${attr.name}" on <${elem.tagName}>. ${suggestion}`,
             line: attr.line,
             column: attr.column

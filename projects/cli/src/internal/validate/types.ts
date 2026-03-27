@@ -26,8 +26,8 @@ export interface LintResult {
 }
 
 export interface Rule {
-  id(): string;
-  severity(): Severity;
+  readonly id: string;
+  readonly severity: Severity;
   check(doc: HTMLDocument, store: Store): LintMessage[];
 }
 

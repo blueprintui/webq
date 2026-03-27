@@ -5,12 +5,9 @@ import { isCustomElement } from '../schema.js';
 import { formatSuggestion } from './suggestion.js';
 
 export class NoUnknownSlot implements Rule {
-  id() {
-    return 'no-unknown-slot';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-slot';
+
+  readonly severity = Severity.Error;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -30,8 +27,8 @@ export class NoUnknownSlot implements Rule {
         if (!slotSet.has(attr.value)) {
           const suggestion = formatSlotNames(decl.slots ?? []);
           msgs.push({
-            ruleId: this.id(),
-            severity: this.severity(),
+            ruleId: this.id,
+            severity: this.severity,
             message: `Unknown slot "${attr.value}" on <${parent.tagName}>. ${suggestion}`,
             line: attr.line,
             column: attr.column

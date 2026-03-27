@@ -5,12 +5,9 @@ import { isCustomElement } from '../schema.js';
 export class NoUnknownElement implements Rule {
   #allowedTags = new Set<string>();
 
-  id() {
-    return 'no-unknown-element';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-element';
+
+  readonly severity = Severity.Error;
 
   configure(opts: RuleOptionSet): void {
     this.#allowedTags = new Set(opts.tags ?? []);
@@ -28,8 +25,8 @@ export class NoUnknownElement implements Rule {
       if (!store.getElement(elem.tagName)) {
         seen.add(elem.tagName);
         msgs.push({
-          ruleId: this.id(),
-          severity: this.severity(),
+          ruleId: this.id,
+          severity: this.severity,
           message: `Unknown custom element <${elem.tagName}>.`,
           line: elem.line,
           column: elem.column

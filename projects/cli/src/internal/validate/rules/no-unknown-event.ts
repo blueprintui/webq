@@ -7,12 +7,9 @@ import { formatSuggestion } from './suggestion.js';
 export class NoUnknownEvent implements Rule {
   #allowedEvents = new Set<string>();
 
-  id() {
-    return 'no-unknown-event';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-unknown-event';
+
+  readonly severity = Severity.Error;
 
   configure(opts: RuleOptionSet): void {
     this.#allowedEvents = new Set(opts.events ?? []);
@@ -37,8 +34,8 @@ export class NoUnknownEvent implements Rule {
         if (!eventSet.has(eventName)) {
           const suggestion = formatEventNames(decl.events ?? []);
           msgs.push({
-            ruleId: this.id(),
-            severity: this.severity(),
+            ruleId: this.id,
+            severity: this.severity,
             message: `Unknown event "${eventName}" on <${elem.tagName}>. ${suggestion}`,
             line: attr.line,
             column: attr.column

@@ -3,12 +3,9 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement } from '../schema.js';
 
 export class NoBooleanAttrValue implements Rule {
-  id() {
-    return 'no-boolean-attr-value';
-  }
-  severity() {
-    return Severity.Warning;
-  }
+  readonly id = 'no-boolean-attr-value';
+
+  readonly severity = Severity.Warning;
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -29,8 +26,8 @@ export class NoBooleanAttrValue implements Rule {
         if (!boolAttrs.has(attr.name)) continue;
 
         msgs.push({
-          ruleId: this.id(),
-          severity: this.severity(),
+          ruleId: this.id,
+          severity: this.severity,
           message: `Attribute "${attr.name}" on <${elem.tagName}> is boolean. Use "${attr.name}" alone instead of "${attr.name}"="${attr.value}".`,
           line: attr.line,
           column: attr.column

@@ -1,16 +1,9 @@
 import eslint from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
-import eslintConfigPrettier from 'eslint-config-prettier/flat';
 
 export default defineConfig([
   { ignores: ['dist/**', '.wireit/**'] },
   eslint.configs.recommended,
-  tseslint.configs.strict,
-  eslintConfigPrettier,
-  {
-    rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
-    }
-  }
+  tseslint.configs.strict
 ]);

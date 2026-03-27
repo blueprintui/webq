@@ -6,12 +6,9 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument, type HTMLElem
 export class NoMissingSiblingBinding implements Rule {
   #patternStore?: PatternStore;
 
-  id() {
-    return 'no-missing-sibling-binding';
-  }
-  severity() {
-    return Severity.Error;
-  }
+  readonly id = 'no-missing-sibling-binding';
+
+  readonly severity = Severity.Error;
 
   setPatternStore(store: PatternStore | undefined): void {
     this.#patternStore = store;
@@ -45,8 +42,8 @@ export class NoMissingSiblingBinding implements Rule {
             if (val === undefined) {
               triggerOk = false;
               msgs.push({
-                ruleId: this.id(),
-                severity: this.severity(),
+                ruleId: this.id,
+                severity: this.severity,
                 message: `Pattern "${pat.name}": <${elem.tagName}> is missing required attribute "${attrRule.name}"`,
                 line: elem.line,
                 column: elem.column
@@ -54,8 +51,8 @@ export class NoMissingSiblingBinding implements Rule {
             } else if (attrRule.value && val !== attrRule.value) {
               triggerOk = false;
               msgs.push({
-                ruleId: this.id(),
-                severity: this.severity(),
+                ruleId: this.id,
+                severity: this.severity,
                 message: `Pattern "${pat.name}": <${elem.tagName}> attribute "${attrRule.name}" must be "${attrRule.value}"`,
                 line: elem.line,
                 column: elem.column
@@ -78,8 +75,8 @@ export class NoMissingSiblingBinding implements Rule {
           if (!target) {
             const triggerDesc = describeElement(elem, sib);
             msgs.push({
-              ruleId: this.id(),
-              severity: this.severity(),
+              ruleId: this.id,
+              severity: this.severity,
               message: `Pattern "${pat.name}": ${triggerDesc} has no sibling <${sib.target.tag}>`,
               line: elem.line,
               column: elem.column
@@ -91,8 +88,8 @@ export class NoMissingSiblingBinding implements Rule {
             if (!attrRule.required) continue;
             if (getAttrValue(target, attrRule.name) === undefined) {
               msgs.push({
-                ruleId: this.id(),
-                severity: this.severity(),
+                ruleId: this.id,
+                severity: this.severity,
                 message: `Pattern "${pat.name}": <${target.tagName}> is missing required attribute "${attrRule.name}"`,
                 line: target.line,
                 column: target.column
@@ -105,16 +102,16 @@ export class NoMissingSiblingBinding implements Rule {
             const targetVal = getAttrValue(target, binding.targetAttribute);
             if (triggerVal && targetVal === undefined) {
               msgs.push({
-                ruleId: this.id(),
-                severity: this.severity(),
+                ruleId: this.id,
+                severity: this.severity,
                 message: `Pattern "${pat.name}": <${target.tagName}> is missing attribute "${binding.targetAttribute}" bound to <${elem.tagName} ${binding.triggerAttribute}="${triggerVal}">`,
                 line: target.line,
                 column: target.column
               });
             } else if (triggerVal && targetVal !== undefined && targetVal !== '' && triggerVal !== targetVal) {
               msgs.push({
-                ruleId: this.id(),
-                severity: this.severity(),
+                ruleId: this.id,
+                severity: this.severity,
                 message: `Pattern "${pat.name}": <${elem.tagName} ${binding.triggerAttribute}="${triggerVal}"> has no sibling <${sib.target.tag} ${binding.targetAttribute}="${triggerVal}">`,
                 line: elem.line,
                 column: elem.column

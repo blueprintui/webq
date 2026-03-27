@@ -21,15 +21,32 @@ import type { CustomAttribute } from '../internal/attributes/types.js';
 import type { CSSCustomPropertySummary } from '../internal/styles/store.js';
 import type { CSSCustomProperty } from '../internal/styles/types.js';
 
+const ansiFallback: Record<string, string> = {
+  '#e62f2f': '\x1b[31m',
+  '#008fff': '\x1b[34m',
+  '#1888df': '\x1b[34m',
+  '#51da51': '\x1b[32m',
+  '#e796e7': '\x1b[35m',
+  yellow: '\x1b[33m',
+  green: '\x1b[32m',
+  blue: '\x1b[34m',
+  gray: '\x1b[90m'
+};
+
+function color(value: string): string {
+  if (typeof Bun !== 'undefined') return Bun.color(value, 'ansi') as string;
+  return ansiFallback[value] ?? '';
+}
+
 export const colorize = {
-  error: (msg: string) => `${Bun.color('#e62f2f', 'ansi')}${msg}\x1b[0m`,
-  warning: (msg: string) => `${Bun.color('yellow', 'ansi')}${msg}\x1b[0m`,
-  success: (msg: string) => `${Bun.color('green', 'ansi')}${msg}\x1b[0m`,
-  info: (msg: string) => `${Bun.color('blue', 'ansi')}${msg}\x1b[0m`,
-  debug: (msg: string) => `${Bun.color('gray', 'ansi')}${msg}\x1b[0m`,
-  blue: (msg: string) => `${Bun.color('#008fff', 'ansi')}${msg}\x1b[0m`,
-  green: (msg: string) => `${Bun.color('#51da51', 'ansi')}${msg}\x1b[0m`,
-  pink: (msg: string) => `${Bun.color('#e796e7', 'ansi')}${msg}\x1b[0m`
+  error: (msg: string) => `${color('#e62f2f')}${msg}\x1b[0m`,
+  warning: (msg: string) => `${color('yellow')}${msg}\x1b[0m`,
+  success: (msg: string) => `${color('green')}${msg}\x1b[0m`,
+  info: (msg: string) => `${color('blue')}${msg}\x1b[0m`,
+  debug: (msg: string) => `${color('gray')}${msg}\x1b[0m`,
+  blue: (msg: string) => `${color('#008fff')}${msg}\x1b[0m`,
+  green: (msg: string) => `${color('#51da51')}${msg}\x1b[0m`,
+  pink: (msg: string) => `${color('#e796e7')}${msg}\x1b[0m`
 };
 
 export const ansi = {
@@ -39,9 +56,9 @@ export const ansi = {
   italic: '\x1b[3m',
   underline: '\x1b[4m',
   colors: {
-    blue: Bun.color('#1888df', 'ansi'),
-    green: Bun.color('#51da51', 'ansi'),
-    pink: Bun.color('#e796e7', 'ansi')
+    blue: color('#1888df'),
+    green: color('#51da51'),
+    pink: color('#e796e7')
   }
 };
 

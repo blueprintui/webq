@@ -35,12 +35,13 @@ const rule: Rule.RuleModule = {
   create(context) {
     const options = context.options[0] as { path: string; events?: string[] } | undefined;
     if (!options?.path) return {};
+    const path = options.path;
 
     const additionalEvents = new Set(options.events ?? []);
 
     function checkDocument() {
       const html = context.sourceCode.getText();
-      const messages = runWebqValidation(html, options!.path);
+      const messages = runWebqValidation(html, path);
 
       for (const msg of messages) {
         if (msg.ruleId !== RULE_ID) continue;

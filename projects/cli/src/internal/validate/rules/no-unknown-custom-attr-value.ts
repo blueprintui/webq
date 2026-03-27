@@ -7,12 +7,9 @@ import { customAttrAppliesTo } from './no-unknown-attr.js';
 export class NoUnknownCustomAttrValue implements Rule {
   #customAttrStore?: CustomAttributeStore;
 
-  id() {
-    return 'no-unknown-custom-attr-value';
-  }
-  severity() {
-    return Severity.Warning;
-  }
+  readonly id = 'no-unknown-custom-attr-value';
+
+  readonly severity = Severity.Warning;
 
   setCustomAttributeStore(store: CustomAttributeStore | undefined): void {
     this.#customAttrStore = store;
@@ -53,8 +50,8 @@ export class NoUnknownCustomAttrValue implements Rule {
     for (const token of attr.value.split(/\s+/)) {
       if (!validTokens.has(token)) {
         msgs.push({
-          ruleId: this.id(),
-          severity: this.severity(),
+          ruleId: this.id,
+          severity: this.severity,
           message: `Unknown token "${token}" for custom attribute "${ca.name}" on <${tagName}>.`,
           line: attr.line,
           column: attr.column
@@ -76,8 +73,8 @@ export class NoUnknownCustomAttrValue implements Rule {
 
     return [
       {
-        ruleId: this.id(),
-        severity: this.severity(),
+        ruleId: this.id,
+        severity: this.severity,
         message: `Unknown value "${attr.value}" for custom attribute "${ca.name}" on <${tagName}>. Valid values: ${validValues.join(', ')}`,
         line: attr.line,
         column: attr.column

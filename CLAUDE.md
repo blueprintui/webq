@@ -12,6 +12,11 @@ This is a Bun/TypeScript monorepo (workspaces) containing tools for validating W
 - **`projects/eslint/`** (`@webq/eslint`) — ESLint plugin that validates custom element HTML usage via `@html-eslint/parser`. Delegates validation to the `webq` CLI. See `projects/eslint/CLAUDE.md` for details.
 - **`projects/schemas/`** — JSON schemas for custom-elements, custom-attributes, custom-patterns, custom-styles, DTCG tokens, and VSCode custom data formats.
 
+## Tooling
+
+- This repo uses **Bun** as the package manager and runtime. Always use `bun run <script>`, `bun test`, `bun install`, and `bun x <package>` — never `npm`, `npx`, or `yarn`.
+- Dependencies must always be pinned to an **exact version number** (no `^` or `~` prefixes).
+
 ## Quick Reference
 
 ### Monorepo (root)
@@ -38,10 +43,10 @@ bun test src/internal/elements/store.test.ts  # Single test
 
 ```bash
 cd projects/eslint
-bun run ci                # Build + test (wireit, cached)
+bun run ci                # Build + lint + test (wireit, cached)
 bun run build             # TypeScript compilation
-bun test                  # Run all tests (vitest)
-npx vitest run src/rules/no-unknown-attr.test.ts  # Single test
+bun test src/             # Run all tests
+bun test src/rules/no-unknown-attr.test.ts  # Single test
 ```
 
 ## Cross-Cutting Concepts
