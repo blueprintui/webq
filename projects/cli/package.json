@@ -1,6 +1,6 @@
 {
   "name": "@webq/cli",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "CLI tool and MCP server for querying and validating Web Components against Custom Elements Manifest files.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

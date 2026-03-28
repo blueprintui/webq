@@ -1,3 +1,14 @@
+## [1.1.1](https://github.com/blueprintui/webq/compare/@webq/cli-v1.1.0...@webq/cli-v1.1.1) (2026-03-28)
+
+### Features
+
+* **eslint:** release ([a357eeb](https://github.com/blueprintui/webq/commit/a357eebaff4f8c7eebd23a1e4a75a3ff40d1d813))
+
+### Bug Fixes
+
+* **cli:** path exports ([8d0f4f0](https://github.com/blueprintui/webq/commit/8d0f4f06013f670538c5fd614d785826bf94efcf))
+* **eslint:** release script ([746bdac](https://github.com/blueprintui/webq/commit/746bdac63e49627be7117baa39c60584ec219a5e))
+
 ## [1.1.0](https://github.com/blueprintui/webq/compare/@webq/cli-v1.0.1...@webq/cli-v1.1.0) (2026-03-28)
 
 ### Features
