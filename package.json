@@ -51,7 +51,8 @@
     "release": {
       "command": "echo 'Releasing...'",
       "dependencies": [
-        "release:cli"
+        "release:cli",
+        "release:eslint"
       ]
     },
     "release:cli": {
