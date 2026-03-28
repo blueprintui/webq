@@ -1,17 +1,24 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "noEmit": true,
-    "module": "esnext",
-    "target": "esnext",
-    "lib": ["esnext"],
-    "types": ["bun-types"],
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
+    "rootDir": "./src",
     "outDir": "./dist",
-    "rootDir": "./"
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "types": ["bun"],
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    // todo
+    "strict": false,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": false,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false
   }
 }

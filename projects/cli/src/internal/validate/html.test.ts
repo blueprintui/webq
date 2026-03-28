@@ -67,4 +67,55 @@ describe('parseHTML', () => {
     expect(doc.elements.length).toBe(1);
     expect(doc.elements[0].tagName).toBe('div');
   });
+
+  test('parses multiline attributes with correct positions', () => {
+    const doc = parseHTML('<div\n  class="foo"\n  id="bar"></div>');
+    const attrs = doc.elements[0].attributes;
+    expect(attrs.length).toBe(2);
+    expect(attrs[0].name).toBe('class');
+    expect(attrs[0].value).toBe('foo');
+    expect(attrs[0].line).toBe(2);
+    expect(attrs[0].column).toBe(3);
+    expect(attrs[1].name).toBe('id');
+    expect(attrs[1].value).toBe('bar');
+    expect(attrs[1].line).toBe(3);
+    expect(attrs[1].column).toBe(3);
+  });
+
+  test('parses unquoted attribute values', () => {
+    const doc = parseHTML('<div class=foo></div>');
+    const attr = doc.elements[0].attributes[0];
+    expect(attr.name).toBe('class');
+    expect(attr.value).toBe('foo');
+    expect(attr.hasValue).toBe(true);
+  });
+
+  test('parses single-quoted attribute values', () => {
+    const doc = parseHTML("<div class='test'></div>");
+    const attr = doc.elements[0].attributes[0];
+    expect(attr.name).toBe('class');
+    expect(attr.value).toBe('test');
+    expect(attr.hasValue).toBe(true);
+  });
+
+  test('handles DOCTYPE', () => {
+    const doc = parseHTML('<!DOCTYPE html><div></div>');
+    expect(doc.elements.length).toBe(1);
+    expect(doc.elements[0].tagName).toBe('div');
+  });
+
+  test('parses attributes with spaces around =', () => {
+    const doc = parseHTML('<div class = "foo"></div>');
+    const attr = doc.elements[0].attributes[0];
+    expect(attr.name).toBe('class');
+    expect(attr.value).toBe('foo');
+    expect(attr.hasValue).toBe(true);
+  });
+
+  test('handles > inside quoted attribute values', () => {
+    const doc = parseHTML('<div title="a > b"></div>');
+    expect(doc.elements.length).toBe(1);
+    expect(doc.elements[0].attributes[0].name).toBe('title');
+    expect(doc.elements[0].attributes[0].value).toBe('a > b');
+  });
 });

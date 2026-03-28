@@ -1,5 +1,7 @@
 import { describe, test, expect } from 'bun:test';
 import {
+  colorize,
+  printMarkdown,
   wrapText,
   formatElementSummaries,
   formatElement,
@@ -29,6 +31,37 @@ import type {
   Command,
   CSSPart
 } from '../internal/elements/types.js';
+
+describe('colorize', () => {
+  test('wraps text with ANSI codes', () => {
+    expect(colorize.error('fail')).toContain('fail');
+    expect(colorize.error('fail')).toContain('\x1b[0m');
+    expect(colorize.warning('warn')).toContain('warn');
+    expect(colorize.success('ok')).toContain('ok');
+    expect(colorize.info('info')).toContain('info');
+    expect(colorize.debug('dbg')).toContain('dbg');
+    expect(colorize.blue('b')).toContain('b');
+    expect(colorize.green('g')).toContain('g');
+    expect(colorize.pink('p')).toContain('p');
+  });
+});
+
+describe('printMarkdown', () => {
+  test('writes markdown to stderr', () => {
+    const original = process.stderr.write;
+    let output = '';
+    process.stderr.write = (s: string | Uint8Array) => {
+      output += s.toString();
+      return true;
+    };
+    try {
+      printMarkdown('**bold**');
+      expect(output.length).toBeGreaterThan(0);
+    } finally {
+      process.stderr.write = original;
+    }
+  });
+});
 
 describe('formatElementSummaries', () => {
   test('formats multiple elements', () => {
@@ -370,6 +403,15 @@ describe('wrapText', () => {
 
   test('splits words longer than maxWidth', () => {
     expect(wrapText('abcdefghij', 4)).toBe('abcd\nefgh\nij');
+  });
+
+  test('flushes current line before splitting long word', () => {
+    const out = wrapText('hi abcdefghij', 4);
+    expect(out).toBe('hi\nabcd\nefgh\nij');
+  });
+
+  test('returns text unchanged when maxWidth < 1', () => {
+    expect(wrapText('hello', 0)).toBe('hello');
   });
 });
 

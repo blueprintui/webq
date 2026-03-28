@@ -1,5 +1,35 @@
 import type { HTMLDocument, HTMLElement, HTMLAttribute } from './types.js';
 
+const CHAR_DQUOTE = 34; // "
+const CHAR_SQUOTE = 39; // '
+const CHAR_GT = 62; // >
+
+function isWhitespace(ch: string): boolean {
+  return ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r';
+}
+
+function isTagDelimiter(ch: string): boolean {
+  return isWhitespace(ch) || ch === '>' || ch === '/';
+}
+
+/** Scan forward from `start` to find the closing `>`, respecting quoted attribute values. Returns the index of `>`, or `src.length` if not found. */
+function findTagEnd(src: string, start: number): number {
+  let i = start;
+  let inQuote = 0;
+  while (i < src.length) {
+    const ch = src.charCodeAt(i);
+    if (inQuote) {
+      if (ch === inQuote) inQuote = 0;
+    } else if (ch === CHAR_DQUOTE || ch === CHAR_SQUOTE) {
+      inQuote = ch;
+    } else if (ch === CHAR_GT) {
+      return i;
+    }
+    i++;
+  }
+  return i;
+}
+
 class LineIndex {
   #lineStarts: number[];
 
@@ -98,36 +128,13 @@ export function parseHTML(src: string): HTMLDocument {
       continue;
     }
 
-    while (
-      i < src.length &&
-      src[i] !== ' ' &&
-      src[i] !== '\t' &&
-      src[i] !== '\n' &&
-      src[i] !== '\r' &&
-      src[i] !== '>' &&
-      src[i] !== '/'
-    ) {
+    while (i < src.length && !isTagDelimiter(src[i])) {
       i++;
     }
     const tagName = src.slice(tagStart + 1, i).toLowerCase();
 
     // Find end of tag
-    let tagEnd = i;
-    let inQuote = 0;
-    while (tagEnd < src.length) {
-      const ch = src.charCodeAt(tagEnd);
-      if (inQuote) {
-        if (ch === inQuote) inQuote = 0;
-      } else if (ch === 34 || ch === 39) {
-        // " or '
-        inQuote = ch;
-      } else if (ch === 62) {
-        // >
-        break;
-      }
-      tagEnd++;
-    }
-
+    const tagEnd = findTagEnd(src, i);
     if (tagEnd >= src.length) break;
 
     const selfClosing = src[tagEnd - 1] === '/' || isVoidElement(tagName);
@@ -197,37 +204,13 @@ function isVoidElement(tagName: string): boolean {
 }
 
 function parseAttributes(src: string, tagOffset: number, idx: LineIndex): HTMLAttribute[] {
-  // Find the end of this tag (the closing >)
-  let tagEnd = tagOffset;
-  let inQuote = 0;
-  while (tagEnd < src.length) {
-    const ch = src.charCodeAt(tagEnd);
-    if (inQuote) {
-      if (ch === inQuote) inQuote = 0;
-    } else if (ch === 34 || ch === 39) {
-      // " or '
-      inQuote = ch;
-    } else if (ch === 62) {
-      // >
-      break;
-    }
-    tagEnd++;
-  }
-
+  const tagEnd = findTagEnd(src, tagOffset);
   if (tagEnd >= src.length) return [];
   const tagSrc = src.slice(tagOffset, tagEnd + 1);
 
   // Skip past the tag name
   let i = 1; // skip '<'
-  while (
-    i < tagSrc.length &&
-    tagSrc[i] !== ' ' &&
-    tagSrc[i] !== '\t' &&
-    tagSrc[i] !== '\n' &&
-    tagSrc[i] !== '\r' &&
-    tagSrc[i] !== '>' &&
-    tagSrc[i] !== '/'
-  ) {
+  while (i < tagSrc.length && !isTagDelimiter(tagSrc[i])) {
     i++;
   }
 
@@ -235,7 +218,7 @@ function parseAttributes(src: string, tagOffset: number, idx: LineIndex): HTMLAt
 
   while (i < tagSrc.length) {
     // Skip whitespace
-    while (i < tagSrc.length && (tagSrc[i] === ' ' || tagSrc[i] === '\t' || tagSrc[i] === '\n' || tagSrc[i] === '\r')) {
+    while (i < tagSrc.length && isWhitespace(tagSrc[i])) {
       i++;
     }
 
@@ -243,16 +226,7 @@ function parseAttributes(src: string, tagOffset: number, idx: LineIndex): HTMLAt
 
     // Read attribute name
     const nameStart = i;
-    while (
-      i < tagSrc.length &&
-      tagSrc[i] !== '=' &&
-      tagSrc[i] !== ' ' &&
-      tagSrc[i] !== '\t' &&
-      tagSrc[i] !== '\n' &&
-      tagSrc[i] !== '\r' &&
-      tagSrc[i] !== '>' &&
-      tagSrc[i] !== '/'
-    ) {
+    while (i < tagSrc.length && tagSrc[i] !== '=' && !isTagDelimiter(tagSrc[i])) {
       i++;
     }
 
@@ -274,7 +248,7 @@ function parseAttributes(src: string, tagOffset: number, idx: LineIndex): HTMLAt
     };
 
     // Skip whitespace before potential =
-    while (i < tagSrc.length && (tagSrc[i] === ' ' || tagSrc[i] === '\t' || tagSrc[i] === '\n' || tagSrc[i] === '\r')) {
+    while (i < tagSrc.length && isWhitespace(tagSrc[i])) {
       i++;
     }
 
@@ -284,10 +258,7 @@ function parseAttributes(src: string, tagOffset: number, idx: LineIndex): HTMLAt
       i++; // skip '='
 
       // Skip whitespace after =
-      while (
-        i < tagSrc.length &&
-        (tagSrc[i] === ' ' || tagSrc[i] === '\t' || tagSrc[i] === '\n' || tagSrc[i] === '\r')
-      ) {
+      while (i < tagSrc.length && isWhitespace(tagSrc[i])) {
         i++;
       }
 
@@ -306,15 +277,7 @@ function parseAttributes(src: string, tagOffset: number, idx: LineIndex): HTMLAt
         } else {
           // Unquoted value
           const valStart = i;
-          while (
-            i < tagSrc.length &&
-            tagSrc[i] !== ' ' &&
-            tagSrc[i] !== '\t' &&
-            tagSrc[i] !== '\n' &&
-            tagSrc[i] !== '\r' &&
-            tagSrc[i] !== '>' &&
-            tagSrc[i] !== '/'
-          ) {
+          while (i < tagSrc.length && !isTagDelimiter(tagSrc[i])) {
             i++;
           }
           attr.value = tagSrc.slice(valStart, i);

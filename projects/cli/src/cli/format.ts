@@ -1,4 +1,5 @@
-import { marked, MarkedExtension } from 'marked';
+import { marked } from 'marked';
+import type { MarkedExtension } from 'marked';
 import { markedTerminal } from 'marked-terminal';
 
 import type {

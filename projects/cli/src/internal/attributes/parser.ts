@@ -8,7 +8,7 @@ export async function parseCustomAttributes(path: string): Promise<CustomAttribu
   return normalizeCustomAttributesFile(raw);
 }
 
-function normalizeCustomAttributesFile(raw: unknown): CustomAttributesFile {
+export function normalizeCustomAttributesFile(raw: unknown): CustomAttributesFile {
   const caf = raw as CustomAttributesFile;
   if (caf.attributes) {
     for (const attr of caf.attributes) {

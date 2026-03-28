@@ -1,5 +1,13 @@
 import { describe, test, expect, afterEach } from 'bun:test';
-import { resolvedPath, buildValidateConfig, createStore, printJSON } from './helpers.js';
+import {
+  resolvedPath,
+  buildValidateConfig,
+  createStore,
+  printJSON,
+  loadPatternsStore,
+  loadCustomAttributesStore,
+  loadCustomStylesStore
+} from './helpers.js';
 import type { Config } from '../internal/config/config.js';
 import { Severity } from '../internal/validate/types.js';
 import { join } from 'path';
@@ -130,5 +138,68 @@ describe('printJSON', () => {
     } finally {
       console.log = original;
     }
+  });
+});
+
+describe('loadPatternsStore', () => {
+  test('returns a store when patterns file exists', async () => {
+    const cfg = emptyConfig();
+    const store = await loadPatternsStore(cfg, testdataPath);
+    expect(store).toBeDefined();
+  });
+
+  test('returns undefined when no patterns found', async () => {
+    const cfg = emptyConfig();
+    const store = await loadPatternsStore(cfg, '/nonexistent');
+    expect(store).toBeUndefined();
+  });
+
+  test('uses config patternsPath when set', async () => {
+    const cfg = emptyConfig();
+    cfg.global.patternsPath = join(testdataPath, 'custom-patterns.json');
+    const store = await loadPatternsStore(cfg);
+    expect(store).toBeDefined();
+  });
+});
+
+describe('loadCustomAttributesStore', () => {
+  test('returns a store when attributes file exists', async () => {
+    const cfg = emptyConfig();
+    const store = await loadCustomAttributesStore(cfg, testdataPath);
+    expect(store).toBeDefined();
+  });
+
+  test('returns undefined when no attributes found', async () => {
+    const cfg = emptyConfig();
+    const store = await loadCustomAttributesStore(cfg, '/nonexistent');
+    expect(store).toBeUndefined();
+  });
+});
+
+describe('loadCustomStylesStore', () => {
+  test('returns a store when styles file exists', async () => {
+    const cfg = emptyConfig();
+    const store = await loadCustomStylesStore(cfg, testdataPath);
+    expect(store).toBeDefined();
+  });
+
+  test('returns undefined when no styles found', async () => {
+    const cfg = emptyConfig();
+    const store = await loadCustomStylesStore(cfg, '/nonexistent');
+    expect(store).toBeUndefined();
+  });
+
+  test('loads DTCG tokens when tokensPath is set', async () => {
+    const cfg = emptyConfig();
+    cfg.global.tokensPath = join(testdataPath, 'tokens.json');
+    const store = await loadCustomStylesStore(cfg, '/nonexistent');
+    expect(store).toBeDefined();
+  });
+
+  test('merges DTCG tokens with existing styles', async () => {
+    const cfg = emptyConfig();
+    cfg.global.tokensPath = join(testdataPath, 'tokens.json');
+    const store = await loadCustomStylesStore(cfg, testdataPath);
+    expect(store).toBeDefined();
   });
 });

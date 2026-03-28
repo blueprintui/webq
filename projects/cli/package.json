@@ -5,6 +5,10 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./validate": "./dist/validate.js"
+  },
   "bin": {
     "webq": "dist/index.js"
   },
@@ -20,6 +24,7 @@
     "ci": "wireit",
     "debug": "wireit",
     "test": "wireit",
+    "test:coverage": "wireit",
     "lint": "wireit",
     "build": "wireit",
     "install:local": "wireit",
@@ -33,8 +38,8 @@
     "ci": {
       "dependencies": [
         "lint",
-        "test",
-        "build"
+        "build",
+        "test:coverage"
       ]
     },
     "debug": {
@@ -42,12 +47,23 @@
       "cache": false
     },
     "test": {
-      "command": "bun test",
+      "command": "bun test --coverage",
       "files": [
         "src/**/*.ts",
         "src/**/*.json",
         "testdata/**/*",
         "tsconfig.json"
+      ],
+      "output": []
+    },
+    "test:coverage": {
+      "command": "bun test --coverage",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "testdata/**/*",
+        "tsconfig.json",
+        "bunfig.toml"
       ],
       "output": []
     },
@@ -72,25 +88,29 @@
       ]
     },
     "build:js": {
-      "command": "bun build ./src/index.ts --outdir=./dist --target=bun --format=esm --minify",
+      "command": "bun build ./src/index.ts ./src/validate.ts --outdir=./dist --target=bun --format=esm --minify",
       "files": [
         "src/**/*.ts",
         "src/**/*.json",
         "tsconfig.json"
       ],
       "output": [
-        "dist/index.js"
+        "dist/index.js",
+        "dist/validate.js"
       ]
     },
     "build:tsc": {
-      "command": "tsc",
+      "command": "tsc --emitDeclarationOnly --project tsconfig.types.json",
       "files": [
         "src/**/*.ts",
         "src/**/*.json",
         "tsconfig.json",
-        "src/global.d.ts"
+        "tsconfig.types.json"
       ],
-      "output": []
+      "output": [
+        "dist/index.d.ts",
+        "dist/validate.d.ts"
+      ]
     },
     "build:darwin-arm64": {
       "command": "bun build --compile --minify src/index.ts --target=bun-darwin-arm64 --outfile dist/webq-macos-arm64",
@@ -185,13 +205,13 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@types/bun": "catalog:",
     "@eslint/js": "catalog:",
     "@types/marked-terminal": "6.1.1",
     "@types/node": "catalog:",
     "@types/yargs": "17.0.35",
     "@typescript-eslint/eslint-plugin": "8.57.0",
     "@typescript-eslint/parser": "8.57.0",
-    "bun-types": "1.3.10",
     "eslint": "10.0.3",
     "prettier": "3.8.1",
     "typescript": "catalog:",

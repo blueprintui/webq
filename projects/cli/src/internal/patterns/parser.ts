@@ -8,7 +8,7 @@ export async function parsePatterns(path: string): Promise<PatternsFile> {
   return normalizePatternsFile(raw);
 }
 
-function normalizePatternsFile(raw: unknown): PatternsFile {
+export function normalizePatternsFile(raw: unknown): PatternsFile {
   const pf = raw as PatternsFile;
   if (pf.patterns) {
     for (const pattern of pf.patterns) {

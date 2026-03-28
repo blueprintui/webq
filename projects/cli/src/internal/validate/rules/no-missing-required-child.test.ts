@@ -84,4 +84,38 @@ describe('NoMissingRequiredChild', () => {
     const doc = parseHTML('<bp-field></bp-field>');
     expect(rule.check(doc, store)).toEqual([]);
   });
+
+  test('required child with slot matches correctly', () => {
+    const slotPatternsJSON = `{
+      "schemaVersion": "1.0.0",
+      "patterns": [{
+        "name": "card-layout",
+        "description": "Card with header slot",
+        "structure": {
+          "root": "bp-card",
+          "children": [
+            { "rule": "required", "element": { "tag": "div", "slot": "header" } }
+          ]
+        }
+      }]
+    }`;
+    const slotCEMJSON = `{
+      "schemaVersion": "1.0.0",
+      "modules": [
+        { "kind": "javascript-module", "path": "src/card.js", "declarations": [{ "kind": "class", "name": "BpCard", "tagName": "bp-card", "customElement": true }] }
+      ]
+    }`;
+    const store = makeStore(slotCEMJSON);
+    const ps = makePatternsStore(slotPatternsJSON);
+    const rule = new NoMissingRequiredChild();
+    rule.setPatternStore(ps);
+
+    const validDoc = parseHTML('<bp-card><div slot="header">Title</div></bp-card>');
+    expect(rule.check(validDoc, store)).toEqual([]);
+
+    const invalidDoc = parseHTML('<bp-card><div>No slot</div></bp-card>');
+    const msgs = rule.check(invalidDoc, store);
+    expect(msgs.length).toBeGreaterThan(0);
+    expect(msgs[0].message).toContain('slot="header"');
+  });
 });

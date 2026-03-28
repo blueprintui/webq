@@ -11,6 +11,13 @@ async function createTestStore() {
 }
 
 describe('Store', () => {
+  test('GetManifests returns original manifests', async () => {
+    const store = await createTestStore();
+    const manifests = store.getManifests();
+    expect(manifests.length).toBe(1);
+    expect(manifests[0].schemaVersion).toBe('1.0.0');
+  });
+
   test('ListElements returns all elements sorted', async () => {
     const store = await createTestStore();
     const elements = store.listElements();
