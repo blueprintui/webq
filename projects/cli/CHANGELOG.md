@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/blueprintui/webq/compare/@webq/cli-v1.1.1...@webq/cli-v1.1.2) (2026-03-28)
+
+### Bug Fixes
+
+* **cli:** install path script ([da57a70](https://github.com/blueprintui/webq/commit/da57a70e8cd449a22fe36259ae72fa2627032301))
+
 ## [1.1.1](https://github.com/blueprintui/webq/compare/@webq/cli-v1.1.0...@webq/cli-v1.1.1) (2026-03-28)
 
 ### Features
