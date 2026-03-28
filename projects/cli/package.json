@@ -17,7 +17,9 @@
     "CHANGELOG.md",
     "LICENSE",
     "package.json",
-    "dist/index.js"
+    "dist/index.js",
+    "dist/validate.js",
+    "dist/**/*.d.ts"
   ],
   "scripts": {
     "start": "wireit",

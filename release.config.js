@@ -59,28 +59,31 @@ export default {
       '@semantic-release/github',
       {
         success: '🎉 This issue has been resolved in version ${nextRelease.version} 🎉',
-        assets: [
-          {
-            label: 'linux-arm64',
-            path: `dist/webq-linux-arm64`
-          },
-          {
-            label: 'linux-x64',
-            path: `dist/webq-linux-x64`
-          },
-          {
-            label: 'macos-arm64',
-            path: `dist/webq-macos-arm64`
-          },
-          {
-            label: 'macos-x64',
-            path: `dist/webq-macos-x64`
-          },
-          {
-            label: 'windows-x64',
-            path: `dist/webq-windows-x64.exe`
-          }
-        ]
+        assets:
+          scope === 'cli'
+            ? [
+                {
+                  label: 'linux-arm64',
+                  path: `dist/webq-linux-arm64`
+                },
+                {
+                  label: 'linux-x64',
+                  path: `dist/webq-linux-x64`
+                },
+                {
+                  label: 'macos-arm64',
+                  path: `dist/webq-macos-arm64`
+                },
+                {
+                  label: 'macos-x64',
+                  path: `dist/webq-macos-x64`
+                },
+                {
+                  label: 'windows-x64',
+                  path: `dist/webq-windows-x64.exe`
+                }
+              ]
+            : []
       }
     ]
   ]
