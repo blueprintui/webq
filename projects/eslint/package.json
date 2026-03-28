@@ -40,6 +40,7 @@
     "build": "wireit",
     "lint": "wireit",
     "test": "wireit",
+    "test:coverage": "wireit",
     "test:watch": "bun test --watch"
   },
   "wireit": {
@@ -47,7 +48,7 @@
       "dependencies": [
         "build",
         "lint",
-        "test"
+        "test:coverage"
       ]
     },
     "lint": {
@@ -60,26 +61,67 @@
       "output": []
     },
     "build": {
-      "command": "tsc",
+      "dependencies": [
+        "build:js",
+        "build:tsc"
+      ]
+    },
+    "build:js": {
+      "command": "bun build ./src/index.ts --outdir=./dist --target=bun --format=esm --minify",
       "files": [
         "src/**/*.ts",
+        "src/**/*.json",
         "tsconfig.json"
       ],
       "output": [
-        "dist/**"
+        "dist/index.js"
+      ],
+      "dependencies": [
+        "../cli:build"
+      ]
+    },
+    "build:tsc": {
+      "command": "tsc --emitDeclarationOnly --project tsconfig.types.json",
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json",
+        "tsconfig.types.json"
+      ],
+      "output": [
+        "dist/index.d.ts"
+      ],
+      "dependencies": [
+        "../cli:build"
       ]
     },
     "test": {
-      "command": "ln -sf $(cd ../cli && pwd)/dist/index.js /tmp/webq && chmod +x /tmp/webq && PATH=\"/tmp:$PATH\" bun test src/",
+      "command": "bun test src/",
       "dependencies": [
-        "../cli:build"
+        "../cli:build:tsc"
       ],
       "files": [
         "src/**/*.ts",
         "src/**/*.json"
       ],
       "output": []
+    },
+    "test:coverage": {
+      "command": "bun test src/ --coverage",
+      "dependencies": [
+        "../cli:build:tsc"
+      ],
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "tsconfig.json",
+        "bunfig.toml"
+      ],
+      "output": []
     }
+  },
+  "dependencies": {
+    "@webq/cli": "workspace:*"
   },
   "peerDependencies": {
     "eslint": ">=9"
@@ -89,6 +131,7 @@
     "@html-eslint/eslint-plugin": "0.54.2",
     "@html-eslint/parser": "0.54.0",
     "@html-eslint/types": "0.54.0",
+    "@types/bun": "catalog:",
     "@types/node": "catalog:",
     "es-html-parser": "0.3.1",
     "eslint": "catalog:",
