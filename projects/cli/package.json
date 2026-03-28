@@ -173,7 +173,7 @@
       "dependencies": [
         "build"
       ],
-      "command": "mkdir -p \"$HOME/.local/bin\" && cp dist/webq-macos-arm64 \"$HOME/.local/bin/webq\" && codesign --sign - --force $HOME/.local/bin/webq",
+      "command": "bash install.sh",
       "cache": false
     },
     "uninstall:local": {

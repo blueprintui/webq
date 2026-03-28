@@ -41,7 +41,14 @@ if [ -f "$SCRIPT_DIR/dist/$TARGET" ]; then
   SOURCE="$SCRIPT_DIR/dist/$TARGET"
 else
   echo "Downloading $TARGET..."
-  DOWNLOAD_URL="https://github.com/$REPO/releases/latest/download/$TARGET"
+  TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases" \
+    | grep -o '"tag_name": *"@webq/cli-v[^"]*"' \
+    | head -1 \
+    | cut -d'"' -f4)
+  if [ -z "$TAG" ]; then
+    echo "Could not find latest @webq/cli release"; exit 1
+  fi
+  DOWNLOAD_URL="https://github.com/$REPO/releases/download/$TAG/$TARGET"
   SOURCE="$(mktemp)"
   curl -fsSL "$DOWNLOAD_URL" -o "$SOURCE"
 fi
