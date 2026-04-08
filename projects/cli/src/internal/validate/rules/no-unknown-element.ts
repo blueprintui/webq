@@ -29,7 +29,9 @@ export class NoUnknownElement implements Rule {
           severity: this.severity,
           message: `Unknown custom element <${elem.tagName}>.`,
           line: elem.line,
-          column: elem.column
+          column: elem.column,
+          endLine: elem.endLine,
+          endColumn: elem.endColumn
         });
       }
     }

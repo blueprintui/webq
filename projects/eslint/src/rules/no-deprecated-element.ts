@@ -28,7 +28,10 @@ const rule: Rule.RuleModule = {
       for (const msg of messages) {
         if (msg.ruleId !== RULE_ID) continue;
         context.report({
-          loc: { start: { line: msg.line, column: msg.column - 1 }, end: { line: msg.line, column: msg.column } },
+          loc: {
+            start: { line: msg.line, column: msg.column - 1 },
+            end: { line: msg.endLine ?? msg.line, column: (msg.endColumn ?? msg.column + 1) - 1 }
+          },
           messageId: 'deprecatedElement',
           data: { webqMessage: msg.message }
         });

@@ -14,6 +14,8 @@ describe('NoDeprecatedAttr', () => {
     expect(msgs[0].severity).toBe(Severity.Warning);
     expect(msgs[0].message).toContain('closable');
     expect(msgs[0].message).toContain('Use dismissible instead');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(11);
   });
 
   test('non-deprecated attr no messages', () => {

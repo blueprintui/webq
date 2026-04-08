@@ -21,7 +21,9 @@ export class NoDeprecatedElement implements Rule {
         severity: this.severity,
         message: `<${elem.tagName}> is deprecated. ${decl.deprecated}`,
         line: elem.line,
-        column: elem.column
+        column: elem.column,
+        endLine: elem.endLine,
+        endColumn: elem.endColumn
       });
     }
 

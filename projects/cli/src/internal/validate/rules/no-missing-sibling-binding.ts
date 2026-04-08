@@ -46,7 +46,9 @@ export class NoMissingSiblingBinding implements Rule {
                 severity: this.severity,
                 message: `Pattern "${pat.name}": <${elem.tagName}> is missing required attribute "${attrRule.name}"`,
                 line: elem.line,
-                column: elem.column
+                column: elem.column,
+                endLine: elem.endLine,
+                endColumn: elem.endColumn
               });
             } else if (attrRule.value && val !== attrRule.value) {
               triggerOk = false;
@@ -55,7 +57,9 @@ export class NoMissingSiblingBinding implements Rule {
                 severity: this.severity,
                 message: `Pattern "${pat.name}": <${elem.tagName}> attribute "${attrRule.name}" must be "${attrRule.value}"`,
                 line: elem.line,
-                column: elem.column
+                column: elem.column,
+                endLine: elem.endLine,
+                endColumn: elem.endColumn
               });
             }
           }
@@ -79,7 +83,9 @@ export class NoMissingSiblingBinding implements Rule {
               severity: this.severity,
               message: `Pattern "${pat.name}": ${triggerDesc} has no sibling <${sib.target.tag}>`,
               line: elem.line,
-              column: elem.column
+              column: elem.column,
+              endLine: elem.endLine,
+              endColumn: elem.endColumn
             });
             continue;
           }
@@ -114,7 +120,9 @@ export class NoMissingSiblingBinding implements Rule {
                 severity: this.severity,
                 message: `Pattern "${pat.name}": <${elem.tagName} ${binding.triggerAttribute}="${triggerVal}"> has no sibling <${sib.target.tag} ${binding.targetAttribute}="${triggerVal}">`,
                 line: elem.line,
-                column: elem.column
+                column: elem.column,
+                endLine: elem.endLine,
+                endColumn: elem.endColumn
               });
             }
           }

@@ -22,6 +22,8 @@ describe('NoUnknownAttr', () => {
     expect(msgs[0].severity).toBe(Severity.Error);
     expect(msgs[0].message).toContain('unknown');
     expect(msgs[0].message).toContain('Valid attributes');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(12);
   });
 
   test('global attrs allowed', () => {

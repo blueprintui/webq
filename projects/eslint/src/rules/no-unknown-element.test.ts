@@ -36,6 +36,15 @@ ruleTester.run('no-unknown-element', rule, {
       code: '<not-listed></not-listed>',
       options: [{ path: webqPath, tags: ['other-element'] }],
       errors: [{ messageId: 'unknownElement' }]
+    },
+    {
+      code: `<div>
+  <not-listed>
+    <span></span>
+  </not-listed>
+</div>`,
+      options: [{ path: webqPath, tags: ['other-element'] }],
+      errors: [{ messageId: 'unknownElement', line: 2, column: 3, endLine: 4, endColumn: 15 }]
     }
   ]
 });

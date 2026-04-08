@@ -35,7 +35,9 @@ export class NoMissingRequiredChild implements Rule {
                   severity: this.severity,
                   message: `Pattern "${pat.name}": <${elem.tagName}> requires a ${describeChildElement(child.element)} child`,
                   line: elem.line,
-                  column: elem.column
+                  column: elem.column,
+                  endLine: elem.endLine,
+                  endColumn: elem.endColumn
                 });
               }
               break;
@@ -48,7 +50,9 @@ export class NoMissingRequiredChild implements Rule {
                   severity: this.severity,
                   message: `Pattern "${pat.name}": <${elem.tagName}> requires one of: ${descs.join(', ')}`,
                   line: elem.line,
-                  column: elem.column
+                  column: elem.column,
+                  endLine: elem.endLine,
+                  endColumn: elem.endColumn
                 });
               }
               break;
@@ -60,7 +64,9 @@ export class NoMissingRequiredChild implements Rule {
                   severity: this.severity,
                   message: `Pattern "${pat.name}": <${elem.tagName}> requires at least one ${describeChildElement(child.element)} child`,
                   line: elem.line,
-                  column: elem.column
+                  column: elem.column,
+                  endLine: elem.endLine,
+                  endColumn: elem.endColumn
                 });
               }
               break;

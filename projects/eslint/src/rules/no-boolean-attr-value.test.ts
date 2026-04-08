@@ -33,7 +33,12 @@ ruleTester.run('no-boolean-attr-value', rule, {
     {
       code: '<my-button disabled="disabled"></my-button>',
       options: [webqOption],
-      errors: [{ messageId: 'booleanAttrValue' }]
+      errors: [{ messageId: 'booleanAttrValue', line: 1, column: 12, endLine: 1, endColumn: 13 }]
+    },
+    {
+      code: '<my-button\n  disabled="true"\n></my-button>',
+      options: [webqOption],
+      errors: [{ messageId: 'booleanAttrValue', line: 2, column: 3, endLine: 2, endColumn: 4 }]
     }
   ]
 });

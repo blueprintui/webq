@@ -15,6 +15,8 @@ describe('NoDeprecatedCommand', () => {
     expect(msgs.length).toBe(1);
     expect(msgs[0].severity).toBe(Severity.Warning);
     expect(msgs[0].message).toContain('--dismiss');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(39);
   });
 
   test('non-deprecated command no messages', () => {

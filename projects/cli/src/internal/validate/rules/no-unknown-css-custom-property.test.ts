@@ -18,6 +18,8 @@ describe('NoUnknownCSSCustomProperty', () => {
     const msgs = rule.check(doc, store);
     expect(msgs.length).toBe(1);
     expect(msgs[0].message).toContain('--unknown-prop');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(20);
   });
 
   test('inline style unknown property', () => {

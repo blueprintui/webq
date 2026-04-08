@@ -11,7 +11,7 @@ ruleTester.run('no-deprecated-element', rule, {
     {
       code: '<my-old-card heading="Hello"></my-old-card>',
       options: [webqOption],
-      errors: [{ messageId: 'deprecatedElement' }]
+      errors: [{ messageId: 'deprecatedElement', line: 1, column: 1, endLine: 1, endColumn: 43 }]
     }
   ]
 });

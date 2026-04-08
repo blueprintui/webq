@@ -110,7 +110,12 @@ export function parseHTML(src: string): HTMLDocument {
       const closeEnd = src.indexOf('>', tagStart);
       if (closeEnd >= 0) {
         if (stack.length > 0) {
-          stack.pop();
+          const closed = stack.pop();
+          if (closed) {
+            const endPos = idx.position(closeEnd);
+            closed.endLine = endPos.line;
+            closed.endColumn = endPos.col;
+          }
         }
         pos = closeEnd + 1;
         continue;

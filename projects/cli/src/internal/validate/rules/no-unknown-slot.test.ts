@@ -18,5 +18,7 @@ describe('NoUnknownSlot', () => {
     const msgs = rule.check(doc, store);
     expect(msgs.length).toBe(1);
     expect(msgs[0].message).toContain('unknown');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(18);
   });
 });

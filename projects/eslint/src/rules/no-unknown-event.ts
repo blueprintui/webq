@@ -53,7 +53,10 @@ const rule: Rule.RuleModule = {
         }
 
         context.report({
-          loc: { start: { line: msg.line, column: msg.column - 1 }, end: { line: msg.line, column: msg.column } },
+          loc: {
+            start: { line: msg.line, column: msg.column - 1 },
+            end: { line: msg.endLine ?? msg.line, column: (msg.endColumn ?? msg.column + 1) - 1 }
+          },
           messageId: 'unknownEvent',
           data: { webqMessage: msg.message }
         });

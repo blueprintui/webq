@@ -13,6 +13,8 @@ describe('NoBooleanAttrValue', () => {
     expect(msgs.length).toBe(1);
     expect(msgs[0].severity).toBe(Severity.Warning);
     expect(msgs[0].message).toContain('disabled');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(12);
   });
 
   test('boolean without value ok', () => {

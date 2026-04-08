@@ -19,6 +19,8 @@ describe('NoUnknownAttrValue', () => {
     expect(msgs.length).toBe(1);
     expect(msgs[0].message).toContain('invalid');
     expect(msgs[0].message).toContain('primary');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(12);
   });
 
   test('no value attribute skipped', () => {

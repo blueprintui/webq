@@ -15,7 +15,7 @@ ruleTester.run('no-missing-required-child', rule, {
     {
       code: '<my-alert><span>Content only</span></my-alert>',
       options: [webqOption],
-      errors: [{ messageId: 'missingRequiredChild' }]
+      errors: [{ messageId: 'missingRequiredChild', line: 1, column: 1, endLine: 1, endColumn: 46 }]
     }
   ]
 });

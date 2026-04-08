@@ -13,6 +13,10 @@ describe('NoDeprecatedElement', () => {
     expect(msgs.length).toBe(1);
     expect(msgs[0].severity).toBe(Severity.Warning);
     expect(msgs[0].message).toContain('deprecated');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(1);
+    expect(msgs[0].endLine).toBe(1);
+    expect(msgs[0].endColumn).toBe(21);
   });
 
   test('non-deprecated element no messages', () => {

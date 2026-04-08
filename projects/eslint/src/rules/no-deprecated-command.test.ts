@@ -28,7 +28,7 @@ ruleTester.run('no-deprecated-command', rule, {
     {
       code: '<button command="--dismiss" commandfor="a1">Dismiss</button><my-alert id="a1"></my-alert>',
       options: [webqOption],
-      errors: [{ messageId: 'deprecatedCommand' }]
+      errors: [{ messageId: 'deprecatedCommand', line: 1, column: 9, endLine: 1, endColumn: 10 }]
     }
   ]
 });

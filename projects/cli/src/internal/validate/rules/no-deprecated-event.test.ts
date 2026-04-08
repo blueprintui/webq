@@ -13,6 +13,8 @@ describe('NoDeprecatedEvent', () => {
     expect(msgs.length).toBe(1);
     expect(msgs[0].severity).toBe(Severity.Warning);
     expect(msgs[0].message).toContain('bp-close');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(11);
   });
 
   test('non-deprecated event no messages', () => {

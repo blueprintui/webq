@@ -13,6 +13,8 @@ describe('NoDeprecatedSlot', () => {
     expect(msgs.length).toBe(1);
     expect(msgs[0].severity).toBe(Severity.Warning);
     expect(msgs[0].message).toContain('media');
+    expect(msgs[0].line).toBe(1);
+    expect(msgs[0].column).toBe(15);
   });
 
   test('non-deprecated slot no messages', () => {

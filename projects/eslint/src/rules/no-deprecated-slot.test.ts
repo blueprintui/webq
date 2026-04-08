@@ -17,7 +17,7 @@ ruleTester.run('no-deprecated-slot', rule, {
     {
       code: '<my-alert><span slot="icon">X</span></my-alert>',
       options: [webqOption],
-      errors: [{ messageId: 'deprecatedSlot' }]
+      errors: [{ messageId: 'deprecatedSlot', line: 1, column: 17, endLine: 1, endColumn: 18 }]
     }
   ]
 });

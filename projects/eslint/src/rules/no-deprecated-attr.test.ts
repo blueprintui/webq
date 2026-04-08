@@ -12,7 +12,7 @@ ruleTester.run('no-deprecated-attr', rule, {
     {
       code: '<my-alert type="info"></my-alert>',
       options: [webqOption],
-      errors: [{ messageId: 'deprecatedAttr' }]
+      errors: [{ messageId: 'deprecatedAttr', line: 1, column: 11, endLine: 1, endColumn: 12 }]
     }
   ]
 });
