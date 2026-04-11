@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/blueprintui/webq/compare/@webq/cli-v1.1.2...@webq/cli-v1.2.0) (2026-04-11)
+
+### Features
+
+* **cli:** enhance error reporting with line and column positions ([4d8995f](https://github.com/blueprintui/webq/commit/4d8995f4e84dfb86e4698ec22a809f4e2b649a6b))
+
 ## [1.1.2](https://github.com/blueprintui/webq/compare/@webq/cli-v1.1.1...@webq/cli-v1.1.2) (2026-03-28)
 
 ### Bug Fixes
