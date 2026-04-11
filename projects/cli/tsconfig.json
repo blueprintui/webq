@@ -9,13 +9,6 @@
     "types": ["bun"],
     "moduleResolution": "bundler",
     "noEmit": true,
-    // todo
-    "strict": false,
-    "noFallthroughCasesInSwitch": false,
-    "noUncheckedIndexedAccess": false,
-    "noImplicitOverride": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "strict": true
   }
 }
