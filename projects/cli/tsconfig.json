@@ -8,12 +8,9 @@
     "moduleDetection": "force",
     "types": ["bun"],
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
     "noEmit": true,
     // todo
     "strict": false,
-    "skipLibCheck": true,
     "noFallthroughCasesInSwitch": false,
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,
