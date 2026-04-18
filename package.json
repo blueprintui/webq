@@ -81,6 +81,6 @@
     "wireit": "0.14.12"
   },
   "dependencies": {
-    "@types/node": "^25.5.0"
+    "@types/node": "catalog:"
   }
 }

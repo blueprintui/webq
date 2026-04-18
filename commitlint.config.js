@@ -1,7 +1,7 @@
 export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    'scope-enum': [2, 'always', ['ci', 'cli', 'eslint']],
+    'scope-enum': [2, 'always', ['ci', 'cli', 'eslint', 'schemas']],
     'body-empty': [0, 'never'],
     'body-leading-blank': [2, 'always'],
     'footer-leading-blank': [2, 'always'],

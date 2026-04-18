@@ -5,7 +5,7 @@
     "": {
       "name": "webq-monorepo",
       "dependencies": {
-        "@types/node": "^25.5.0",
+        "@types/node": "catalog:",
       },
       "devDependencies": {
         "@commitlint/cli": "20.5.0",
@@ -25,7 +25,7 @@
     },
     "projects/cli": {
       "name": "@webq/cli",
-      "version": "1.0.1",
+      "version": "1.2.0",
       "bin": {
         "webq": "dist/index.js",
       },
@@ -52,7 +52,7 @@
     },
     "projects/eslint": {
       "name": "@webq/eslint",
-      "version": "0.0.0",
+      "version": "1.0.0",
       "dependencies": {
         "@webq/cli": "workspace:*",
       },
