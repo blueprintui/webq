@@ -1,3 +1,15 @@
+## [1.1.0](https://github.com/blueprintui/webq/compare/@webq/eslint-v1.0.0...@webq/eslint-v1.1.0) (2026-04-18)
+
+### Features
+
+* **cli:** enhance error reporting with line and column positions ([4d8995f](https://github.com/blueprintui/webq/commit/4d8995f4e84dfb86e4698ec22a809f4e2b649a6b))
+* **eslint:** update commands and enhance validation logic ([6715321](https://github.com/blueprintui/webq/commit/67153216454c6bb0c34fd6043fbc05a7267e203b))
+
+### Bug Fixes
+
+* **cli:** enhance cli validation and testing ([33f8512](https://github.com/blueprintui/webq/commit/33f8512af977dcb0d142c0cc465235a43a7cfbd9))
+* **cli:** install path script ([da57a70](https://github.com/blueprintui/webq/commit/da57a70e8cd449a22fe36259ae72fa2627032301))
+
 ## 1.0.0 (2026-03-28)
 
 ### Features
