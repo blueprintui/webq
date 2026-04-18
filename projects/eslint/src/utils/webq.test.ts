@@ -59,4 +59,51 @@ describe('runWebqValidation', () => {
 
     expect(callCount).toBe(1);
   });
+
+  test('differentiates cache by path', () => {
+    let callCount = 0;
+    _internals.validate = () => {
+      callCount++;
+      return [];
+    };
+
+    runWebqValidation('<x-foo></x-foo>', '/path/a');
+    runWebqValidation('<x-foo></x-foo>', '/path/b');
+    expect(callCount).toBe(2);
+  });
+
+  test('differentiates cache by html', () => {
+    let callCount = 0;
+    _internals.validate = () => {
+      callCount++;
+      return [];
+    };
+
+    runWebqValidation('<x-foo></x-foo>', '/path/a');
+    runWebqValidation('<x-bar></x-bar>', '/path/a');
+    expect(callCount).toBe(2);
+  });
+
+  test('propagates errors from validation', () => {
+    _internals.validate = () => {
+      throw new Error('boom');
+    };
+
+    expect(() => runWebqValidation('<x-err></x-err>', '/path/err')).toThrow('boom');
+  });
+
+  test('clearCache forces re-validation', () => {
+    let callCount = 0;
+    _internals.validate = () => {
+      callCount++;
+      return [];
+    };
+
+    runWebqValidation('<x-clear></x-clear>', '/path/clear');
+    expect(callCount).toBe(1);
+
+    clearCache();
+    runWebqValidation('<x-clear></x-clear>', '/path/clear');
+    expect(callCount).toBe(2);
+  });
 });
