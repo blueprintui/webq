@@ -172,22 +172,25 @@ export function getElementOrThrow(ctx: ToolContext, tagName: string): Declaratio
 
 export function buildElementOutput(ctx: ToolContext, tagName: string): ElementOutput {
   const element = getElementOrThrow(ctx, tagName);
-  const output: ElementOutput = {
+  return {
     tagName: element.tagName,
     name: element.name,
     description: element.description,
-    attributes: [],
-    properties: [],
-    methods: [],
-    events: [],
-    slots: [],
-    commands: [],
-    cssProperties: [],
-    cssParts: []
+    attributes: buildAttributes(element),
+    properties: buildProperties(element),
+    methods: buildMethods(element),
+    events: buildEvents(element),
+    slots: buildSlots(element),
+    commands: buildCommands(element),
+    cssProperties: buildCSSProperties(element),
+    cssParts: buildCSSParts(element)
   };
+}
 
+function buildAttributes(element: Declaration): AttributeInfo[] {
+  const out: AttributeInfo[] = [];
   for (const attr of element.attributes ?? []) {
-    output.attributes.push({
+    out.push({
       name: attr.name,
       description: attr.description,
       type: toTypeInfo(attr.type),
@@ -197,66 +200,99 @@ export function buildElementOutput(ctx: ToolContext, tagName: string): ElementOu
       deprecated: attr.deprecated
     });
   }
+  return out;
+}
 
+function buildProperties(element: Declaration): PropertyInfo[] {
+  const out: PropertyInfo[] = [];
   for (const member of element.members ?? []) {
-    if (member.kind === KindField) {
-      output.properties.push({
-        name: member.name,
-        description: member.description,
-        type: toTypeInfo(member.type),
-        default: member.default,
-        privacy: member.privacy,
-        readonly: member.readonly
-      });
-    } else if (member.kind === KindMethod) {
-      const method: MethodInfo = {
-        name: member.name,
-        description: member.description,
-        privacy: member.privacy,
-        return: toReturnInfo(member.return)
-      };
-      if (member.parameters) method.parameters = member.parameters.map(toParameterInfo);
-      output.methods.push(method);
-    }
+    if (member.kind !== KindField) continue;
+    out.push({
+      name: member.name,
+      description: member.description,
+      type: toTypeInfo(member.type),
+      default: member.default,
+      privacy: member.privacy,
+      readonly: member.readonly
+    });
   }
+  return out;
+}
 
+function buildMethods(element: Declaration): MethodInfo[] {
+  const out: MethodInfo[] = [];
+  for (const member of element.members ?? []) {
+    if (member.kind !== KindMethod) continue;
+    const method: MethodInfo = {
+      name: member.name,
+      description: member.description,
+      privacy: member.privacy,
+      return: toReturnInfo(member.return)
+    };
+    if (member.parameters) method.parameters = member.parameters.map(toParameterInfo);
+    out.push(method);
+  }
+  return out;
+}
+
+function buildEvents(element: Declaration): EventInfo[] {
+  const out: EventInfo[] = [];
   for (const event of element.events ?? []) {
-    output.events.push({
+    out.push({
       name: event.name,
       description: event.description,
       type: toTypeInfo(event.type),
       deprecated: event.deprecated
     });
   }
+  return out;
+}
+
+function buildSlots(element: Declaration): SlotInfo[] {
+  const out: SlotInfo[] = [];
   for (const slot of element.slots ?? []) {
-    output.slots.push({
+    out.push({
       name: slot.name,
       description: slot.description,
       deprecated: slot.deprecated
     });
   }
+  return out;
+}
+
+function buildCommands(element: Declaration): CommandInfo[] {
+  const out: CommandInfo[] = [];
   for (const cmd of element.commands ?? []) {
-    output.commands.push({
+    out.push({
       name: cmd.name,
       description: cmd.description,
       deprecated: cmd.deprecated
     });
   }
+  return out;
+}
+
+function buildCSSProperties(element: Declaration): CSSPropertyInfo[] {
+  const out: CSSPropertyInfo[] = [];
   for (const prop of element.cssProperties ?? []) {
-    output.cssProperties.push({
+    out.push({
       name: prop.name,
       description: prop.description,
       default: prop.default,
       deprecated: prop.deprecated
     });
   }
+  return out;
+}
+
+function buildCSSParts(element: Declaration): CSSPartInfo[] {
+  const out: CSSPartInfo[] = [];
   for (const part of element.cssParts ?? []) {
-    output.cssParts.push({
+    out.push({
       name: part.name,
       description: part.description,
       deprecated: part.deprecated
     });
   }
-
-  return output;
+  return out;
 }

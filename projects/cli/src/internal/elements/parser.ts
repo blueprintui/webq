@@ -23,25 +23,28 @@ export function validate(manifest: Manifest): Error[] {
 
   if (manifest.modules) {
     for (let i = 0; i < manifest.modules.length; i++) {
-      const module = manifest.modules[i];
-      if (!module.path) {
-        errs.push(new Error(`module ${i}: missing path`));
-      }
-      if (!module.kind) {
-        errs.push(new Error(`module ${i}: missing kind`));
-      }
-
-      if (module.declarations) {
-        for (let j = 0; j < module.declarations.length; j++) {
-          if (!module.declarations[j].name) {
-            errs.push(new Error(`module ${i}, declaration ${j}: missing name`));
-          }
-        }
-      }
+      validateModule(manifest.modules[i], i, errs);
     }
   }
 
   return errs;
+}
+
+function validateModule(module: Manifest['modules'][number], i: number, errs: Error[]): void {
+  if (!module.path) {
+    errs.push(new Error(`module ${i}: missing path`));
+  }
+  if (!module.kind) {
+    errs.push(new Error(`module ${i}: missing kind`));
+  }
+
+  if (module.declarations) {
+    for (let j = 0; j < module.declarations.length; j++) {
+      if (!module.declarations[j].name) {
+        errs.push(new Error(`module ${i}, declaration ${j}: missing name`));
+      }
+    }
+  }
 }
 
 export async function validateFile(path: string): Promise<{ manifest: Manifest; errors: Error[] }> {

@@ -120,36 +120,33 @@ export async function loadCustomAttributesStore(
   return new CustomAttributeStore(caf);
 }
 
-export async function loadCustomStylesStore(cfg: Config, pathFlag?: string): Promise<CustomStyleStore | undefined> {
-  let csf;
+async function resolveStylesPath(cfg: Config, pathFlag?: string): Promise<string> {
+  const configured = cfg.global.stylesPath ?? '';
+  if (configured) return configured;
+  return discoverOptionalFile(cfg, resolveStyles, pathFlag);
+}
 
-  let path = cfg.global.stylesPath ?? '';
-  if (!path) {
-    path = await discoverOptionalFile(cfg, resolveStyles, pathFlag);
-  }
-  if (path) {
-    csf = await parseCustomStyles(path);
-  }
+type StylesFile = Awaited<ReturnType<typeof parseCustomStyles>>;
+
+function mergeStyles(base: StylesFile | undefined, extra: StylesFile | undefined): StylesFile | undefined {
+  if (!extra) return base;
+  if (!base) return extra;
+  base.cssCustomProperties.push(...extra.cssCustomProperties);
+  return base;
+}
+
+async function loadDTCGTokens(tokensPath?: string): Promise<StylesFile | undefined> {
+  if (!tokensPath) return undefined;
+  return (await loadDTCG(tokensPath)) ?? undefined;
+}
+
+export async function loadCustomStylesStore(cfg: Config, pathFlag?: string): Promise<CustomStyleStore | undefined> {
+  const path = await resolveStylesPath(cfg, pathFlag);
+  let csf: StylesFile | undefined = path ? await parseCustomStyles(path) : undefined;
 
   const vscodeData = await loadVSCodeData(cfg, pathFlag);
-  if (vscodeData?.styles) {
-    if (csf) {
-      csf.cssCustomProperties.push(...vscodeData.styles.cssCustomProperties);
-    } else {
-      csf = vscodeData.styles;
-    }
-  }
-
-  if (cfg.global.tokensPath) {
-    const dtcgResult = await loadDTCG(cfg.global.tokensPath);
-    if (dtcgResult) {
-      if (csf) {
-        csf.cssCustomProperties.push(...dtcgResult.cssCustomProperties);
-      } else {
-        csf = dtcgResult;
-      }
-    }
-  }
+  csf = mergeStyles(csf, vscodeData?.styles);
+  csf = mergeStyles(csf, await loadDTCGTokens(cfg.global.tokensPath));
 
   if (!csf) return undefined;
   return new CustomStyleStore(csf);

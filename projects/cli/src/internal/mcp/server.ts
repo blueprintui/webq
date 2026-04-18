@@ -1,5 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import type { Store } from '../elements/store.js';
 import type { ValidateConfig } from '../validate/types.js';
 import type { PatternStore } from '../patterns/store.js';
@@ -77,8 +78,7 @@ export class Server {
     this.#registerResources();
   }
 
-  async serve(): Promise<void> {
-    const transport = new StdioServerTransport();
+  async serve(transport: Transport = new StdioServerTransport()): Promise<void> {
     await this.#mcpServer.connect(transport);
   }
 

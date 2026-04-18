@@ -80,6 +80,20 @@ export function printMarkdown(md: string): void {
   process.stderr.write(mdRenderer.parse(md) as string);
 }
 
+function splitLongWord(word: string, maxWidth: number): string[] {
+  const chunks: string[] = [];
+  for (let i = 0; i < word.length; i += maxWidth) {
+    chunks.push(word.slice(i, i + maxWidth));
+  }
+  return chunks;
+}
+
+function appendWord(line: string, word: string, maxWidth: number): { line: string; flush?: string } {
+  const next = line ? `${line} ${word}` : word;
+  if (next.length <= maxWidth) return { line: next };
+  return { line: word, flush: line || undefined };
+}
+
 /** Wraps plain text to a maximum column width; breaks at spaces, splits words longer than `maxWidth`. */
 export function wrapText(text: string, maxWidth: number): string {
   if (maxWidth < 1) return text;
@@ -94,18 +108,12 @@ export function wrapText(text: string, maxWidth: number): string {
         lines.push(line);
         line = '';
       }
-      for (let i = 0; i < word.length; i += maxWidth) {
-        lines.push(word.slice(i, i + maxWidth));
-      }
+      lines.push(...splitLongWord(word, maxWidth));
       continue;
     }
-    const next = line ? `${line} ${word}` : word;
-    if (next.length <= maxWidth) {
-      line = next;
-    } else {
-      if (line) lines.push(line);
-      line = word;
-    }
+    const result = appendWord(line, word, maxWidth);
+    if (result.flush) lines.push(result.flush);
+    line = result.line;
   }
   if (line) lines.push(line);
   return lines.join('\n');
@@ -125,89 +133,113 @@ export function formatElementSummaries(elements: ElementSummary[]): string {
   return sb;
 }
 
+function attributesSection(attrs: Attribute[] | undefined): string {
+  if (!attrs?.length) return '';
+  return (
+    '## Attributes\n\n' +
+    renderFormattedMarkdownTable(
+      ['Name', 'Type', 'Default', 'Description'],
+      attrs.map(attr => [
+        `\`${attr.name}\``,
+        `${formatTypeText(attr.type)}`,
+        attr.default ?? '',
+        attr.description ?? ''
+      ])
+    )
+  );
+}
+
+function propertiesSection(fields: Member[]): string {
+  if (!fields.length) return '';
+  return (
+    '## Properties\n\n' +
+    renderFormattedMarkdownTable(
+      ['Name', 'Type', 'Default', 'Description'],
+      fields.map(prop => [
+        `\`${prop.name}\``,
+        `${formatTypeText(prop.type)}`,
+        prop.default ?? '',
+        prop.description ?? ''
+      ])
+    )
+  );
+}
+
+function methodsSection(methods: Member[]): string {
+  if (!methods.length) return '';
+  return '## Methods\n\n' + formatMethodsTable(methods);
+}
+
+function eventsSection(events: Event[] | undefined): string {
+  if (!events?.length) return '';
+  return (
+    '## Events\n\n' +
+    renderFormattedMarkdownTable(
+      ['Name', 'Type', 'Description'],
+      events.map(event => [`\`${event.name}\``, `${formatTypeText(event.type)}`, event.description ?? ''])
+    )
+  );
+}
+
+function slotsSection(slots: Slot[] | undefined): string {
+  if (!slots?.length) return '';
+  return (
+    '## Slots\n\n' +
+    renderFormattedMarkdownTable(
+      ['Name', 'Description'],
+      slots.map(slot => [slot.name === '' ? '*(default)*' : '`' + slot.name + '`', slot.description ?? ''])
+    )
+  );
+}
+
+function cssPropertiesSection(props: CSSProperty[] | undefined): string {
+  if (!props?.length) return '';
+  return (
+    '## CSS Custom Properties\n\n' +
+    renderFormattedMarkdownTable(
+      ['Property', 'Default', 'Description'],
+      props.map(prop => [`\`${prop.name}\``, prop.default ?? '', prop.description ?? ''])
+    )
+  );
+}
+
+function commandsSection(commands: Command[] | undefined): string {
+  if (!commands?.length) return '';
+  return (
+    '## Commands\n\n' +
+    renderFormattedMarkdownTable(
+      ['Name', 'Description'],
+      commands.map(cmd => [`\`${cmd.name}\``, cmd.description ?? ''])
+    )
+  );
+}
+
+function cssPartsSection(parts: CSSPart[] | undefined): string {
+  if (!parts?.length) return '';
+  return (
+    '## CSS Parts\n\n' +
+    renderFormattedMarkdownTable(
+      ['Part', 'Description'],
+      parts.map(part => [`\`${part.name}\``, part.description ?? ''])
+    )
+  );
+}
+
 export function formatElement(elem: Declaration): string {
   let sb = `# \`<${elem.tagName}>\`\n\n`;
   if (elem.description) sb += elem.description + '\n\n';
 
-  if (elem.attributes?.length) {
-    sb +=
-      '## Attributes\n\n' +
-      renderFormattedMarkdownTable(
-        ['Name', 'Type', 'Default', 'Description'],
-        elem.attributes.map(attr => [
-          `\`${attr.name}\``,
-          `${formatTypeText(attr.type)}`,
-          attr.default ?? '',
-          attr.description ?? ''
-        ])
-      );
-  }
-
   const fields = (elem.members ?? []).filter(m => m.kind === KindField);
   const methods = (elem.members ?? []).filter(m => m.kind === KindMethod);
 
-  if (fields.length) {
-    sb +=
-      '## Properties\n\n' +
-      renderFormattedMarkdownTable(
-        ['Name', 'Type', 'Default', 'Description'],
-        fields.map(prop => [
-          `\`${prop.name}\``,
-          `${formatTypeText(prop.type)}`,
-          prop.default ?? '',
-          prop.description ?? ''
-        ])
-      );
-  }
-
-  if (methods.length) {
-    sb += '## Methods\n\n' + formatMethodsTable(methods);
-  }
-
-  if (elem.events?.length) {
-    sb +=
-      '## Events\n\n' +
-      renderFormattedMarkdownTable(
-        ['Name', 'Type', 'Description'],
-        elem.events.map(event => [`\`${event.name}\``, `${formatTypeText(event.type)}`, event.description ?? ''])
-      );
-  }
-
-  if (elem.slots?.length) {
-    sb +=
-      '## Slots\n\n' +
-      renderFormattedMarkdownTable(
-        ['Name', 'Description'],
-        elem.slots.map(slot => [slot.name === '' ? '*(default)*' : '`' + slot.name + '`', slot.description ?? ''])
-      );
-  }
-
-  if (elem.cssProperties?.length) {
-    sb +=
-      '## CSS Custom Properties\n\n' +
-      renderFormattedMarkdownTable(
-        ['Property', 'Default', 'Description'],
-        elem.cssProperties.map(prop => [`\`${prop.name}\``, prop.default ?? '', prop.description ?? ''])
-      );
-  }
-
-  if (elem.commands?.length) {
-    sb +=
-      '## Commands\n\n' +
-      renderFormattedMarkdownTable(
-        ['Name', 'Description'],
-        elem.commands.map(cmd => [`\`${cmd.name}\``, cmd.description ?? ''])
-      );
-  }
-
-  if (elem.cssParts?.length) {
-    sb +=
-      '## CSS Parts\n\n' +
-      renderFormattedMarkdownTable(
-        ['Part', 'Description'],
-        elem.cssParts.map(part => [`\`${part.name}\``, part.description ?? ''])
-      );
-  }
+  sb += attributesSection(elem.attributes);
+  sb += propertiesSection(fields);
+  sb += methodsSection(methods);
+  sb += eventsSection(elem.events);
+  sb += slotsSection(elem.slots);
+  sb += cssPropertiesSection(elem.cssProperties);
+  sb += commandsSection(elem.commands);
+  sb += cssPartsSection(elem.cssParts);
 
   return sb;
 }
@@ -327,70 +359,87 @@ export function formatPatternSummaries(summaries: PatternSummary[]): string {
   return sb;
 }
 
+function patternRootSection(root: Pattern['structure']['root']): string {
+  if (!root) return '';
+  let sb = `**Root:** \`<${root.tag}>\`\n\n`;
+  if (root.attributes?.length) {
+    const attrs = root.attributes.map(a => '`' + a.name + '`');
+    sb += 'Required attributes: ' + attrs.join(', ') + '\n\n';
+  }
+  return sb;
+}
+
+function patternChildElement(child: NonNullable<Pattern['structure']['children']>[number]): string {
+  if (child.options?.length) return child.options.map(o => o.tag).join(', ');
+  if (!child.element) return '';
+  let elem = '`<' + child.element.tag + '>`';
+  if (child.element.slot) elem += ' (slot: ' + child.element.slot + ')';
+  return elem;
+}
+
+function patternChildrenSection(children: Pattern['structure']['children']): string {
+  if (!children?.length) return '';
+  return (
+    '### Children\n\n' +
+    renderFormattedMarkdownTable(
+      ['Rule', 'Element', 'Description'],
+      children.map(child => [child.rule, patternChildElement(child), child.description ?? ''])
+    )
+  );
+}
+
+function patternSiblingBindings(bindings: NonNullable<Pattern['structure']['siblings']>[number]['bindings']): string {
+  if (!bindings?.length) return '';
+  let sb = '- **Bindings:**\n';
+  for (const b of bindings) {
+    sb += `  - \`${b.triggerAttribute}\` (trigger) = \`${b.targetAttribute}\` (target)\n`;
+  }
+  return sb;
+}
+
+function patternSiblingsSection(siblings: Pattern['structure']['siblings']): string {
+  if (!siblings?.length) return '';
+  let sb = '### Siblings\n\n';
+  for (const sib of siblings) {
+    if (sib.description) sb += sib.description + '\n\n';
+    sb += `- **Trigger:** \`<${sib.trigger.tag}>\`\n`;
+    sb += `- **Target:** \`<${sib.target.tag}>\`\n`;
+    sb += patternSiblingBindings(sib.bindings);
+    sb += '\n';
+  }
+  return sb;
+}
+
+function patternExamplesSection(examples: Pattern['examples']): string {
+  if (!examples?.length) return '';
+  let sb = '## Examples\n\n';
+  for (const ex of examples) {
+    sb += `### ${ex.name}\n\n`;
+    if (ex.description) sb += ex.description + '\n\n';
+    sb += '```html\n' + ex.html + '\n```\n\n';
+  }
+  return sb;
+}
+
+function patternRelatedSection(related: Pattern['relatedPatterns']): string {
+  if (!related?.length) return '';
+  let sb = '## Related Patterns\n\n';
+  for (const rp of related) {
+    sb += '- ' + rp + '\n';
+  }
+  return sb + '\n';
+}
+
 export function formatPattern(p: Pattern): string {
   let sb = `# ${p.name}\n\n${p.description}\n\n`;
   if (p.tags?.length) sb += '**Tags:** ' + p.tags.join(', ') + '\n\n';
 
   sb += '## Structure\n\n';
-  if (p.structure.root) {
-    sb += `**Root:** \`<${p.structure.root.tag}>\`\n\n`;
-    if (p.structure.root.attributes?.length) {
-      const attrs = p.structure.root.attributes.map(a => '`' + a.name + '`');
-      sb += 'Required attributes: ' + attrs.join(', ') + '\n\n';
-    }
-  }
-
-  if (p.structure.children?.length) {
-    sb +=
-      '### Children\n\n' +
-      renderFormattedMarkdownTable(
-        ['Rule', 'Element', 'Description'],
-        p.structure.children.map(child => {
-          let elem = '';
-          if (child.element) {
-            elem = '`<' + child.element.tag + '>`';
-            if (child.element.slot) elem += ' (slot: ' + child.element.slot + ')';
-          }
-          if (child.options?.length) {
-            elem = child.options.map(o => o.tag).join(', ');
-          }
-          return [child.rule, elem, child.description ?? ''];
-        })
-      );
-  }
-
-  if (p.structure.siblings?.length) {
-    sb += '### Siblings\n\n';
-    for (const sib of p.structure.siblings) {
-      if (sib.description) sb += sib.description + '\n\n';
-      sb += `- **Trigger:** \`<${sib.trigger.tag}>\`\n`;
-      sb += `- **Target:** \`<${sib.target.tag}>\`\n`;
-      if (sib.bindings?.length) {
-        sb += '- **Bindings:**\n';
-        for (const b of sib.bindings) {
-          sb += `  - \`${b.triggerAttribute}\` (trigger) = \`${b.targetAttribute}\` (target)\n`;
-        }
-      }
-      sb += '\n';
-    }
-  }
-
-  if (p.examples?.length) {
-    sb += '## Examples\n\n';
-    for (const ex of p.examples) {
-      sb += `### ${ex.name}\n\n`;
-      if (ex.description) sb += ex.description + '\n\n';
-      sb += '```html\n' + ex.html + '\n```\n\n';
-    }
-  }
-
-  if (p.relatedPatterns?.length) {
-    sb += '## Related Patterns\n\n';
-    for (const rp of p.relatedPatterns) {
-      sb += '- ' + rp + '\n';
-    }
-    sb += '\n';
-  }
+  sb += patternRootSection(p.structure.root);
+  sb += patternChildrenSection(p.structure.children);
+  sb += patternSiblingsSection(p.structure.siblings);
+  sb += patternExamplesSection(p.examples);
+  sb += patternRelatedSection(p.relatedPatterns);
 
   return sb;
 }
@@ -406,45 +455,54 @@ export function formatCustomAttributeSummaries(summaries: CustomAttributeSummary
   return sb;
 }
 
+function appliesToSection(appliesTo: CustomAttribute['appliesTo']): string {
+  if (appliesTo?.all) return '**Applies to:** all elements\n\n';
+  if (appliesTo?.elements?.length) return '**Applies to:** ' + appliesTo.elements.join(', ') + '\n\n';
+  return '';
+}
+
+function tokenGroup(tg: NonNullable<CustomAttribute['tokenGroups']>[number]): string {
+  let sb = `### ${tg.name}\n\n`;
+  if (tg.description) sb += tg.description + '\n\n';
+  if (tg.rule) {
+    const rule = tg.required ? `${tg.rule} (required)` : tg.rule;
+    sb += '**Rule:** ' + rule + '\n\n';
+  }
+  if (tg.requires?.length) sb += '**Requires:** ' + tg.requires.join(', ') + '\n\n';
+  if (tg.values?.length) {
+    sb += renderFormattedMarkdownTable(
+      ['Value', 'Description'],
+      tg.values.map(v => [`\`${v.value}\``, v.description ?? ''])
+    );
+  }
+  return sb;
+}
+
+function tokenGroupsSection(groups: CustomAttribute['tokenGroups']): string {
+  if (!groups?.length) return '';
+  let sb = '## Token Groups\n\n';
+  for (const tg of groups) sb += tokenGroup(tg);
+  return sb;
+}
+
+function customAttrExamplesSection(examples: CustomAttribute['examples']): string {
+  if (!examples?.length) return '';
+  let sb = '## Examples\n\n';
+  for (const ex of examples) {
+    sb += `### ${ex.name}\n\n`;
+    if (ex.description) sb += ex.description + '\n\n';
+    sb += '```html\n' + ex.html + '\n```\n\n';
+  }
+  return sb;
+}
+
 export function formatCustomAttribute(a: CustomAttribute): string {
   let sb = `# \`${a.name}\`\n\n${a.description}\n\n`;
   if (a.syntax) sb += '**Syntax:** `' + a.syntax + '`\n\n';
-  if (a.appliesTo?.all) {
-    sb += '**Applies to:** all elements\n\n';
-  } else if (a.appliesTo?.elements?.length) {
-    sb += '**Applies to:** ' + a.appliesTo.elements.join(', ') + '\n\n';
-  }
+  sb += appliesToSection(a.appliesTo);
   if (a.tags?.length) sb += '**Tags:** ' + a.tags.join(', ') + '\n\n';
-
-  if (a.tokenGroups?.length) {
-    sb += '## Token Groups\n\n';
-    for (const tg of a.tokenGroups) {
-      sb += `### ${tg.name}\n\n`;
-      if (tg.description) sb += tg.description + '\n\n';
-      if (tg.rule) {
-        let rule = tg.rule;
-        if (tg.required) rule += ' (required)';
-        sb += '**Rule:** ' + rule + '\n\n';
-      }
-      if (tg.requires?.length) sb += '**Requires:** ' + tg.requires.join(', ') + '\n\n';
-      if (tg.values?.length) {
-        sb += renderFormattedMarkdownTable(
-          ['Value', 'Description'],
-          tg.values.map(v => [`\`${v.value}\``, v.description ?? ''])
-        );
-      }
-    }
-  }
-
-  if (a.examples?.length) {
-    sb += '## Examples\n\n';
-    for (const ex of a.examples) {
-      sb += `### ${ex.name}\n\n`;
-      if (ex.description) sb += ex.description + '\n\n';
-      sb += '```html\n' + ex.html + '\n```\n\n';
-    }
-  }
-
+  sb += tokenGroupsSection(a.tokenGroups);
+  sb += customAttrExamplesSection(a.examples);
   return sb;
 }
 

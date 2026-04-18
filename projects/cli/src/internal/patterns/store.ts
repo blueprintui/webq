@@ -1,4 +1,4 @@
-import type { Pattern, PatternsFile } from './types.js';
+import type { ElementRef, Pattern, PatternsFile } from './types.js';
 
 export interface PatternSummary {
   name: string;
@@ -44,23 +44,31 @@ export class PatternStore {
 
 function patternReferencesTag(p: Pattern, tagName: string): boolean {
   if (p.structure.root && p.structure.root.tag === tagName) return true;
+  if (childrenReferenceTag(p, tagName)) return true;
+  if (siblingsReferenceTag(p, tagName)) return true;
+  return false;
+}
 
-  if (p.structure.children) {
-    for (const child of p.structure.children) {
-      if (child.element && child.element.tag === tagName) return true;
-      if (child.options) {
-        for (const opt of child.options) {
-          if (opt.tag === tagName) return true;
-        }
-      }
-    }
+function childrenReferenceTag(p: Pattern, tagName: string): boolean {
+  if (!p.structure.children) return false;
+  for (const child of p.structure.children) {
+    if (child.element && child.element.tag === tagName) return true;
+    if (child.options && optionsReferenceTag(child.options, tagName)) return true;
   }
+  return false;
+}
 
-  if (p.structure.siblings) {
-    for (const sib of p.structure.siblings) {
-      if (sib.trigger.tag === tagName || sib.target.tag === tagName) return true;
-    }
+function optionsReferenceTag(options: ElementRef[], tagName: string): boolean {
+  for (const opt of options) {
+    if (opt.tag === tagName) return true;
   }
+  return false;
+}
 
+function siblingsReferenceTag(p: Pattern, tagName: string): boolean {
+  if (!p.structure.siblings) return false;
+  for (const sib of p.structure.siblings) {
+    if (sib.trigger.tag === tagName || sib.target.tag === tagName) return true;
+  }
   return false;
 }

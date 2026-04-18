@@ -93,23 +93,38 @@ export function makeStore(json: string = manifestJSON): Store {
 
 export function makePatternsStore(json: string): PatternStore {
   const raw = JSON.parse(json);
-  // Normalize ElementRef fields
   if (raw.patterns) {
     for (const pattern of raw.patterns) {
-      if (pattern.structure?.root && typeof pattern.structure.root === 'string') {
-        pattern.structure.root = { tag: pattern.structure.root };
-      }
-      if (pattern.structure?.children) {
-        for (const child of pattern.structure.children) {
-          if (child.element && typeof child.element === 'string') {
-            child.element = { tag: child.element };
-          }
-          if (child.options) {
-            child.options = child.options.map((o: unknown) => (typeof o === 'string' ? { tag: o } : o));
-          }
-        }
-      }
+      normalizePattern(pattern);
     }
   }
   return new PatternStore(raw as PatternsFile);
+}
+
+function normalizePattern(pattern: { structure?: { root?: unknown; children?: unknown[] } }): void {
+  if (!pattern.structure) return;
+  normalizeRoot(pattern.structure);
+  normalizeChildren(pattern.structure.children);
+}
+
+function normalizeRoot(structure: { root?: unknown }): void {
+  if (structure.root && typeof structure.root === 'string') {
+    structure.root = { tag: structure.root };
+  }
+}
+
+function normalizeChildren(children: unknown[] | undefined): void {
+  if (!children) return;
+  for (const child of children as Array<{ element?: unknown; options?: unknown[] }>) {
+    normalizeChild(child);
+  }
+}
+
+function normalizeChild(child: { element?: unknown; options?: unknown[] }): void {
+  if (child.element && typeof child.element === 'string') {
+    child.element = { tag: child.element };
+  }
+  if (child.options) {
+    child.options = child.options.map(o => (typeof o === 'string' ? { tag: o } : o));
+  }
 }

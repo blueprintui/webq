@@ -1,4 +1,6 @@
 import type { Store } from '../../elements/store.js';
+import type { Slot } from '../../elements/types.js';
+import type { HTMLAttribute, HTMLElement } from '../types.js';
 import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../types.js';
 import { isCustomElement } from '../schema.js';
 
@@ -12,29 +14,45 @@ export class NoDeprecatedSlot implements Rule {
 
     for (const elem of doc.elements) {
       for (const attr of elem.attributes) {
-        if (attr.name !== 'slot') continue;
-
-        const parent = elem.parent;
-        if (!parent || !isCustomElement(parent.tagName)) continue;
-
-        const decl = store.getElement(parent.tagName);
-        if (!decl) continue;
-
-        for (const s of decl.slots ?? []) {
-          if (s.name === attr.value && s.deprecated) {
-            msgs.push({
-              ruleId: this.id,
-              severity: this.severity,
-              message: `Slot "${attr.value}" on <${parent.tagName}> is deprecated. ${s.deprecated}`,
-              line: attr.line,
-              column: attr.column
-            });
-            break;
-          }
-        }
+        const msg = checkSlotAttr(elem, attr, store, this.id, this.severity);
+        if (msg) msgs.push(msg);
       }
     }
 
     return msgs;
   }
+}
+
+function checkSlotAttr(
+  elem: HTMLElement,
+  attr: HTMLAttribute,
+  store: Store,
+  ruleId: string,
+  severity: Severity
+): LintMessage | undefined {
+  if (attr.name !== 'slot') return undefined;
+
+  const parent = elem.parent;
+  if (!parent || !isCustomElement(parent.tagName)) return undefined;
+
+  const decl = store.getElement(parent.tagName);
+  if (!decl) return undefined;
+
+  const deprecatedSlot = findDeprecatedSlot(decl.slots ?? [], attr.value);
+  if (!deprecatedSlot) return undefined;
+
+  return {
+    ruleId,
+    severity,
+    message: `Slot "${attr.value}" on <${parent.tagName}> is deprecated. ${deprecatedSlot.deprecated}`,
+    line: attr.line,
+    column: attr.column
+  };
+}
+
+function findDeprecatedSlot(slots: Slot[], name: string): Slot | undefined {
+  for (const s of slots) {
+    if (s.name === name && s.deprecated) return s;
+  }
+  return undefined;
 }

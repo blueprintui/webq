@@ -1,7 +1,7 @@
 import type { Manifest, Declaration, Attribute } from '../elements/types.js';
 import type { CustomAttributesFile, CustomAttribute } from '../attributes/types.js';
 import type { CustomStylesFile, CSSCustomProperty } from '../styles/types.js';
-import type { HTMLCustomData, TagAttribute, Value, ValueSet } from './types.js';
+import type { HTMLCustomData, Tag, TagAttribute, Value, ValueSet } from './types.js';
 import type { CSSCustomData } from './types.js';
 import { parseDescription } from './types.js';
 import { isCustomElement } from '../validate/schema.js';
@@ -11,78 +11,87 @@ export function convertHTML(data: HTMLCustomData): {
   attributes: CustomAttributesFile | undefined;
 } {
   const valueSets = buildValueSetMap(data.valueSets ?? []);
+  const declarations = buildDeclarations(data.tags ?? [], valueSets);
+  const manifest = buildManifest(declarations);
+  const caf = buildCustomAttributesFile(data.globalAttributes ?? [], valueSets);
+  return { manifest, attributes: caf };
+}
 
+function buildDeclarations(tags: Tag[], valueSets: Map<string, Value[]>): Declaration[] {
   const declarations: Declaration[] = [];
-  for (const tag of data.tags ?? []) {
+  for (const tag of tags) {
     if (!isCustomElement(tag.name)) continue;
-
-    const attrs: Attribute[] = [];
-    for (const a of tag.attributes ?? []) {
-      const attr: Attribute = {
-        name: a.name,
-        description: parseDescription(a.description)
-      };
-      const typeText = resolveTypeText(a, valueSets);
-      if (typeText) {
-        attr.type = { text: typeText };
-      }
-      attrs.push(attr);
-    }
-
     declarations.push({
       kind: 'class',
       name: tag.name,
       description: parseDescription(tag.description),
       tagName: tag.name,
       customElement: true,
-      attributes: attrs
+      attributes: buildTagAttributes(tag.attributes ?? [], valueSets)
     });
   }
+  return declarations;
+}
 
-  let manifest: Manifest | undefined;
-  if (declarations.length > 0) {
-    manifest = {
-      schemaVersion: '2.0.0',
-      modules: [
-        {
-          kind: 'javascript-module',
-          path: 'vscode-custom-data',
-          declarations
-        }
-      ]
+function buildTagAttributes(attributes: TagAttribute[], valueSets: Map<string, Value[]>): Attribute[] {
+  const attrs: Attribute[] = [];
+  for (const a of attributes) {
+    const attr: Attribute = {
+      name: a.name,
+      description: parseDescription(a.description)
     };
-  }
-
-  let caf: CustomAttributesFile | undefined;
-  if (data.globalAttributes && data.globalAttributes.length > 0) {
-    const customAttrs: CustomAttribute[] = [];
-    for (const ga of data.globalAttributes) {
-      const ca: CustomAttribute = {
-        name: ga.name,
-        description: parseDescription(ga.description),
-        appliesTo: { all: true, elements: [] }
-      };
-
-      const values = resolveValues(ga, valueSets);
-      if (values.length > 0) {
-        ca.syntax = 'enum';
-        ca.values = values.map(v => ({
-          value: v.name,
-          description: parseDescription(v.description)
-        }));
-      } else {
-        ca.syntax = 'string';
-      }
-
-      customAttrs.push(ca);
+    const typeText = resolveTypeText(a, valueSets);
+    if (typeText) {
+      attr.type = { text: typeText };
     }
-    caf = {
-      schemaVersion: '1.0.0',
-      attributes: customAttrs
-    };
+    attrs.push(attr);
   }
+  return attrs;
+}
 
-  return { manifest, attributes: caf };
+function buildManifest(declarations: Declaration[]): Manifest | undefined {
+  if (declarations.length === 0) return undefined;
+  return {
+    schemaVersion: '2.0.0',
+    modules: [
+      {
+        kind: 'javascript-module',
+        path: 'vscode-custom-data',
+        declarations
+      }
+    ]
+  };
+}
+
+function buildCustomAttributesFile(
+  globalAttributes: TagAttribute[],
+  valueSets: Map<string, Value[]>
+): CustomAttributesFile | undefined {
+  if (globalAttributes.length === 0) return undefined;
+  const customAttrs: CustomAttribute[] = [];
+  for (const ga of globalAttributes) {
+    customAttrs.push(buildCustomAttribute(ga, valueSets));
+  }
+  return { schemaVersion: '1.0.0', attributes: customAttrs };
+}
+
+function buildCustomAttribute(ga: TagAttribute, valueSets: Map<string, Value[]>): CustomAttribute {
+  const ca: CustomAttribute = {
+    name: ga.name,
+    description: parseDescription(ga.description),
+    appliesTo: { all: true, elements: [] }
+  };
+  const values = resolveValues(ga, valueSets);
+  if (values.length > 0) {
+    ca.syntax = 'enum';
+    ca.values = values.map(v => ({
+      value: v.name,
+      description: parseDescription(v.description)
+    }));
+  } else {
+    ca.syntax = 'string';
+  }
+  return ca;
 }
 
 export function convertCSS(data: CSSCustomData): CustomStylesFile | undefined {

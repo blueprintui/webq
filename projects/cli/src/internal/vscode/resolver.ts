@@ -36,22 +36,36 @@ async function walkDir(dir: string, refs: PackageJSONRef[]): Promise<void> {
 }
 
 async function parsePackageJSON(path: string): Promise<PackageJSONRef | undefined> {
+  const pkg = await readPackageJSON(path);
+  if (!pkg) return undefined;
+
+  const htmlData = extractCustomData(pkg, 'html');
+  const cssData = extractCustomData(pkg, 'css');
+
+  if (htmlData.length === 0 && cssData.length === 0) return undefined;
+
+  const dir = dirname(path);
+  return {
+    dir,
+    htmlDataPaths: resolvePaths(dir, htmlData),
+    cssDataPaths: resolvePaths(dir, cssData)
+  };
+}
+
+async function readPackageJSON(path: string): Promise<Record<string, unknown> | undefined> {
   try {
     const data = await readFile(path, 'utf-8');
-    const pkg = JSON.parse(data);
-
-    const htmlData = pkg?.html?.customData as string[] | undefined;
-    const cssData = pkg?.css?.customData as string[] | undefined;
-
-    if (!htmlData?.length && !cssData?.length) return undefined;
-
-    const dir = dirname(path);
-    return {
-      dir,
-      htmlDataPaths: (htmlData ?? []).map(rel => join(dir, rel)),
-      cssDataPaths: (cssData ?? []).map(rel => join(dir, rel))
-    };
+    return JSON.parse(data) as Record<string, unknown>;
   } catch {
     return undefined;
   }
+}
+
+function extractCustomData(pkg: Record<string, unknown>, key: 'html' | 'css'): string[] {
+  const section = pkg[key] as { customData?: string[] } | undefined;
+  return section?.customData ?? [];
+}
+
+function resolvePaths(dir: string, rels: string[]): string[] {
+  return rels.map(rel => join(dir, rel));
 }

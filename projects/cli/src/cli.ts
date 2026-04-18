@@ -44,6 +44,33 @@ const Version = '0.0.0';
 
 const MAX_WIDTH = Math.min(process.stdout.columns ?? 100, 100);
 
+function countElements(manifest: Awaited<ReturnType<typeof parseManifest>>): number {
+  let count = 0;
+  for (const module of manifest.modules) {
+    for (const decl of module.declarations ?? []) {
+      if (decl.tagName) count++;
+    }
+  }
+  return count;
+}
+
+async function validateManifestFile(path: string): Promise<boolean> {
+  const manifest = await parseManifest(path);
+  const validationErrors = validateManifest(manifest);
+  process.stderr.write(
+    `Manifest: ${path}\nSchema Version: ${manifest.schemaVersion}\nModules: ${manifest.modules.length}\n`
+  );
+  process.stderr.write(`Custom Elements: ${countElements(manifest)}\n`);
+  if (validationErrors.length > 0) {
+    process.stderr.write('Validation errors:\n');
+    for (const e of validationErrors) process.stderr.write(`  ✗ ${e.message}\n`);
+    process.stderr.write('\n');
+    return true;
+  }
+  process.stderr.write('✓ Manifest is valid\n\n');
+  return false;
+}
+
 function printLintResult(result: LintResult): boolean {
   for (const msg of result.messages) {
     const severity = msg.severity === Severity.Error ? 'error' : 'warning';
@@ -382,26 +409,7 @@ const cli = yargs(hideBin(process.argv))
     }
     let hasErrors = false;
     for (const p of manifestPaths) {
-      const manifest = await parseManifest(p);
-      const validationErrors = validateManifest(manifest);
-      process.stderr.write(
-        `Manifest: ${p}\nSchema Version: ${manifest.schemaVersion}\nModules: ${manifest.modules.length}\n`
-      );
-      let elementCount = 0;
-      for (const module of manifest.modules) {
-        for (const decl of module.declarations ?? []) {
-          if (decl.tagName) elementCount++;
-        }
-      }
-      process.stderr.write(`Custom Elements: ${elementCount}\n`);
-      if (validationErrors.length > 0) {
-        hasErrors = true;
-        process.stderr.write('Validation errors:\n');
-        for (const e of validationErrors) process.stderr.write(`  ✗ ${e.message}\n`);
-      } else {
-        process.stderr.write('✓ Manifest is valid\n');
-      }
-      process.stderr.write('\n');
+      if (await validateManifestFile(p)) hasErrors = true;
     }
     if (hasErrors) process.exit(1);
   })

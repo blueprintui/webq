@@ -24,24 +24,41 @@ function walk(
     if (child === null || typeof child !== 'object') continue;
 
     const childPath = [...path, key];
-
-    if (isToken(child)) {
-      const token = child as { $value: unknown; $type?: string; $description?: string };
-      const name = '--' + childPath.join('-');
-      const value = typeof token.$value === 'string' ? token.$value : String(token.$value);
-      const type = token.$type ?? inheritedType;
-      const tags = path.length > 0 ? [...path] : [];
-
-      const prop: CSSCustomProperty = { name, value };
-      if (type) prop.type = type;
-      if (token.$description) prop.description = token.$description;
-      if (tags.length > 0) prop.tags = tags;
-
-      properties.push(prop);
-    } else {
-      const group = child as Record<string, unknown>;
-      const groupType = (group.$type as string | undefined) ?? inheritedType;
-      walk(group, properties, childPath, groupType);
-    }
+    walkChild(child, properties, childPath, path, inheritedType);
   }
+}
+
+function walkChild(
+  child: DTCGNode,
+  properties: CSSCustomProperty[],
+  childPath: string[],
+  parentPath: string[],
+  inheritedType: string | undefined
+): void {
+  if (isToken(child)) {
+    properties.push(buildProperty(child, childPath, parentPath, inheritedType));
+    return;
+  }
+  const group = child as Record<string, unknown>;
+  const groupType = (group.$type as string | undefined) ?? inheritedType;
+  walk(group, properties, childPath, groupType);
+}
+
+function buildProperty(
+  child: DTCGNode,
+  childPath: string[],
+  parentPath: string[],
+  inheritedType: string | undefined
+): CSSCustomProperty {
+  const token = child as { $value: unknown; $type?: string; $description?: string };
+  const name = '--' + childPath.join('-');
+  const value = typeof token.$value === 'string' ? token.$value : String(token.$value);
+  const type = token.$type ?? inheritedType;
+  const tags = parentPath.length > 0 ? [...parentPath] : [];
+
+  const prop: CSSCustomProperty = { name, value };
+  if (type) prop.type = type;
+  if (token.$description) prop.description = token.$description;
+  if (tags.length > 0) prop.tags = tags;
+  return prop;
 }

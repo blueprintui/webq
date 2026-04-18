@@ -59,132 +59,104 @@ class LineIndex {
   }
 }
 
+interface ParserState {
+  src: string;
+  idx: LineIndex;
+  doc: HTMLDocument;
+  stack: HTMLElement[];
+  pos: number;
+}
+
+function captureStyleText(state: ParserState, from: number, to: number): void {
+  const { stack, src, doc, idx } = state;
+  if (stack.length === 0 || stack[stack.length - 1].tagName !== 'style') return;
+  const textContent = src.slice(from, to);
+  if (!textContent.trim()) return;
+  const { line, col } = idx.position(from);
+  doc.styleTags.push({ content: textContent, contentLine: line, contentColumn: col });
+}
+
+function handleComment(src: string, tagStart: number): number {
+  const commentEnd = src.indexOf('-->', tagStart + 4);
+  return commentEnd >= 0 ? commentEnd + 3 : -1;
+}
+
+function handleDoctype(src: string, tagStart: number): number {
+  const docEnd = src.indexOf('>', tagStart);
+  return docEnd >= 0 ? docEnd + 1 : -1;
+}
+
+function handleCloseTag(state: ParserState, tagStart: number): number {
+  const { src, stack, idx } = state;
+  const closeEnd = src.indexOf('>', tagStart);
+  if (closeEnd < 0) return -1;
+  const closed = stack.pop();
+  if (closed) {
+    const endPos = idx.position(closeEnd);
+    closed.endLine = endPos.line;
+    closed.endColumn = endPos.col;
+  }
+  return closeEnd + 1;
+}
+
+function handleOpenTag(state: ParserState, tagStart: number): number {
+  const { src, idx, doc, stack } = state;
+  let i = tagStart + 1;
+  if (i >= src.length || !/[a-zA-Z]/.test(src[i])) return tagStart + 1;
+
+  const { line, col } = idx.position(tagStart);
+  while (i < src.length && !isTagDelimiter(src[i])) i++;
+  const tagName = src.slice(tagStart + 1, i).toLowerCase();
+
+  const tagEnd = findTagEnd(src, i);
+  if (tagEnd >= src.length) return -1;
+
+  const selfClosing = src[tagEnd - 1] === '/' || isVoidElement(tagName);
+  const attrs = parseAttributes(src, tagStart, idx);
+  const elem: HTMLElement = { tagName, attributes: attrs, children: [], line, column: col };
+
+  if (stack.length > 0) {
+    const parent = stack[stack.length - 1];
+    elem.parent = parent;
+    parent.children.push(elem);
+  }
+  doc.elements.push(elem);
+  if (!selfClosing) stack.push(elem);
+
+  return tagEnd + 1;
+}
+
+function dispatchToken(state: ParserState, tagStart: number): number {
+  const { src } = state;
+  if (src.startsWith('<!--', tagStart)) return handleComment(src, tagStart);
+  if (src.startsWith('<!', tagStart)) return handleDoctype(src, tagStart);
+  if (src[tagStart + 1] === '/') return handleCloseTag(state, tagStart);
+  return handleOpenTag(state, tagStart);
+}
+
 export function parseHTML(src: string): HTMLDocument {
-  const idx = new LineIndex(src);
-  const doc: HTMLDocument = { elements: [], styleTags: [] };
+  const state: ParserState = {
+    src,
+    idx: new LineIndex(src),
+    doc: { elements: [], styleTags: [] },
+    stack: [],
+    pos: 0
+  };
 
-  // Simple HTML tokenizer that tracks positions
-  let pos = 0;
-  const stack: HTMLElement[] = [];
-
-  while (pos < src.length) {
-    // Find next tag
-    const tagStart = src.indexOf('<', pos);
+  while (state.pos < src.length) {
+    const tagStart = src.indexOf('<', state.pos);
     if (tagStart < 0) break;
 
-    // Check for text content before this tag (for style content)
-    if (stack.length > 0 && stack[stack.length - 1].tagName === 'style') {
-      const textContent = src.slice(pos, tagStart);
-      if (textContent.trim()) {
-        const { line, col } = idx.position(pos);
-        doc.styleTags.push({
-          content: textContent,
-          contentLine: line,
-          contentColumn: col
-        });
-      }
-    }
+    captureStyleText(state, state.pos, tagStart);
 
-    // Check for comment
-    if (src.startsWith('<!--', tagStart)) {
-      const commentEnd = src.indexOf('-->', tagStart + 4);
-      if (commentEnd >= 0) {
-        pos = commentEnd + 3;
-        continue;
-      }
-      break;
-    }
-
-    // Check for DOCTYPE
-    if (src.startsWith('<!', tagStart) && !src.startsWith('<!--', tagStart)) {
-      const docEnd = src.indexOf('>', tagStart);
-      if (docEnd >= 0) {
-        pos = docEnd + 1;
-        continue;
-      }
-      break;
-    }
-
-    // Check for closing tag
-    if (src[tagStart + 1] === '/') {
-      const closeEnd = src.indexOf('>', tagStart);
-      if (closeEnd >= 0) {
-        if (stack.length > 0) {
-          const closed = stack.pop();
-          if (closed) {
-            const endPos = idx.position(closeEnd);
-            closed.endLine = endPos.line;
-            closed.endColumn = endPos.col;
-          }
-        }
-        pos = closeEnd + 1;
-        continue;
-      }
-      break;
-    }
-
-    // Parse opening tag
-    const { line, col } = idx.position(tagStart);
-
-    // Extract tag name
-    let i = tagStart + 1;
-    if (i >= src.length || !/[a-zA-Z]/.test(src[i])) {
-      pos = tagStart + 1;
-      continue;
-    }
-
-    while (i < src.length && !isTagDelimiter(src[i])) {
-      i++;
-    }
-    const tagName = src.slice(tagStart + 1, i).toLowerCase();
-
-    // Find end of tag
-    const tagEnd = findTagEnd(src, i);
-    if (tagEnd >= src.length) break;
-
-    const selfClosing = src[tagEnd - 1] === '/' || isVoidElement(tagName);
-
-    // Parse attributes
-    const attrs = parseAttributes(src, tagStart, idx);
-
-    const elem: HTMLElement = {
-      tagName,
-      attributes: attrs,
-      children: [],
-      line,
-      column: col
-    };
-
-    // Set parent relationship
-    if (stack.length > 0) {
-      const parent = stack[stack.length - 1];
-      elem.parent = parent;
-      parent.children.push(elem);
-    }
-
-    doc.elements.push(elem);
-
-    if (!selfClosing) {
-      stack.push(elem);
-    }
-
-    pos = tagEnd + 1;
+    const next = dispatchToken(state, tagStart);
+    if (next < 0) break;
+    state.pos = next;
   }
 
-  // Handle any remaining style content
-  if (stack.length > 0 && stack[stack.length - 1].tagName === 'style' && pos < src.length) {
-    const textContent = src.slice(pos);
-    if (textContent.trim()) {
-      const { line, col } = idx.position(pos);
-      doc.styleTags.push({
-        content: textContent,
-        contentLine: line,
-        contentColumn: col
-      });
-    }
-  }
+  captureStyleText(state, state.pos, src.length);
 
-  return doc;
+  return state.doc;
 }
 
 const voidElements = new Set([
@@ -208,89 +180,90 @@ function isVoidElement(tagName: string): boolean {
   return voidElements.has(tagName);
 }
 
+function skipWhitespace(src: string, i: number): number {
+  while (i < src.length && isWhitespace(src[i])) i++;
+  return i;
+}
+
+function skipTagName(src: string, i: number): number {
+  while (i < src.length && !isTagDelimiter(src[i])) i++;
+  return i;
+}
+
+function readAttrName(src: string, i: number): number {
+  while (i < src.length && src[i] !== '=' && !isTagDelimiter(src[i])) i++;
+  return i;
+}
+
+function readQuotedValue(src: string, i: number): { value: string; next: number } {
+  const quote = src[i];
+  i++;
+  const start = i;
+  while (i < src.length && src[i] !== quote) i++;
+  const value = src.slice(start, i);
+  if (i < src.length) i++;
+  return { value, next: i };
+}
+
+function readUnquotedValue(src: string, i: number): { value: string; next: number } {
+  const start = i;
+  while (i < src.length && !isTagDelimiter(src[i])) i++;
+  return { value: src.slice(start, i), next: i };
+}
+
+function readAttrValue(src: string, i: number): { value: string; next: number } {
+  if (src[i] === '"' || src[i] === "'") return readQuotedValue(src, i);
+  return readUnquotedValue(src, i);
+}
+
+function parseSingleAttribute(
+  tagSrc: string,
+  i: number,
+  tagOffset: number,
+  idx: LineIndex
+): { attr: HTMLAttribute | null; next: number } {
+  const nameStart = i;
+  i = readAttrName(tagSrc, i);
+  if (nameStart === i) return { attr: null, next: i + 1 };
+
+  const attrName = tagSrc.slice(nameStart, i);
+  const { line, col } = idx.position(tagOffset + nameStart);
+  const attr: HTMLAttribute = {
+    name: attrName,
+    value: '',
+    line,
+    column: col,
+    hasValue: false
+  };
+
+  i = skipWhitespace(tagSrc, i);
+  if (i >= tagSrc.length || tagSrc[i] !== '=') return { attr, next: i };
+
+  attr.hasValue = true;
+  i = skipWhitespace(tagSrc, i + 1);
+  if (i < tagSrc.length) {
+    const { value, next } = readAttrValue(tagSrc, i);
+    attr.value = value;
+    i = next;
+  }
+  return { attr, next: i };
+}
+
 function parseAttributes(src: string, tagOffset: number, idx: LineIndex): HTMLAttribute[] {
   const tagEnd = findTagEnd(src, tagOffset);
   if (tagEnd >= src.length) return [];
   const tagSrc = src.slice(tagOffset, tagEnd + 1);
 
-  // Skip past the tag name
-  let i = 1; // skip '<'
-  while (i < tagSrc.length && !isTagDelimiter(tagSrc[i])) {
-    i++;
-  }
-
+  let i = skipTagName(tagSrc, 1); // skip '<' then tag name
   const attrs: HTMLAttribute[] = [];
 
   while (i < tagSrc.length) {
-    // Skip whitespace
-    while (i < tagSrc.length && isWhitespace(tagSrc[i])) {
-      i++;
-    }
-
+    i = skipWhitespace(tagSrc, i);
     if (i >= tagSrc.length || tagSrc[i] === '>' || tagSrc[i] === '/') break;
 
-    // Read attribute name
-    const nameStart = i;
-    while (i < tagSrc.length && tagSrc[i] !== '=' && !isTagDelimiter(tagSrc[i])) {
-      i++;
-    }
-
-    if (nameStart === i) {
-      i++;
-      continue;
-    }
-
-    const attrName = tagSrc.slice(nameStart, i);
-    const absNameOffset = tagOffset + nameStart;
-    const { line, col } = idx.position(absNameOffset);
-
-    const attr: HTMLAttribute = {
-      name: attrName,
-      value: '',
-      line,
-      column: col,
-      hasValue: false
-    };
-
-    // Skip whitespace before potential =
-    while (i < tagSrc.length && isWhitespace(tagSrc[i])) {
-      i++;
-    }
-
-    // Check for =value
-    if (i < tagSrc.length && tagSrc[i] === '=') {
-      attr.hasValue = true;
-      i++; // skip '='
-
-      // Skip whitespace after =
-      while (i < tagSrc.length && isWhitespace(tagSrc[i])) {
-        i++;
-      }
-
-      if (i < tagSrc.length) {
-        if (tagSrc[i] === '"' || tagSrc[i] === "'") {
-          const quote = tagSrc[i];
-          i++; // skip opening quote
-          const valStart = i;
-          while (i < tagSrc.length && tagSrc[i] !== quote) {
-            i++;
-          }
-          attr.value = tagSrc.slice(valStart, i);
-          if (i < tagSrc.length) {
-            i++; // skip closing quote
-          }
-        } else {
-          // Unquoted value
-          const valStart = i;
-          while (i < tagSrc.length && !isTagDelimiter(tagSrc[i])) {
-            i++;
-          }
-          attr.value = tagSrc.slice(valStart, i);
-        }
-      }
-    }
-
-    attrs.push(attr);
+    const { attr, next } = parseSingleAttribute(tagSrc, i, tagOffset, idx);
+    i = next;
+    if (attr) attrs.push(attr);
   }
 
   return attrs;

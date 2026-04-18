@@ -118,4 +118,76 @@ describe('parseHTML', () => {
     expect(doc.elements[0].attributes[0].name).toBe('title');
     expect(doc.elements[0].attributes[0].value).toBe('a > b');
   });
+
+  test('preserves single quotes inside double-quoted values', () => {
+    const doc = parseHTML(`<a href="it's ok"></a>`);
+    expect(doc.elements[0].attributes[0].value).toBe("it's ok");
+  });
+
+  test('preserves double quotes inside single-quoted values', () => {
+    const doc = parseHTML(`<a title='she said "hi"'></a>`);
+    expect(doc.elements[0].attributes[0].value).toBe('she said "hi"');
+  });
+
+  test('handles CRLF line endings for element positions', () => {
+    const doc = parseHTML('\r\n\r\n<div></div>');
+    expect(doc.elements[0].line).toBe(3);
+    expect(doc.elements[0].column).toBe(1);
+  });
+
+  test('handles CRLF line endings for multiline attributes', () => {
+    const doc = parseHTML('<div\r\n  class="foo"\r\n  id="bar"></div>');
+    const [cls, id] = doc.elements[0].attributes;
+    expect(cls.line).toBe(2);
+    expect(cls.column).toBe(3);
+    expect(id.line).toBe(3);
+    expect(id.column).toBe(3);
+  });
+
+  test('parses empty attribute values', () => {
+    const doc = parseHTML('<div class=""></div>');
+    const attr = doc.elements[0].attributes[0];
+    expect(attr.value).toBe('');
+    expect(attr.hasValue).toBe(true);
+  });
+
+  test('preserves entity references without decoding', () => {
+    const doc = parseHTML('<a title="a &amp; b"></a>');
+    expect(doc.elements[0].attributes[0].value).toBe('a &amp; b');
+  });
+
+  test('still records unclosed tags as elements', () => {
+    const doc = parseHTML('<div><span>');
+    expect(doc.elements.map(e => e.tagName)).toEqual(['div', 'span']);
+  });
+
+  test('records unclosed tag attributes', () => {
+    const doc = parseHTML('<div class="a"><span id="b">');
+    expect(doc.elements[0].attributes[0].value).toBe('a');
+    expect(doc.elements[1].attributes[0].value).toBe('b');
+  });
+
+  test('captures multiple style blocks', () => {
+    const doc = parseHTML('<style>a{color:red}</style><style>b{color:blue}</style>');
+    expect(doc.styleTags.length).toBe(2);
+    expect(doc.styleTags[0].content).toContain('color:red');
+    expect(doc.styleTags[1].content).toContain('color:blue');
+  });
+
+  test('whitespace-only input yields no elements', () => {
+    const doc = parseHTML('   \n\t  ');
+    expect(doc.elements.length).toBe(0);
+  });
+
+  test('handles mismatched closing tags without crashing', () => {
+    const doc = parseHTML('<div><span></div></span>');
+    expect(doc.elements.map(e => e.tagName)).toEqual(['div', 'span']);
+    expect(doc.elements[1].parent).toBe(doc.elements[0]);
+  });
+
+  test('handles unterminated comments', () => {
+    const doc = parseHTML('<div></div><!-- never closed');
+    expect(doc.elements.length).toBe(1);
+    expect(doc.elements[0].tagName).toBe('div');
+  });
 });

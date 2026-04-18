@@ -10,7 +10,17 @@ export interface CommandPair {
 }
 
 export function resolveCommandPairs(doc: HTMLDocument, store: Store): CommandPair[] {
-  // First pass: collect id → element mappings
+  const idMap = buildIdMap(doc);
+
+  const pairs: CommandPair[] = [];
+  for (const elem of doc.elements) {
+    const pair = resolvePair(elem, idMap, store);
+    if (pair) pairs.push(pair);
+  }
+  return pairs;
+}
+
+function buildIdMap(doc: HTMLDocument): Map<string, HTMLElement> {
   const idMap = new Map<string, HTMLElement>();
   for (const elem of doc.elements) {
     for (const attr of elem.attributes) {
@@ -19,31 +29,35 @@ export function resolveCommandPairs(doc: HTMLDocument, store: Store): CommandPai
       }
     }
   }
+  return idMap;
+}
 
-  // Second pass: resolve command/commandfor pairs
-  const pairs: CommandPair[] = [];
-  for (const elem of doc.elements) {
-    let commandAttr: HTMLAttribute | undefined;
-    let commandForAttr: HTMLAttribute | undefined;
-    for (const attr of elem.attributes) {
-      if (attr.name === 'command') commandAttr = attr;
-      if (attr.name === 'commandfor') commandForAttr = attr;
-    }
+function resolvePair(elem: HTMLElement, idMap: Map<string, HTMLElement>, store: Store): CommandPair | undefined {
+  const { commandAttr, commandForAttr } = findCommandAttrs(elem);
+  if (!commandAttr || !commandForAttr) return undefined;
 
-    if (!commandAttr || !commandForAttr) continue;
+  const targetElem = idMap.get(commandForAttr.value);
+  if (!targetElem || !isCustomElement(targetElem.tagName)) return undefined;
 
-    const targetElem = idMap.get(commandForAttr.value);
-    if (!targetElem || !isCustomElement(targetElem.tagName)) continue;
+  const decl = store.getElement(targetElem.tagName);
+  if (!decl) return undefined;
 
-    const decl = store.getElement(targetElem.tagName);
-    if (!decl) continue;
+  return {
+    commandAttr,
+    targetTag: targetElem.tagName,
+    declaration: decl
+  };
+}
 
-    pairs.push({
-      commandAttr,
-      targetTag: targetElem.tagName,
-      declaration: decl
-    });
+function findCommandAttrs(elem: HTMLElement): {
+  commandAttr?: HTMLAttribute;
+  commandForAttr?: HTMLAttribute;
+} {
+  let commandAttr: HTMLAttribute | undefined;
+  let commandForAttr: HTMLAttribute | undefined;
+  for (const attr of elem.attributes) {
+    if (attr.name === 'command') commandAttr = attr;
+    if (attr.name === 'commandfor') commandForAttr = attr;
   }
-
-  return pairs;
+  return { commandAttr, commandForAttr };
 }

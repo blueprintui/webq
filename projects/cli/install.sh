@@ -55,9 +55,9 @@ fi
 
 chmod +x "$SOURCE"
 
-# Applying ad-hoc code signature for MacOS
-if [ "$OS" = "Darwin" ]; then
-  codesign --sign - --force "$SOURCE"
+# macOS requires ad-hoc code signature for binaries to execute
+if [ "$OS" = "Darwin" ] && command -v codesign >/dev/null 2>&1; then
+  codesign --sign - --force "$INSTALL_DIR/$BINARY_NAME" 2>/dev/null || warn "Ad-hoc code signing failed — binary may not run."
 fi
 
 DEST="$INSTALL_DIR/$BINARY_NAME"
