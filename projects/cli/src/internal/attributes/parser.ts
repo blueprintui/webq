@@ -8,25 +8,29 @@ export async function parseCustomAttributes(path: string): Promise<CustomAttribu
   return normalizeCustomAttributesFile(raw);
 }
 
+function normalizeAttribute(attr: CustomAttributesFile['attributes'][number]): void {
+  if (attr.appliesTo !== undefined) {
+    attr.appliesTo = parseAppliesTo(attr.appliesTo);
+  } else {
+    attr.appliesTo = { all: false, elements: [] };
+  }
+  if (attr.values) {
+    attr.values = attr.values.map((val: unknown) => parseTokenValue(val));
+  }
+  if (attr.tokenGroups) {
+    for (const tg of attr.tokenGroups) {
+      if (tg.values) {
+        tg.values = tg.values.map((val: unknown) => parseTokenValue(val));
+      }
+    }
+  }
+}
+
 export function normalizeCustomAttributesFile(raw: unknown): CustomAttributesFile {
   const caf = raw as CustomAttributesFile;
   if (caf.attributes) {
     for (const attr of caf.attributes) {
-      if (attr.appliesTo !== undefined) {
-        attr.appliesTo = parseAppliesTo(attr.appliesTo);
-      } else {
-        attr.appliesTo = { all: false, elements: [] };
-      }
-      if (attr.values) {
-        attr.values = attr.values.map((v: unknown) => parseTokenValue(v));
-      }
-      if (attr.tokenGroups) {
-        for (const tg of attr.tokenGroups) {
-          if (tg.values) {
-            tg.values = tg.values.map((v: unknown) => parseTokenValue(v));
-          }
-        }
-      }
+      normalizeAttribute(attr);
     }
   }
   return caf;

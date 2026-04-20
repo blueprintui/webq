@@ -14,9 +14,21 @@ import { parseHTML } from './html.js';
 
 const defaultRules: Rule[] = [];
 
-export function registerRule(r: Rule): void {
-  if (defaultRules.some(existing => existing.id === r.id)) return;
-  defaultRules.push(r);
+export interface VerifyOptions {
+  cfg?: ValidateConfig;
+  stores?: VerifyStores;
+}
+
+interface CollectContext {
+  rule: Rule;
+  doc: ReturnType<typeof parseHTML>;
+  store: Store;
+  cfg: ValidateConfig | undefined;
+}
+
+export function registerRule(rule: Rule): void {
+  if (defaultRules.some(existing => existing.id === rule.id)) return;
+  defaultRules.push(rule);
 }
 
 export function allRules(): Rule[] {
@@ -24,16 +36,11 @@ export function allRules(): Rule[] {
 }
 
 export function getRule(id: string): Rule | undefined {
-  return defaultRules.find(r => r.id === id);
+  return defaultRules.find(rule => rule.id === id);
 }
 
-export function verify(
-  html: string,
-  store: Store,
-  rules: Rule[],
-  cfg?: ValidateConfig,
-  stores?: VerifyStores
-): LintResult {
+export function verify(html: string, store: Store, rules: Rule[], options: VerifyOptions = {}): LintResult {
+  const { cfg, stores } = options;
   const doc = parseHTML(html);
   const result: LintResult = {
     messages: [],
@@ -47,7 +54,7 @@ export function verify(
     if (isRuleDisabled(rule, cfg)) continue;
     configureRule(rule, cfg);
     injectStores(rule, vs);
-    collectMessages(rule, doc, store, cfg, result);
+    collectMessages({ rule, doc, store, cfg }, result);
   }
 
   return result;
@@ -71,13 +78,8 @@ function injectStores(rule: Rule, vs: VerifyStores): void {
   if (isCustomAttrAwareRule(rule)) rule.setCustomAttributeStore(vs.customAttributeStore);
 }
 
-function collectMessages(
-  rule: Rule,
-  doc: ReturnType<typeof parseHTML>,
-  store: Store,
-  cfg: ValidateConfig | undefined,
-  result: LintResult
-): void {
+function collectMessages(ctx: CollectContext, result: LintResult): void {
+  const { rule, doc, store, cfg } = ctx;
   const msgs = rule.check(doc, store);
   for (const msg of msgs) {
     const finalMsg = { ...msg };

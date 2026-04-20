@@ -8,25 +8,26 @@ export interface CSSCustomPropertySummary {
 }
 
 export class CustomStyleStore {
-  #properties: Map<string, CSSCustomProperty> = new Map();
+  readonly #properties: Map<string, CSSCustomProperty>;
 
   constructor(csf: CustomStylesFile) {
-    for (const p of csf.cssCustomProperties) {
-      this.#properties.set(p.name, p);
+    this.#properties = new Map();
+    for (const prop of csf.cssCustomProperties) {
+      this.#properties.set(prop.name, prop);
     }
   }
 
   getCSSCustomProperties(): CSSCustomPropertySummary[] {
     const summaries: CSSCustomPropertySummary[] = [];
-    for (const p of this.#properties.values()) {
+    for (const prop of this.#properties.values()) {
       summaries.push({
-        name: p.name,
-        description: p.description,
-        type: p.type,
-        tags: p.tags
+        name: prop.name,
+        description: prop.description,
+        type: prop.type,
+        tags: prop.tags
       });
     }
-    return summaries.sort((a, b) => a.name.localeCompare(b.name));
+    return summaries.sort((left, right) => left.name.localeCompare(right.name));
   }
 
   getCSSCustomProperty(name: string): CSSCustomProperty | undefined {

@@ -5,9 +5,13 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement } from '../schema.js';
 
 export class NoBooleanAttrValue implements Rule {
-  readonly id = 'no-boolean-attr-value';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Warning;
+  constructor() {
+    this.id = 'no-boolean-attr-value';
+    this.severity = Severity.Warning;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -35,8 +39,8 @@ function getBooleanAttrs(elem: HTMLElement, store: Store): Set<string> | undefin
 
 function collectBooleanAttrs(attrs: Attribute[]): Set<string> {
   const result = new Set<string>();
-  for (const a of attrs) {
-    if (a.type?.text === 'boolean') result.add(a.name);
+  for (const attr of attrs) {
+    if (attr.type?.text === 'boolean') result.add(attr.name);
   }
   return result;
 }

@@ -1,6 +1,7 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatCustomAttributeSummaries } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
+import type { CustomAttributeSummary } from '../store.js';
 
 export const metadata = {
   command: 'attribute.list',
@@ -12,23 +13,23 @@ export const metadata = {
     destructiveHint: false as const,
     openWorldHint: false as const
   },
-  inputSchema: z.object({})
+  inputSchema: zod.object({})
 };
 
-export function toMarkdown(ctx: ToolContext) {
+export function toMarkdown(ctx: ToolContext): string {
   if (!ctx.customAttrStore) return 'No custom-attributes.json found\n';
   return formatCustomAttributeSummaries(ctx.customAttrStore.getCustomAttributes());
 }
 
-export function toJSON(ctx: ToolContext) {
+export function toJSON(ctx: ToolContext): { attributes: CustomAttributeSummary[] } {
   if (!ctx.customAttrStore) return { attributes: [] };
   const summaries = ctx.customAttrStore.getCustomAttributes();
   return {
-    attributes: summaries.map(s => ({
-      name: s.name,
-      description: s.description,
-      syntax: s.syntax,
-      tags: s.tags
+    attributes: summaries.map(summary => ({
+      name: summary.name,
+      description: summary.description,
+      syntax: summary.syntax,
+      tags: summary.tags
     }))
   };
 }

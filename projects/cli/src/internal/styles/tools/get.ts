@@ -1,6 +1,7 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatCSSCustomPropertyDetail } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
+import type { CSSCustomProperty } from '../types.js';
 
 export const metadata = {
   command: 'style.property <name>',
@@ -12,19 +13,19 @@ export const metadata = {
     destructiveHint: false as const,
     openWorldHint: false as const
   },
-  inputSchema: z.object({
-    name: z.string().describe('The name of the CSS custom property')
+  inputSchema: zod.object({
+    name: zod.string().describe('The name of the CSS custom property')
   })
 };
 
-export function toMarkdown(ctx: ToolContext, input: { name: string }) {
+export function toMarkdown(ctx: ToolContext, input: { name: string }): string {
   if (!ctx.customStyleStore) throw new Error('No custom styles file loaded');
   const prop = ctx.customStyleStore.getCSSCustomProperty(input.name);
   if (!prop) throw new Error(`CSS custom property "${input.name}" not found`);
   return formatCSSCustomPropertyDetail(prop);
 }
 
-export function toJSON(ctx: ToolContext, input: { name: string }) {
+export function toJSON(ctx: ToolContext, input: { name: string }): CSSCustomProperty {
   if (!ctx.customStyleStore) throw new Error('No custom styles file loaded');
   const prop = ctx.customStyleStore.getCSSCustomProperty(input.name);
   if (!prop) throw new Error(`CSS custom property "${input.name}" not found`);

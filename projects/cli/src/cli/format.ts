@@ -40,14 +40,14 @@ function color(value: string): string {
 }
 
 export const colorize = {
-  error: (msg: string) => `${color('#e62f2f')}${msg}\x1b[0m`,
-  warning: (msg: string) => `${color('yellow')}${msg}\x1b[0m`,
-  success: (msg: string) => `${color('green')}${msg}\x1b[0m`,
-  info: (msg: string) => `${color('blue')}${msg}\x1b[0m`,
-  debug: (msg: string) => `${color('gray')}${msg}\x1b[0m`,
-  blue: (msg: string) => `${color('#008fff')}${msg}\x1b[0m`,
-  green: (msg: string) => `${color('#51da51')}${msg}\x1b[0m`,
-  pink: (msg: string) => `${color('#e796e7')}${msg}\x1b[0m`
+  error: (msg: string): string => `${color('#e62f2f')}${msg}\x1b[0m`,
+  warning: (msg: string): string => `${color('yellow')}${msg}\x1b[0m`,
+  success: (msg: string): string => `${color('green')}${msg}\x1b[0m`,
+  info: (msg: string): string => `${color('blue')}${msg}\x1b[0m`,
+  debug: (msg: string): string => `${color('gray')}${msg}\x1b[0m`,
+  blue: (msg: string): string => `${color('#008fff')}${msg}\x1b[0m`,
+  green: (msg: string): string => `${color('#51da51')}${msg}\x1b[0m`,
+  pink: (msg: string): string => `${color('#e796e7')}${msg}\x1b[0m`
 };
 
 export const ansi = {
@@ -65,9 +65,9 @@ export const ansi = {
 
 const mdRenderer = marked.use(
   markedTerminal({
-    firstHeading: (msg: string) => colorize.green(msg),
-    heading: (msg: string) => colorize.green(msg),
-    codespan: (msg: string) => colorize.green(msg),
+    firstHeading: (msg: string): string => colorize.green(msg),
+    heading: (msg: string): string => colorize.green(msg),
+    codespan: (msg: string): string => colorize.green(msg),
     tableOptions: {
       style: {
         head: ['\x1b[0m']
@@ -82,8 +82,8 @@ export function printMarkdown(md: string): void {
 
 function splitLongWord(word: string, maxWidth: number): string[] {
   const chunks: string[] = [];
-  for (let i = 0; i < word.length; i += maxWidth) {
-    chunks.push(word.slice(i, i + maxWidth));
+  for (let idx = 0; idx < word.length; idx += maxWidth) {
+    chunks.push(word.slice(idx, idx + maxWidth));
   }
   return chunks;
 }
@@ -94,6 +94,17 @@ function appendWord(line: string, word: string, maxWidth: number): { line: strin
   return { line: word, flush: line || undefined };
 }
 
+function addWordToLines(line: string, word: string, maxWidth: number, lines: string[]): string {
+  if (word.length > maxWidth) {
+    if (line) lines.push(line);
+    lines.push(...splitLongWord(word, maxWidth));
+    return '';
+  }
+  const result = appendWord(line, word, maxWidth);
+  if (result.flush) lines.push(result.flush);
+  return result.line;
+}
+
 /** Wraps plain text to a maximum column width; breaks at spaces, splits words longer than `maxWidth`. */
 export function wrapText(text: string, maxWidth: number): string {
   if (maxWidth < 1) return text;
@@ -101,27 +112,16 @@ export function wrapText(text: string, maxWidth: number): string {
   if (words.length === 0 || (words.length === 1 && words[0] === '')) return '';
   const lines: string[] = [];
   let line = '';
-
   for (const word of words) {
-    if (word.length > maxWidth) {
-      if (line) {
-        lines.push(line);
-        line = '';
-      }
-      lines.push(...splitLongWord(word, maxWidth));
-      continue;
-    }
-    const result = appendWord(line, word, maxWidth);
-    if (result.flush) lines.push(result.flush);
-    line = result.line;
+    line = addWordToLines(line, word, maxWidth, lines);
   }
   if (line) lines.push(line);
   return lines.join('\n');
 }
 
-function formatTypeText(t?: Type): string {
-  if (!t) return '';
-  return '`' + t.text + '`';
+function formatTypeText(type?: Type): string {
+  if (!type) return '';
+  return '`' + type.text + '`';
 }
 
 export function formatElementSummaries(elements: ElementSummary[]): string {
@@ -229,8 +229,8 @@ export function formatElement(elem: Declaration): string {
   let sb = `# \`<${elem.tagName}>\`\n\n`;
   if (elem.description) sb += elem.description + '\n\n';
 
-  const fields = (elem.members ?? []).filter(m => m.kind === KindField);
-  const methods = (elem.members ?? []).filter(m => m.kind === KindMethod);
+  const fields = (elem.members ?? []).filter(member => member.kind === KindField);
+  const methods = (elem.members ?? []).filter(member => member.kind === KindMethod);
 
   sb += attributesSection(elem.attributes);
   sb += propertiesSection(fields);
@@ -268,7 +268,12 @@ export function formatMembersValue(members: Member[], tagName: string, title: st
   if (!members.length) return sb + `No ${title.toLowerCase()} defined.\n`;
   sb += renderFormattedMarkdownTable(
     ['Name', 'Type', 'Default', 'Description'],
-    members.map(m => [`\`${m.name}\``, `${formatTypeText(m.type)}`, m.default ?? '', m.description ?? ''])
+    members.map(member => [
+      `\`${member.name}\``,
+      `${formatTypeText(member.type)}`,
+      member.default ?? '',
+      member.description ?? ''
+    ])
   );
   return sb;
 }
@@ -277,10 +282,10 @@ function formatMethodsTable(methods: Member[]): string {
   return renderFormattedMarkdownTable(
     ['Name', 'Parameters', 'Return', 'Description'],
     methods.map(method => {
-      const params = (method.parameters ?? []).map(p => {
-        let s = p.name;
-        if (p.type) s += ': ' + p.type.text;
-        return s;
+      const params = (method.parameters ?? []).map(param => {
+        let str = param.name;
+        if (param.type) str += ': ' + param.type.text;
+        return str;
       });
       return [
         `\`${method.name}\``,
@@ -351,10 +356,10 @@ export function formatCSSPartsValue(parts: CSSPart[], tagName: string): string {
 
 export function formatPatternSummaries(summaries: PatternSummary[]): string {
   let sb = '# Patterns\n\n';
-  for (const s of summaries) {
-    sb += `## ${s.name}\n\n`;
-    if (s.description) sb += s.description + '\n\n';
-    if (s.tags?.length) sb += 'Tags: ' + s.tags.join(', ') + '\n\n';
+  for (const summary of summaries) {
+    sb += `## ${summary.name}\n\n`;
+    if (summary.description) sb += summary.description + '\n\n';
+    if (summary.tags?.length) sb += 'Tags: ' + summary.tags.join(', ') + '\n\n';
   }
   return sb;
 }
@@ -363,14 +368,14 @@ function patternRootSection(root: Pattern['structure']['root']): string {
   if (!root) return '';
   let sb = `**Root:** \`<${root.tag}>\`\n\n`;
   if (root.attributes?.length) {
-    const attrs = root.attributes.map(a => '`' + a.name + '`');
+    const attrs = root.attributes.map(attr => '`' + attr.name + '`');
     sb += 'Required attributes: ' + attrs.join(', ') + '\n\n';
   }
   return sb;
 }
 
 function patternChildElement(child: NonNullable<Pattern['structure']['children']>[number]): string {
-  if (child.options?.length) return child.options.map(o => o.tag).join(', ');
+  if (child.options?.length) return child.options.map(opt => opt.tag).join(', ');
   if (!child.element) return '';
   let elem = '`<' + child.element.tag + '>`';
   if (child.element.slot) elem += ' (slot: ' + child.element.slot + ')';
@@ -391,8 +396,8 @@ function patternChildrenSection(children: Pattern['structure']['children']): str
 function patternSiblingBindings(bindings: NonNullable<Pattern['structure']['siblings']>[number]['bindings']): string {
   if (!bindings?.length) return '';
   let sb = '- **Bindings:**\n';
-  for (const b of bindings) {
-    sb += `  - \`${b.triggerAttribute}\` (trigger) = \`${b.targetAttribute}\` (target)\n`;
+  for (const binding of bindings) {
+    sb += `  - \`${binding.triggerAttribute}\` (trigger) = \`${binding.targetAttribute}\` (target)\n`;
   }
   return sb;
 }
@@ -430,27 +435,27 @@ function patternRelatedSection(related: Pattern['relatedPatterns']): string {
   return sb + '\n';
 }
 
-export function formatPattern(p: Pattern): string {
-  let sb = `# ${p.name}\n\n${p.description}\n\n`;
-  if (p.tags?.length) sb += '**Tags:** ' + p.tags.join(', ') + '\n\n';
+export function formatPattern(pattern: Pattern): string {
+  let sb = `# ${pattern.name}\n\n${pattern.description}\n\n`;
+  if (pattern.tags?.length) sb += '**Tags:** ' + pattern.tags.join(', ') + '\n\n';
 
   sb += '## Structure\n\n';
-  sb += patternRootSection(p.structure.root);
-  sb += patternChildrenSection(p.structure.children);
-  sb += patternSiblingsSection(p.structure.siblings);
-  sb += patternExamplesSection(p.examples);
-  sb += patternRelatedSection(p.relatedPatterns);
+  sb += patternRootSection(pattern.structure.root);
+  sb += patternChildrenSection(pattern.structure.children);
+  sb += patternSiblingsSection(pattern.structure.siblings);
+  sb += patternExamplesSection(pattern.examples);
+  sb += patternRelatedSection(pattern.relatedPatterns);
 
   return sb;
 }
 
 export function formatCustomAttributeSummaries(summaries: CustomAttributeSummary[]): string {
   let sb = '# Custom Attributes\n\n';
-  for (const s of summaries) {
-    sb += `## \`${s.name}\`\n\n`;
-    if (s.description) sb += s.description + '\n\n';
-    if (s.syntax) sb += 'Syntax: `' + s.syntax + '`\n\n';
-    if (s.tags?.length) sb += 'Tags: ' + s.tags.join(', ') + '\n\n';
+  for (const summary of summaries) {
+    sb += `## \`${summary.name}\`\n\n`;
+    if (summary.description) sb += summary.description + '\n\n';
+    if (summary.syntax) sb += 'Syntax: `' + summary.syntax + '`\n\n';
+    if (summary.tags?.length) sb += 'Tags: ' + summary.tags.join(', ') + '\n\n';
   }
   return sb;
 }
@@ -472,7 +477,7 @@ function tokenGroup(tg: NonNullable<CustomAttribute['tokenGroups']>[number]): st
   if (tg.values?.length) {
     sb += renderFormattedMarkdownTable(
       ['Value', 'Description'],
-      tg.values.map(v => [`\`${v.value}\``, v.description ?? ''])
+      tg.values.map(value => [`\`${value.value}\``, value.description ?? ''])
     );
   }
   return sb;
@@ -496,13 +501,13 @@ function customAttrExamplesSection(examples: CustomAttribute['examples']): strin
   return sb;
 }
 
-export function formatCustomAttribute(a: CustomAttribute): string {
-  let sb = `# \`${a.name}\`\n\n${a.description}\n\n`;
-  if (a.syntax) sb += '**Syntax:** `' + a.syntax + '`\n\n';
-  sb += appliesToSection(a.appliesTo);
-  if (a.tags?.length) sb += '**Tags:** ' + a.tags.join(', ') + '\n\n';
-  sb += tokenGroupsSection(a.tokenGroups);
-  sb += customAttrExamplesSection(a.examples);
+export function formatCustomAttribute(attr: CustomAttribute): string {
+  let sb = `# \`${attr.name}\`\n\n${attr.description}\n\n`;
+  if (attr.syntax) sb += '**Syntax:** `' + attr.syntax + '`\n\n';
+  sb += appliesToSection(attr.appliesTo);
+  if (attr.tags?.length) sb += '**Tags:** ' + attr.tags.join(', ') + '\n\n';
+  sb += tokenGroupsSection(attr.tokenGroups);
+  sb += customAttrExamplesSection(attr.examples);
   return sb;
 }
 
@@ -510,16 +515,21 @@ export function formatCSSCustomPropertySummaries(summaries: CSSCustomPropertySum
   let sb = '# CSS Custom Properties\n\n';
   sb += renderFormattedMarkdownTable(
     ['Name', 'Type', 'Description', 'Tags'],
-    summaries.map(s => [`\`${s.name}\``, s.type ?? '', s.description ?? '', s.tags?.join(', ') ?? ''])
+    summaries.map(summary => [
+      `\`${summary.name}\``,
+      summary.type ?? '',
+      summary.description ?? '',
+      summary.tags?.join(', ') ?? ''
+    ])
   );
   return sb;
 }
 
-export function formatCSSCustomPropertyDetail(p: CSSCustomProperty): string {
-  let sb = `# \`${p.name}\`\n\n`;
-  if (p.description) sb += p.description + '\n\n';
-  if (p.value) sb += '**Value:** `' + p.value + '`\n\n';
-  if (p.type) sb += '**Type:** `' + p.type + '`\n\n';
-  if (p.tags?.length) sb += '**Tags:** ' + p.tags.join(', ') + '\n\n';
+export function formatCSSCustomPropertyDetail(prop: CSSCustomProperty): string {
+  let sb = `# \`${prop.name}\`\n\n`;
+  if (prop.description) sb += prop.description + '\n\n';
+  if (prop.value) sb += '**Value:** `' + prop.value + '`\n\n';
+  if (prop.type) sb += '**Type:** `' + prop.type + '`\n\n';
+  if (prop.tags?.length) sb += '**Tags:** ' + prop.tags.join(', ') + '\n\n';
   return sb;
 }

@@ -5,9 +5,13 @@ import { isCustomElement } from '../schema.js';
 import { formatSuggestion } from './suggestion.js';
 
 export class NoUnknownSlot implements Rule {
-  readonly id = 'no-unknown-slot';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-unknown-slot';
+    this.severity = Severity.Error;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -22,7 +26,7 @@ export class NoUnknownSlot implements Rule {
         const decl = store.getElement(parent.tagName);
         if (!decl) continue;
 
-        const slotSet = new Set((decl.slots ?? []).map(s => s.name));
+        const slotSet = new Set((decl.slots ?? []).map(slot => slot.name));
 
         if (!slotSet.has(attr.value)) {
           const suggestion = formatSlotNames(decl.slots ?? []);
@@ -42,6 +46,6 @@ export class NoUnknownSlot implements Rule {
 }
 
 function formatSlotNames(slots: Slot[]): string {
-  const names = slots.map(s => (s.name === '' ? '"" (default)' : s.name));
+  const names = slots.map(slot => (slot.name === '' ? '"" (default)' : slot.name));
   return formatSuggestion(names, 'slots', 'Available slots');
 }

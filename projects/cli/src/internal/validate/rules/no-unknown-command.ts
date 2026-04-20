@@ -5,15 +5,19 @@ import { resolveCommandPairs } from './command-helper.js';
 import { formatSuggestion } from './suggestion.js';
 
 export class NoUnknownCommand implements Rule {
-  readonly id = 'no-unknown-command';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-unknown-command';
+    this.severity = Severity.Error;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
 
     for (const pair of resolveCommandPairs(doc, store)) {
-      const cmdSet = new Set((pair.declaration.commands ?? []).map(c => c.name));
+      const cmdSet = new Set((pair.declaration.commands ?? []).map(cmd => cmd.name));
 
       if (!cmdSet.has(pair.commandAttr.value)) {
         const suggestion = formatCommandNames(pair.declaration.commands ?? []);
@@ -33,7 +37,7 @@ export class NoUnknownCommand implements Rule {
 
 function formatCommandNames(commands: Command[]): string {
   return formatSuggestion(
-    commands.map(c => c.name),
+    commands.map(cmd => cmd.name),
     'commands',
     'Valid commands'
   );

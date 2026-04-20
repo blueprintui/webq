@@ -8,25 +8,26 @@ export interface CustomAttributeSummary {
 }
 
 export class CustomAttributeStore {
-  #attributes: Map<string, CustomAttribute> = new Map();
+  readonly #attributes: Map<string, CustomAttribute>;
 
   constructor(caf: CustomAttributesFile) {
-    for (const a of caf.attributes) {
-      this.#attributes.set(a.name, a);
+    this.#attributes = new Map();
+    for (const attr of caf.attributes) {
+      this.#attributes.set(attr.name, attr);
     }
   }
 
   getCustomAttributes(): CustomAttributeSummary[] {
     const summaries: CustomAttributeSummary[] = [];
-    for (const a of this.#attributes.values()) {
+    for (const attr of this.#attributes.values()) {
       summaries.push({
-        name: a.name,
-        description: a.description,
-        syntax: a.syntax,
-        tags: a.tags
+        name: attr.name,
+        description: attr.description,
+        syntax: attr.syntax,
+        tags: attr.tags
       });
     }
-    return summaries.sort((a, b) => a.name.localeCompare(b.name));
+    return summaries.sort((left, right) => left.name.localeCompare(right.name));
   }
 
   getCustomAttribute(name: string): CustomAttribute | undefined {

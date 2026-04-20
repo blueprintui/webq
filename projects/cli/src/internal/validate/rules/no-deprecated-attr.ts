@@ -3,9 +3,14 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement } from '../schema.js';
 
 export class NoDeprecatedAttr implements Rule {
-  readonly id = 'no-deprecated-attr';
+  readonly id: string;
 
-  readonly severity = Severity.Warning;
+  readonly severity: Severity;
+
+  constructor() {
+    this.id = 'no-deprecated-attr';
+    this.severity = Severity.Warning;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -17,8 +22,8 @@ export class NoDeprecatedAttr implements Rule {
       if (!decl) continue;
 
       const deprecatedAttrs = new Map<string, string>();
-      for (const a of decl.attributes ?? []) {
-        if (a.deprecated) deprecatedAttrs.set(a.name, a.deprecated);
+      for (const attr of decl.attributes ?? []) {
+        if (attr.deprecated) deprecatedAttrs.set(attr.name, attr.deprecated);
       }
 
       for (const attr of elem.attributes) {

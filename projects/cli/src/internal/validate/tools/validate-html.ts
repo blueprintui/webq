@@ -1,6 +1,6 @@
-import z from 'zod/v3';
+import zod from 'zod/v3';
 import type { ToolContext } from '../../tools.js';
-import type { Rule } from '../types.js';
+import type { Rule, LintResult } from '../types.js';
 import { verify, allRules, getRule } from '../validate.js';
 
 export const metadata = {
@@ -13,9 +13,9 @@ export const metadata = {
     destructiveHint: false as const,
     openWorldHint: false as const
   },
-  inputSchema: z.object({
-    html: z.string().describe('The HTML string to validate'),
-    rule: z.string().optional().describe('Run a specific rule')
+  inputSchema: zod.object({
+    html: zod.string().describe('The HTML string to validate'),
+    rule: zod.string().optional().describe('Run a specific rule')
   })
 };
 
@@ -24,18 +24,21 @@ export function toMarkdown(_ctx: ToolContext, _input: { html: string; rule?: str
   throw new Error('validate-html does not support markdown output');
 }
 
-export function toJSON(ctx: ToolContext, input: { html: string; rule?: string }) {
+export function toJSON(ctx: ToolContext, input: { html: string; rule?: string }): LintResult {
   let rules: Rule[];
   if (input.rule) {
-    const r = getRule(input.rule);
-    if (!r) throw new Error(`unknown rule "${input.rule}"`);
-    rules = [r];
+    const result = getRule(input.rule);
+    if (!result) throw new Error(`unknown rule "${input.rule}"`);
+    rules = [result];
   } else {
     rules = allRules();
   }
-  return verify(input.html, ctx.store, rules, ctx.validateCfg, {
-    patternStore: ctx.patternStore,
-    customStyleStore: ctx.customStyleStore,
-    customAttributeStore: ctx.customAttrStore
+  return verify(input.html, ctx.store, rules, {
+    cfg: ctx.validateCfg,
+    stores: {
+      patternStore: ctx.patternStore,
+      customStyleStore: ctx.customStyleStore,
+      customAttributeStore: ctx.customAttrStore
+    }
   });
 }

@@ -57,8 +57,8 @@ const allTools: ToolModule[] = [
 ];
 
 export class Server {
-  #mcpServer: McpServer;
-  #ctx: ToolContext;
+  readonly #mcpServer: McpServer;
+  readonly #ctx: ToolContext;
 
   constructor(cfg: ServerConfig) {
     this.#ctx = {
@@ -97,9 +97,9 @@ export class Server {
             return {
               content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }]
             };
-          } catch (e) {
+          } catch (err) {
             return {
-              content: [{ type: 'text' as const, text: (e as Error).message }],
+              content: [{ type: 'text' as const, text: (err as Error).message }],
               isError: true
             };
           }

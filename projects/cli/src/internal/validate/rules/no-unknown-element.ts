@@ -3,11 +3,15 @@ import { Severity, type Rule, type LintMessage, type RuleOptionSet, type HTMLDoc
 import { isCustomElement } from '../schema.js';
 
 export class NoUnknownElement implements Rule {
-  #allowedTags = new Set<string>();
+  #allowedTags: Set<string>;
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly id = 'no-unknown-element';
-
-  readonly severity = Severity.Error;
+  constructor() {
+    this.#allowedTags = new Set();
+    this.id = 'no-unknown-element';
+    this.severity = Severity.Error;
+  }
 
   configure(opts: RuleOptionSet): void {
     this.#allowedTags = new Set(opts.tags ?? []);

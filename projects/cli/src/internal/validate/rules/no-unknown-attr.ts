@@ -9,10 +9,13 @@ import { formatSuggestion } from './suggestion.js';
 
 export class NoUnknownAttr implements Rule {
   #customAttrStore?: CustomAttributeStore;
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly id = 'no-unknown-attr';
-
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-unknown-attr';
+    this.severity = Severity.Error;
+  }
 
   setCustomAttributeStore(store: CustomAttributeStore | undefined): void {
     this.#customAttrStore = store;
@@ -25,7 +28,7 @@ export class NoUnknownAttr implements Rule {
       const decl = getDeclaration(elem, store);
       if (!decl) continue;
 
-      const attrSet = new Set((decl.attributes ?? []).map(a => a.name));
+      const attrSet = new Set((decl.attributes ?? []).map(attr => attr.name));
 
       for (const attr of elem.attributes) {
         const msg = this.#checkAttr(elem, attr, decl, attrSet);
@@ -79,7 +82,7 @@ export function customAttrAppliesTo(ca: CustomAttribute, tagName: string): boole
 
 function formatAttrNames(attrs: Attribute[]): string {
   return formatSuggestion(
-    attrs.map(a => a.name),
+    attrs.map(attr => attr.name),
     'attributes',
     'Valid attributes'
   );

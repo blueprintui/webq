@@ -5,11 +5,15 @@ import { isCustomElement, parseEventName } from '../schema.js';
 import { formatSuggestion } from './suggestion.js';
 
 export class NoUnknownEvent implements Rule {
-  #allowedEvents = new Set<string>();
+  #allowedEvents: Set<string>;
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly id = 'no-unknown-event';
-
-  readonly severity = Severity.Error;
+  constructor() {
+    this.#allowedEvents = new Set();
+    this.id = 'no-unknown-event';
+    this.severity = Severity.Error;
+  }
 
   configure(opts: RuleOptionSet): void {
     this.#allowedEvents = new Set(opts.events ?? []);
@@ -24,7 +28,7 @@ export class NoUnknownEvent implements Rule {
       const decl = store.getElement(elem.tagName);
       if (!decl) continue;
 
-      const eventSet = new Set((decl.events ?? []).map(e => e.name));
+      const eventSet = new Set((decl.events ?? []).map(event => event.name));
 
       for (const attr of elem.attributes) {
         const { name: eventName, isEvent } = parseEventName(attr.name);
@@ -50,7 +54,7 @@ export class NoUnknownEvent implements Rule {
 
 function formatEventNames(events: Event[]): string {
   return formatSuggestion(
-    events.map(e => e.name),
+    events.map(event => event.name),
     'events',
     'Valid events'
   );

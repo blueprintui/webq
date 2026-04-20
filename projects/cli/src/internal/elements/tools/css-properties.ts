@@ -1,11 +1,11 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatCSSPropertiesValue } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
 import type { CSSPropertiesOutput } from './tools.js';
 import { getElementOrThrow } from './tools.js';
 
-const tagNameSchema = z.object({
-  tagName: z.string().describe("The tag name of the custom element (e.g. 'my-button')")
+const tagNameSchema = zod.object({
+  tagName: zod.string().describe("The tag name of the custom element (e.g. 'my-button')")
 });
 
 export const metadata = {
@@ -21,7 +21,7 @@ export const metadata = {
   inputSchema: tagNameSchema
 };
 
-export function toMarkdown(ctx: ToolContext, input: { tagName: string }) {
+export function toMarkdown(ctx: ToolContext, input: { tagName: string }): string {
   const element = getElementOrThrow(ctx, input.tagName);
   return formatCSSPropertiesValue(element.cssProperties ?? [], input.tagName);
 }
@@ -30,11 +30,11 @@ export function toJSON(ctx: ToolContext, input: { tagName: string }): CSSPropert
   const element = getElementOrThrow(ctx, input.tagName);
   return {
     tagName: input.tagName,
-    cssProperties: (element.cssProperties ?? []).map(p => ({
-      name: p.name,
-      description: p.description,
-      default: p.default,
-      deprecated: p.deprecated
+    cssProperties: (element.cssProperties ?? []).map(prop => ({
+      name: prop.name,
+      description: prop.description,
+      default: prop.default,
+      deprecated: prop.deprecated
     }))
   };
 }

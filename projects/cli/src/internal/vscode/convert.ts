@@ -35,16 +35,16 @@ function buildDeclarations(tags: Tag[], valueSets: Map<string, Value[]>): Declar
 
 function buildTagAttributes(attributes: TagAttribute[], valueSets: Map<string, Value[]>): Attribute[] {
   const attrs: Attribute[] = [];
-  for (const a of attributes) {
-    const attr: Attribute = {
-      name: a.name,
-      description: parseDescription(a.description)
+  for (const attr of attributes) {
+    const out: Attribute = {
+      name: attr.name,
+      description: parseDescription(attr.description)
     };
-    const typeText = resolveTypeText(a, valueSets);
+    const typeText = resolveTypeText(attr, valueSets);
     if (typeText) {
-      attr.type = { text: typeText };
+      out.type = { text: typeText };
     }
-    attrs.push(attr);
+    attrs.push(out);
   }
   return attrs;
 }
@@ -84,9 +84,9 @@ function buildCustomAttribute(ga: TagAttribute, valueSets: Map<string, Value[]>)
   const values = resolveValues(ga, valueSets);
   if (values.length > 0) {
     ca.syntax = 'enum';
-    ca.values = values.map(v => ({
-      value: v.name,
-      description: parseDescription(v.description)
+    ca.values = values.map(val => ({
+      value: val.name,
+      description: parseDescription(val.description)
     }));
   } else {
     ca.syntax = 'string';
@@ -96,11 +96,11 @@ function buildCustomAttribute(ga: TagAttribute, valueSets: Map<string, Value[]>)
 
 export function convertCSS(data: CSSCustomData): CustomStylesFile | undefined {
   const props: CSSCustomProperty[] = [];
-  for (const p of data.properties ?? []) {
-    if (!p.name.startsWith('--')) continue;
+  for (const prop of data.properties ?? []) {
+    if (!prop.name.startsWith('--')) continue;
     props.push({
-      name: p.name,
-      description: parseDescription(p.description)
+      name: prop.name,
+      description: parseDescription(prop.description)
     });
   }
 
@@ -113,11 +113,11 @@ export function convertCSS(data: CSSCustomData): CustomStylesFile | undefined {
 }
 
 function buildValueSetMap(valueSets: ValueSet[]): Map<string, Value[]> {
-  const m = new Map<string, Value[]>();
+  const map = new Map<string, Value[]>();
   for (const vs of valueSets) {
-    m.set(vs.name, vs.values ?? []);
+    map.set(vs.name, vs.values ?? []);
   }
-  return m;
+  return map;
 }
 
 function resolveValues(attr: TagAttribute, valueSets: Map<string, Value[]>): Value[] {
@@ -129,5 +129,5 @@ function resolveValues(attr: TagAttribute, valueSets: Map<string, Value[]>): Val
 function resolveTypeText(attr: TagAttribute, valueSets: Map<string, Value[]>): string {
   const values = resolveValues(attr, valueSets);
   if (values.length === 0) return '';
-  return values.map(v => `'${v.name}'`).join(' | ');
+  return values.map(val => `'${val.name}'`).join(' | ');
 }

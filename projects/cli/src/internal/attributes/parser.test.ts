@@ -27,6 +27,29 @@ describe('parseCustomAttributes', () => {
     expect(typeGroup?.values?.[0]).toHaveProperty('value');
   });
 
+  test('normalizes top-level enum values', async () => {
+    const tmpPath = join(import.meta.dir, '../../../testdata/.tmp-attrs-values.json');
+    const { writeFile, unlink } = await import('fs/promises');
+    const data = JSON.stringify({
+      schemaVersion: '1.0.0',
+      attributes: [
+        {
+          name: 'data-theme',
+          description: 'Theme',
+          syntax: 'enum',
+          values: ['light', { value: 'dark', description: 'Dark mode' }]
+        }
+      ]
+    });
+    await writeFile(tmpPath, data);
+    try {
+      const caf = await parseCustomAttributes(tmpPath);
+      expect(caf.attributes[0].values).toEqual([{ value: 'light' }, { value: 'dark', description: 'Dark mode' }]);
+    } finally {
+      await unlink(tmpPath);
+    }
+  });
+
   test('normalizes missing appliesTo to default', async () => {
     const tmpPath = join(import.meta.dir, '../../../testdata/.tmp-attrs-test.json');
     const { writeFile, unlink } = await import('fs/promises');

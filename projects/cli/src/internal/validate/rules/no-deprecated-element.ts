@@ -3,9 +3,13 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement } from '../schema.js';
 
 export class NoDeprecatedElement implements Rule {
-  readonly id = 'no-deprecated-element';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Warning;
+  constructor() {
+    this.id = 'no-deprecated-element';
+    this.severity = Severity.Warning;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];

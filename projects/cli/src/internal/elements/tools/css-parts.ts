@@ -1,11 +1,11 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatCSSPartsValue } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
 import type { CSSPartsOutput } from './tools.js';
 import { getElementOrThrow } from './tools.js';
 
-const tagNameSchema = z.object({
-  tagName: z.string().describe("The tag name of the custom element (e.g. 'my-button')")
+const tagNameSchema = zod.object({
+  tagName: zod.string().describe("The tag name of the custom element (e.g. 'my-button')")
 });
 
 export const metadata = {
@@ -21,7 +21,7 @@ export const metadata = {
   inputSchema: tagNameSchema
 };
 
-export function toMarkdown(ctx: ToolContext, input: { tagName: string }) {
+export function toMarkdown(ctx: ToolContext, input: { tagName: string }): string {
   const element = getElementOrThrow(ctx, input.tagName);
   return formatCSSPartsValue(element.cssParts ?? [], input.tagName);
 }
@@ -30,10 +30,10 @@ export function toJSON(ctx: ToolContext, input: { tagName: string }): CSSPartsOu
   const element = getElementOrThrow(ctx, input.tagName);
   return {
     tagName: input.tagName,
-    cssParts: (element.cssParts ?? []).map(p => ({
-      name: p.name,
-      description: p.description,
-      deprecated: p.deprecated
+    cssParts: (element.cssParts ?? []).map(part => ({
+      name: part.name,
+      description: part.description,
+      deprecated: part.deprecated
     }))
   };
 }

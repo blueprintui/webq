@@ -3,9 +3,13 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement, parseEventName } from '../schema.js';
 
 export class NoDeprecatedEvent implements Rule {
-  readonly id = 'no-deprecated-event';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Warning;
+  constructor() {
+    this.id = 'no-deprecated-event';
+    this.severity = Severity.Warning;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -17,8 +21,8 @@ export class NoDeprecatedEvent implements Rule {
       if (!decl) continue;
 
       const deprecatedEvents = new Map<string, string>();
-      for (const e of decl.events ?? []) {
-        if (e.deprecated) deprecatedEvents.set(e.name, e.deprecated);
+      for (const event of decl.events ?? []) {
+        if (event.deprecated) deprecatedEvents.set(event.name, event.deprecated);
       }
 
       for (const attr of elem.attributes) {

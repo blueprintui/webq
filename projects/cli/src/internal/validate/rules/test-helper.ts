@@ -125,6 +125,6 @@ function normalizeChild(child: { element?: unknown; options?: unknown[] }): void
     child.element = { tag: child.element };
   }
   if (child.options) {
-    child.options = child.options.map(o => (typeof o === 'string' ? { tag: o } : o));
+    child.options = child.options.map(opt => (typeof opt === 'string' ? { tag: opt } : opt));
   }
 }

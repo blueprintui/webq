@@ -45,14 +45,15 @@ export function parseRuleConfig(raw: unknown): RuleConfig {
 }
 
 export async function load(path?: string): Promise<Config> {
-  const explicit = !!path;
-  if (!path) {
-    path = join(process.cwd(), defaultConfigFile);
+  const explicit = Boolean(path);
+  let resolvedPath = path;
+  if (!resolvedPath) {
+    resolvedPath = join(process.cwd(), defaultConfigFile);
   }
 
   let data: string;
   try {
-    data = await readFile(path, 'utf-8');
+    data = await readFile(resolvedPath, 'utf-8');
   } catch (err: unknown) {
     if ((err as NodeJS.ErrnoException).code === 'ENOENT' && !explicit) {
       return emptyConfig();
@@ -94,8 +95,8 @@ function normalizeConfig(raw: unknown): Config {
   return cfg;
 }
 
-export function parseSeverity(s: string): Severity {
-  switch (s) {
+export function parseSeverity(severity: string): Severity {
+  switch (severity) {
     case 'error':
       return Severity.Error;
     case 'warn':
@@ -103,6 +104,6 @@ export function parseSeverity(s: string): Severity {
     case 'off':
       return Severity.Off;
     default:
-      throw new Error(`invalid severity "${s}": must be "error", "warn", or "off"`);
+      throw new Error(`invalid severity "${severity}": must be "error", "warn", or "off"`);
   }
 }

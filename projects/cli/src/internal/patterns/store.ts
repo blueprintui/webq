@@ -7,24 +7,25 @@ export interface PatternSummary {
 }
 
 export class PatternStore {
-  #patterns: Map<string, Pattern> = new Map();
+  readonly #patterns: Map<string, Pattern>;
 
   constructor(pf: PatternsFile) {
-    for (const p of pf.patterns) {
-      this.#patterns.set(p.name, p);
+    this.#patterns = new Map();
+    for (const pattern of pf.patterns) {
+      this.#patterns.set(pattern.name, pattern);
     }
   }
 
   getPatterns(): PatternSummary[] {
     const summaries: PatternSummary[] = [];
-    for (const p of this.#patterns.values()) {
+    for (const pattern of this.#patterns.values()) {
       summaries.push({
-        name: p.name,
-        description: p.description,
-        tags: p.tags
+        name: pattern.name,
+        description: pattern.description,
+        tags: pattern.tags
       });
     }
-    return summaries.sort((a, b) => a.name.localeCompare(b.name));
+    return summaries.sort((first, second) => first.name.localeCompare(second.name));
   }
 
   getPattern(name: string): Pattern | undefined {
@@ -33,25 +34,25 @@ export class PatternStore {
 
   getPatternsForElement(tagName: string): Pattern[] {
     const result: Pattern[] = [];
-    for (const p of this.#patterns.values()) {
-      if (patternReferencesTag(p, tagName)) {
-        result.push(p);
+    for (const pattern of this.#patterns.values()) {
+      if (patternReferencesTag(pattern, tagName)) {
+        result.push(pattern);
       }
     }
     return result;
   }
 }
 
-function patternReferencesTag(p: Pattern, tagName: string): boolean {
-  if (p.structure.root && p.structure.root.tag === tagName) return true;
-  if (childrenReferenceTag(p, tagName)) return true;
-  if (siblingsReferenceTag(p, tagName)) return true;
+function patternReferencesTag(pattern: Pattern, tagName: string): boolean {
+  if (pattern.structure.root && pattern.structure.root.tag === tagName) return true;
+  if (childrenReferenceTag(pattern, tagName)) return true;
+  if (siblingsReferenceTag(pattern, tagName)) return true;
   return false;
 }
 
-function childrenReferenceTag(p: Pattern, tagName: string): boolean {
-  if (!p.structure.children) return false;
-  for (const child of p.structure.children) {
+function childrenReferenceTag(pattern: Pattern, tagName: string): boolean {
+  if (!pattern.structure.children) return false;
+  for (const child of pattern.structure.children) {
     if (child.element && child.element.tag === tagName) return true;
     if (child.options && optionsReferenceTag(child.options, tagName)) return true;
   }
@@ -65,9 +66,9 @@ function optionsReferenceTag(options: ElementRef[], tagName: string): boolean {
   return false;
 }
 
-function siblingsReferenceTag(p: Pattern, tagName: string): boolean {
-  if (!p.structure.siblings) return false;
-  for (const sib of p.structure.siblings) {
+function siblingsReferenceTag(pattern: Pattern, tagName: string): boolean {
+  if (!pattern.structure.siblings) return false;
+  for (const sib of pattern.structure.siblings) {
     if (sib.trigger.tag === tagName || sib.target.tag === tagName) return true;
   }
   return false;

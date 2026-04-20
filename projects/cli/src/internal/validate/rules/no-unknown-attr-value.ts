@@ -5,9 +5,13 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement, parseAttrValues } from '../schema.js';
 
 export class NoUnknownAttrValue implements Rule {
-  readonly id = 'no-unknown-attr-value';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-unknown-attr-value';
+    this.severity = Severity.Error;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -17,7 +21,7 @@ export class NoUnknownAttrValue implements Rule {
       if (!attrDefs) continue;
 
       for (const attr of elem.attributes) {
-        const msg = checkAttrValue(elem, attr, attrDefs, this.id, this.severity);
+        const msg = checkAttrValue({ elem, attr, attrDefs }, this.id, this.severity);
         if (msg) msgs.push(msg);
       }
     }
@@ -26,20 +30,21 @@ export class NoUnknownAttrValue implements Rule {
   }
 }
 
+interface AttrValueContext {
+  elem: HTMLElement;
+  attr: HTMLAttribute;
+  attrDefs: Map<string, Attribute>;
+}
+
 function getAttrDefs(elem: HTMLElement, store: Store): Map<string, Attribute> | undefined {
   if (!isCustomElement(elem.tagName)) return undefined;
   const decl = store.getElement(elem.tagName);
   if (!decl) return undefined;
-  return new Map((decl.attributes ?? []).map(a => [a.name, a]));
+  return new Map((decl.attributes ?? []).map(attr => [attr.name, attr]));
 }
 
-function checkAttrValue(
-  elem: HTMLElement,
-  attr: HTMLAttribute,
-  attrDefs: Map<string, Attribute>,
-  ruleId: string,
-  severity: Severity
-): LintMessage | undefined {
+function checkAttrValue(ctx: AttrValueContext, ruleId: string, severity: Severity): LintMessage | undefined {
+  const { elem, attr, attrDefs } = ctx;
   if (!attr.hasValue) return undefined;
 
   const def = attrDefs.get(attr.name);

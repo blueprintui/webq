@@ -7,10 +7,13 @@ import { computeStylePosition, cssRuleBlockRegex, cssVarRefRegex, extractTagName
 
 export class NoUnknownStyleValue implements Rule {
   #customStyleStore?: CustomStyleStore;
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly id = 'no-unknown-style-value';
-
-  readonly severity = Severity.Warning;
+  constructor() {
+    this.id = 'no-unknown-style-value';
+    this.severity = Severity.Warning;
+  }
 
   setCustomStyleStore(store: CustomStyleStore | undefined): void {
     this.#customStyleStore = store;
@@ -21,27 +24,42 @@ export class NoUnknownStyleValue implements Rule {
     const customStyleStore = this.#customStyleStore;
 
     const msgs: LintMessage[] = [];
+    const ctx: StyleCheckContext = {
+      store,
+      customStyleStore,
+      ruleId: this.id,
+      severity: this.severity
+    };
 
     for (const style of doc.styleTags) {
-      checkStyleTag(style, store, customStyleStore, this.id, this.severity, msgs);
+      checkStyleTag(ctx, style, msgs);
     }
 
     for (const elem of doc.elements) {
-      checkInlineStyle(elem, store, customStyleStore, this.id, this.severity, msgs);
+      checkInlineStyle(ctx, elem, msgs);
     }
 
     return msgs;
   }
 }
 
-function checkStyleTag(
-  style: HTMLStyleTag,
-  store: Store,
-  customStyleStore: CustomStyleStore,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
+interface StyleCheckContext {
+  store: Store;
+  customStyleStore: CustomStyleStore;
+  ruleId: string;
+  severity: Severity;
+}
+
+interface TokenMessageInput {
+  tokenName: string;
+  ruleId: string;
+  severity: Severity;
+  line: number;
+  column: number;
+}
+
+function checkStyleTag(ctx: StyleCheckContext, style: HTMLStyleTag, msgs: LintMessage[]): void {
+  const { store, customStyleStore, ruleId, severity } = ctx;
   for (const ruleMatch of style.content.matchAll(cssRuleBlockRegex)) {
     const selector = ruleMatch[1];
     const blockContent = ruleMatch[2];
@@ -56,41 +74,40 @@ function checkStyleTag(
 
       const absOffset = blockStart + varMatch.index;
       const { line, col } = computeStylePosition(style, absOffset);
-      msgs.push(buildUnknownTokenMessage(tokenName, ruleId, severity, line, col));
+      msgs.push(buildUnknownTokenMessage({ tokenName, ruleId, severity, line, column: col }));
     }
   }
 }
 
-function checkInlineStyle(
-  elem: HTMLElement,
-  store: Store,
-  customStyleStore: CustomStyleStore,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
+function checkInlineStyle(ctx: StyleCheckContext, elem: HTMLElement, msgs: LintMessage[]): void {
   if (!isCustomElement(elem.tagName)) return;
 
   for (const attr of elem.attributes) {
     if (attr.name !== 'style' || !attr.hasValue) continue;
-    checkInlineStyleAttr(elem, attr, store, customStyleStore, ruleId, severity, msgs);
+    checkInlineStyleAttr(ctx, elem, attr, msgs);
   }
 }
 
 function checkInlineStyleAttr(
+  ctx: StyleCheckContext,
   elem: HTMLElement,
   attr: HTMLAttribute,
-  store: Store,
-  customStyleStore: CustomStyleStore,
-  ruleId: string,
-  severity: Severity,
   msgs: LintMessage[]
 ): void {
+  const { store, customStyleStore, ruleId, severity } = ctx;
   const elemPropSet = buildCSSPropSet(store, elem.tagName);
   for (const varMatch of attr.value.matchAll(cssVarRefRegex)) {
     const tokenName = varMatch[1];
     if (isKnownToken(tokenName, customStyleStore, elemPropSet)) continue;
-    msgs.push(buildUnknownTokenMessage(tokenName, ruleId, severity, attr.line, attr.column));
+    msgs.push(
+      buildUnknownTokenMessage({
+        tokenName,
+        ruleId,
+        severity,
+        line: attr.line,
+        column: attr.column
+      })
+    );
   }
 }
 
@@ -104,13 +121,8 @@ function isKnownToken(
   return false;
 }
 
-function buildUnknownTokenMessage(
-  tokenName: string,
-  ruleId: string,
-  severity: Severity,
-  line: number,
-  column: number
-): LintMessage {
+function buildUnknownTokenMessage(input: TokenMessageInput): LintMessage {
+  const { tokenName, ruleId, severity, line, column } = input;
   return {
     ruleId,
     severity,
@@ -124,5 +136,5 @@ function buildCSSPropSet(store: Store, tagName: string): Set<string> | undefined
   if (!isCustomElement(tagName)) return undefined;
   const decl = store.getElement(tagName);
   if (!decl) return undefined;
-  return new Set((decl.cssProperties ?? []).map(p => p.name));
+  return new Set((decl.cssProperties ?? []).map(prop => prop.name));
 }

@@ -6,10 +6,13 @@ import { customAttrAppliesTo } from './no-unknown-attr.js';
 
 export class NoUnknownCustomAttrValue implements Rule {
   #customAttrStore?: CustomAttributeStore;
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly id = 'no-unknown-custom-attr-value';
-
-  readonly severity = Severity.Warning;
+  constructor() {
+    this.id = 'no-unknown-custom-attr-value';
+    this.severity = Severity.Warning;
+  }
 
   setCustomAttributeStore(store: CustomAttributeStore | undefined): void {
     this.#customAttrStore = store;
@@ -65,11 +68,11 @@ export class NoUnknownCustomAttrValue implements Rule {
   #checkEnum(ca: CustomAttribute, attr: HTMLAttribute, tagName: string): LintMessage[] {
     if (!attr.hasValue || !attr.value) return [];
 
-    for (const v of ca.values ?? []) {
-      if (v.value === attr.value) return [];
+    for (const value of ca.values ?? []) {
+      if (value.value === attr.value) return [];
     }
 
-    const validValues = (ca.values ?? []).map(v => v.value);
+    const validValues = (ca.values ?? []).map(value => value.value);
 
     return [
       {
@@ -86,12 +89,12 @@ export class NoUnknownCustomAttrValue implements Rule {
 function buildTokenSet(ca: CustomAttribute): Set<string> {
   const set = new Set<string>();
   for (const group of ca.tokenGroups ?? []) {
-    for (const v of group.values ?? []) {
-      set.add(v.value);
+    for (const value of group.values ?? []) {
+      set.add(value.value);
     }
   }
-  for (const v of ca.values ?? []) {
-    set.add(v.value);
+  for (const value of ca.values ?? []) {
+    set.add(value.value);
   }
   return set;
 }

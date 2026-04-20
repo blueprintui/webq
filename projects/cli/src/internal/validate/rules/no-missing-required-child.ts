@@ -5,10 +5,13 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument, type HTMLElem
 
 export class NoMissingRequiredChild implements Rule {
   #patternStore?: PatternStore;
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly id = 'no-missing-required-child';
-
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-missing-required-child';
+    this.severity = Severity.Error;
+  }
 
   setPatternStore(store: PatternStore | undefined): void {
     this.#patternStore = store;
@@ -24,7 +27,7 @@ export class NoMissingRequiredChild implements Rule {
       const pats = patternStore.getPatternsForElement(elem.tagName);
       for (const pat of pats) {
         if (!isRootMatch(pat, elem.tagName)) continue;
-        collectPatternMessages(elem, pat, this.id, this.severity, msgs);
+        collectPatternMessages({ elem, pat, ruleId: this.id, severity: this.severity }, msgs);
       }
     }
 
@@ -32,95 +35,68 @@ export class NoMissingRequiredChild implements Rule {
   }
 }
 
-function isRootMatch(pat: Pattern, tagName: string): boolean {
-  return !!pat.structure.root && pat.structure.root.tag === tagName;
+interface ChildCheckContext {
+  elem: HTMLElement;
+  pat: Pattern;
+  ruleId: string;
+  severity: Severity;
 }
 
-function collectPatternMessages(
-  elem: HTMLElement,
-  pat: Pattern,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
-  for (const child of pat.structure.children ?? []) {
-    const msg = checkChildRule(elem, pat, child, ruleId, severity);
+function isRootMatch(pat: Pattern, tagName: string): boolean {
+  const root = pat.structure.root;
+  return root !== undefined && root.tag === tagName;
+}
+
+function collectPatternMessages(ctx: ChildCheckContext, msgs: LintMessage[]): void {
+  for (const child of ctx.pat.structure.children ?? []) {
+    const msg = checkChildRule(ctx, child);
     if (msg) msgs.push(msg);
   }
 }
 
-function checkChildRule(
-  elem: HTMLElement,
-  pat: Pattern,
-  child: ChildRule,
-  ruleId: string,
-  severity: Severity
-): LintMessage | undefined {
+function checkChildRule(ctx: ChildCheckContext, child: ChildRule): LintMessage | undefined {
   switch (child.rule) {
     case 'required':
-      return checkRequiredChild(elem, pat, child, ruleId, severity);
+      return checkRequiredChild(ctx, child);
     case 'oneOf':
-      return checkOneOfChild(elem, pat, child, ruleId, severity);
+      return checkOneOfChild(ctx, child);
     case 'oneOrMore':
-      return checkOneOrMoreChild(elem, pat, child, ruleId, severity);
+      return checkOneOrMoreChild(ctx, child);
     default:
       return undefined;
   }
 }
 
-function checkRequiredChild(
-  elem: HTMLElement,
-  pat: Pattern,
-  child: ChildRule,
-  ruleId: string,
-  severity: Severity
-): LintMessage | undefined {
+function checkRequiredChild(ctx: ChildCheckContext, child: ChildRule): LintMessage | undefined {
+  const { elem, pat } = ctx;
   if (!child.element) return undefined;
   if (hasMatchingChild(elem, child.element)) return undefined;
   return buildMessage(
-    elem,
-    ruleId,
-    severity,
+    ctx,
     `Pattern "${pat.name}": <${elem.tagName}> requires a ${describeChildElement(child.element)} child`
   );
 }
 
-function checkOneOfChild(
-  elem: HTMLElement,
-  pat: Pattern,
-  child: ChildRule,
-  ruleId: string,
-  severity: Severity
-): LintMessage | undefined {
+function checkOneOfChild(ctx: ChildCheckContext, child: ChildRule): LintMessage | undefined {
+  const { elem, pat } = ctx;
   if (!child.options?.length) return undefined;
   if (child.options.some(opt => hasMatchingChild(elem, opt))) return undefined;
   const descs = child.options.map(opt => describeChildElement(opt));
-  return buildMessage(
-    elem,
-    ruleId,
-    severity,
-    `Pattern "${pat.name}": <${elem.tagName}> requires one of: ${descs.join(', ')}`
-  );
+  return buildMessage(ctx, `Pattern "${pat.name}": <${elem.tagName}> requires one of: ${descs.join(', ')}`);
 }
 
-function checkOneOrMoreChild(
-  elem: HTMLElement,
-  pat: Pattern,
-  child: ChildRule,
-  ruleId: string,
-  severity: Severity
-): LintMessage | undefined {
+function checkOneOrMoreChild(ctx: ChildCheckContext, child: ChildRule): LintMessage | undefined {
+  const { elem, pat } = ctx;
   if (!child.element) return undefined;
   if (hasMatchingChild(elem, child.element)) return undefined;
   return buildMessage(
-    elem,
-    ruleId,
-    severity,
+    ctx,
     `Pattern "${pat.name}": <${elem.tagName}> requires at least one ${describeChildElement(child.element)} child`
   );
 }
 
-function buildMessage(elem: HTMLElement, ruleId: string, severity: Severity, message: string): LintMessage {
+function buildMessage(ctx: ChildCheckContext, message: string): LintMessage {
+  const { elem, ruleId, severity } = ctx;
   return {
     ruleId,
     severity,

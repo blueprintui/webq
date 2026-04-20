@@ -11,6 +11,11 @@ function isToken(node: unknown): boolean {
   return node !== null && typeof node === 'object' && '$value' in (node as Record<string, unknown>);
 }
 
+interface WalkPaths {
+  childPath: string[];
+  parentPath: string[];
+}
+
 function walk(
   node: Record<string, unknown>,
   properties: CSSCustomProperty[],
@@ -24,24 +29,23 @@ function walk(
     if (child === null || typeof child !== 'object') continue;
 
     const childPath = [...path, key];
-    walkChild(child, properties, childPath, path, inheritedType);
+    walkChild(child, properties, { childPath, parentPath: path }, inheritedType);
   }
 }
 
 function walkChild(
   child: DTCGNode,
   properties: CSSCustomProperty[],
-  childPath: string[],
-  parentPath: string[],
+  paths: WalkPaths,
   inheritedType: string | undefined
 ): void {
   if (isToken(child)) {
-    properties.push(buildProperty(child, childPath, parentPath, inheritedType));
+    properties.push(buildProperty(child, paths.childPath, paths.parentPath, inheritedType));
     return;
   }
   const group = child as Record<string, unknown>;
   const groupType = (group.$type as string | undefined) ?? inheritedType;
-  walk(group, properties, childPath, groupType);
+  walk(group, properties, paths.childPath, groupType);
 }
 
 function buildProperty(

@@ -144,24 +144,24 @@ export interface ElementOutput {
 }
 
 // Shared helpers
-export function toTypeInfo(t?: Type): TypeInfo | undefined {
-  if (!t) return undefined;
-  return { text: t.text };
+export function toTypeInfo(type?: Type): TypeInfo | undefined {
+  if (!type) return undefined;
+  return { text: type.text };
 }
 
-export function toParameterInfo(p: Parameter): ParameterInfo {
+export function toParameterInfo(param: Parameter): ParameterInfo {
   return {
-    name: p.name,
-    description: p.description,
-    type: toTypeInfo(p.type),
-    default: p.default,
-    optional: p.optional
+    name: param.name,
+    description: param.description,
+    type: toTypeInfo(param.type),
+    default: param.default,
+    optional: param.optional
   };
 }
 
-export function toReturnInfo(r?: Return): ReturnInfo | undefined {
-  if (!r) return undefined;
-  return { type: toTypeInfo(r.type), description: r.description };
+export function toReturnInfo(ret?: Return): ReturnInfo | undefined {
+  if (!ret) return undefined;
+  return { type: toTypeInfo(ret.type), description: ret.description };
 }
 
 export function getElementOrThrow(ctx: ToolContext, tagName: string): Declaration & { tagName: string } {

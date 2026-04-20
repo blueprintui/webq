@@ -3,20 +3,24 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { resolveCommandPairs } from './command-helper.js';
 
 export class NoDeprecatedCommand implements Rule {
-  readonly id = 'no-deprecated-command';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Warning;
+  constructor() {
+    this.id = 'no-deprecated-command';
+    this.severity = Severity.Warning;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
 
     for (const pair of resolveCommandPairs(doc, store)) {
-      for (const c of pair.declaration.commands ?? []) {
-        if (c.name === pair.commandAttr.value && c.deprecated) {
+      for (const cmd of pair.declaration.commands ?? []) {
+        if (cmd.name === pair.commandAttr.value && cmd.deprecated) {
           msgs.push({
             ruleId: this.id,
             severity: this.severity,
-            message: `Command "${pair.commandAttr.value}" for <${pair.targetTag}> is deprecated. ${c.deprecated}`,
+            message: `Command "${pair.commandAttr.value}" for <${pair.targetTag}> is deprecated. ${cmd.deprecated}`,
             line: pair.commandAttr.line,
             column: pair.commandAttr.column
           });

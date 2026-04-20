@@ -1,12 +1,12 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatMembersValue } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
 import { KindField } from '../types.js';
 import type { PropertiesOutput } from './tools.js';
 import { getElementOrThrow, toTypeInfo } from './tools.js';
 
-const tagNameSchema = z.object({
-  tagName: z.string().describe("The tag name of the custom element (e.g. 'my-button')")
+const tagNameSchema = zod.object({
+  tagName: zod.string().describe("The tag name of the custom element (e.g. 'my-button')")
 });
 
 export const metadata = {
@@ -22,24 +22,24 @@ export const metadata = {
   inputSchema: tagNameSchema
 };
 
-export function toMarkdown(ctx: ToolContext, input: { tagName: string }) {
+export function toMarkdown(ctx: ToolContext, input: { tagName: string }): string {
   const element = getElementOrThrow(ctx, input.tagName);
-  const props = (element.members ?? []).filter(m => m.kind === KindField);
+  const props = (element.members ?? []).filter(member => member.kind === KindField);
   return formatMembersValue(props, input.tagName, 'Properties');
 }
 
 export function toJSON(ctx: ToolContext, input: { tagName: string }): PropertiesOutput {
   const element = getElementOrThrow(ctx, input.tagName);
-  const props = (element.members ?? []).filter(m => m.kind === KindField);
+  const props = (element.members ?? []).filter(member => member.kind === KindField);
   return {
     tagName: input.tagName,
-    properties: props.map(p => ({
-      name: p.name,
-      description: p.description,
-      type: toTypeInfo(p.type),
-      default: p.default,
-      privacy: p.privacy,
-      readonly: p.readonly
+    properties: props.map(prop => ({
+      name: prop.name,
+      description: prop.description,
+      type: toTypeInfo(prop.type),
+      default: prop.default,
+      privacy: prop.privacy,
+      readonly: prop.readonly
     }))
   };
 }

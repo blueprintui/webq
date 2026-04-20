@@ -1,4 +1,4 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatPatternSummaries } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
 
@@ -12,22 +12,32 @@ export const metadata = {
     destructiveHint: false as const,
     openWorldHint: false as const
   },
-  inputSchema: z.object({})
+  inputSchema: zod.object({})
 };
 
-export function toMarkdown(ctx: ToolContext) {
+interface PatternListItem {
+  name: string;
+  description: string;
+  tags?: string[];
+}
+
+interface PatternListOutput {
+  patterns: PatternListItem[];
+}
+
+export function toMarkdown(ctx: ToolContext): string {
   if (!ctx.patternStore) return 'No custom-patterns.json found\n';
   return formatPatternSummaries(ctx.patternStore.getPatterns());
 }
 
-export function toJSON(ctx: ToolContext) {
+export function toJSON(ctx: ToolContext): PatternListOutput {
   if (!ctx.patternStore) return { patterns: [] };
   const summaries = ctx.patternStore.getPatterns();
   return {
-    patterns: summaries.map(s => ({
-      name: s.name,
-      description: s.description,
-      tags: s.tags
+    patterns: summaries.map(summary => ({
+      name: summary.name,
+      description: summary.description,
+      tags: summary.tags
     }))
   };
 }

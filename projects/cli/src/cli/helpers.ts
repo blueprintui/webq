@@ -38,8 +38,8 @@ export async function parseManifestsFromPath(path: string): Promise<Manifest[]> 
   if (manifestPaths.length === 0) throw new Error(errNoManifestsFound);
 
   const manifests: Manifest[] = [];
-  for (const p of manifestPaths) {
-    manifests.push(await parseManifest(p));
+  for (const manifestPath of manifestPaths) {
+    manifests.push(await parseManifest(manifestPath));
   }
   return manifests;
 }
@@ -72,10 +72,10 @@ async function discoverOptionalFile(
   const path = resolvedPath(cfg, pathFlag);
   if (!path) return '';
 
-  for (let p of path.split(',')) {
-    p = p.trim();
-    if (!p) continue;
-    const resolved = await resolveFn(p);
+  for (const pathArg of path.split(',')) {
+    const trimmed = pathArg.trim();
+    if (!trimmed) continue;
+    const resolved = await resolveFn(trimmed);
     if (resolved) return resolved;
   }
 

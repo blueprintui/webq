@@ -5,10 +5,13 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument, type HTMLElem
 
 export class NoMissingSiblingBinding implements Rule {
   #patternStore?: PatternStore;
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly id = 'no-missing-sibling-binding';
-
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-missing-sibling-binding';
+    this.severity = Severity.Error;
+  }
 
   setPatternStore(store: PatternStore | undefined): void {
     this.#patternStore = store;
@@ -24,7 +27,7 @@ export class NoMissingSiblingBinding implements Rule {
       const pats = patternStore.getPatternsForElement(elem.tagName);
       for (const pat of pats) {
         for (const sib of pat.structure.siblings ?? []) {
-          collectSiblingMessages(elem, doc, pat, sib, this.id, this.severity, msgs);
+          collectSiblingMessages({ elem, doc, pat, sib, ruleId: this.id, severity: this.severity }, msgs);
         }
       }
     }
@@ -33,29 +36,31 @@ export class NoMissingSiblingBinding implements Rule {
   }
 }
 
-function collectSiblingMessages(
-  elem: HTMLElement,
-  doc: HTMLDocument,
-  pat: Pattern,
-  sib: SiblingRule,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
+interface SiblingCheckContext {
+  elem: HTMLElement;
+  doc: HTMLDocument;
+  pat: Pattern;
+  sib: SiblingRule;
+  ruleId: string;
+  severity: Severity;
+}
+
+function collectSiblingMessages(ctx: SiblingCheckContext, msgs: LintMessage[]): void {
+  const { elem, doc, sib } = ctx;
   if (sib.trigger.tag !== elem.tagName) return;
   if (!hasAnyTriggerAttr(elem, sib)) return;
 
-  const triggerOk = validateTriggerAttrs(elem, pat, sib, ruleId, severity, msgs);
+  const triggerOk = validateTriggerAttrs(ctx, msgs);
   if (!triggerOk) return;
 
   const target = findTarget(elem, doc, sib);
   if (!target) {
-    msgs.push(buildNoSiblingMessage(elem, pat, sib, ruleId, severity));
+    msgs.push(buildNoSiblingMessage(ctx));
     return;
   }
 
-  validateTargetRequiredAttrs(target, pat, sib, ruleId, severity, msgs);
-  validateBindings(elem, target, pat, sib, ruleId, severity, msgs);
+  validateTargetRequiredAttrs(ctx, target, msgs);
+  validateBindings(ctx, target, msgs);
 }
 
 function hasAnyTriggerAttr(elem: HTMLElement, sib: SiblingRule): boolean {
@@ -65,18 +70,12 @@ function hasAnyTriggerAttr(elem: HTMLElement, sib: SiblingRule): boolean {
   return false;
 }
 
-function validateTriggerAttrs(
-  elem: HTMLElement,
-  pat: Pattern,
-  sib: SiblingRule,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): boolean {
+function validateTriggerAttrs(ctx: SiblingCheckContext, msgs: LintMessage[]): boolean {
+  const { sib } = ctx;
   let ok = true;
   for (const attrRule of sib.trigger.attributes ?? []) {
     if (!attrRule.required) continue;
-    const msg = checkTriggerAttr(elem, pat, attrRule, ruleId, severity);
+    const msg = checkTriggerAttr(ctx, attrRule);
     if (msg) {
       ok = false;
       msgs.push(msg);
@@ -85,13 +84,8 @@ function validateTriggerAttrs(
   return ok;
 }
 
-function checkTriggerAttr(
-  elem: HTMLElement,
-  pat: Pattern,
-  attrRule: AttributeRule,
-  ruleId: string,
-  severity: Severity
-): LintMessage | undefined {
+function checkTriggerAttr(ctx: SiblingCheckContext, attrRule: AttributeRule): LintMessage | undefined {
+  const { elem, pat, ruleId, severity } = ctx;
   const val = getAttrValue(elem, attrRule.name);
   if (val === undefined) {
     return buildElemRangeMessage(
@@ -120,13 +114,8 @@ function findTarget(elem: HTMLElement, doc: HTMLDocument, sib: SiblingRule): HTM
   return undefined;
 }
 
-function buildNoSiblingMessage(
-  elem: HTMLElement,
-  pat: Pattern,
-  sib: SiblingRule,
-  ruleId: string,
-  severity: Severity
-): LintMessage {
+function buildNoSiblingMessage(ctx: SiblingCheckContext): LintMessage {
+  const { elem, pat, sib, ruleId, severity } = ctx;
   const triggerDesc = describeElement(elem, sib);
   return buildElemRangeMessage(
     elem,
@@ -136,14 +125,8 @@ function buildNoSiblingMessage(
   );
 }
 
-function validateTargetRequiredAttrs(
-  target: HTMLElement,
-  pat: Pattern,
-  sib: SiblingRule,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
+function validateTargetRequiredAttrs(ctx: SiblingCheckContext, target: HTMLElement, msgs: LintMessage[]): void {
+  const { pat, sib, ruleId, severity } = ctx;
   for (const attrRule of sib.target.attributes ?? []) {
     if (!attrRule.required) continue;
     if (getAttrValue(target, attrRule.name) !== undefined) continue;
@@ -157,30 +140,19 @@ function validateTargetRequiredAttrs(
   }
 }
 
-function validateBindings(
-  elem: HTMLElement,
-  target: HTMLElement,
-  pat: Pattern,
-  sib: SiblingRule,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
-  for (const binding of sib.bindings ?? []) {
-    const msg = checkBinding(elem, target, pat, sib, binding, ruleId, severity);
+function validateBindings(ctx: SiblingCheckContext, target: HTMLElement, msgs: LintMessage[]): void {
+  for (const binding of ctx.sib.bindings ?? []) {
+    const msg = checkBinding(ctx, target, binding);
     if (msg) msgs.push(msg);
   }
 }
 
 function checkBinding(
-  elem: HTMLElement,
+  ctx: SiblingCheckContext,
   target: HTMLElement,
-  pat: Pattern,
-  sib: SiblingRule,
-  binding: AttributeBinding,
-  ruleId: string,
-  severity: Severity
+  binding: AttributeBinding
 ): LintMessage | undefined {
+  const { elem, pat, sib, ruleId, severity } = ctx;
   const triggerVal = getAttrValue(elem, binding.triggerAttribute) ?? '';
   if (!triggerVal) return undefined;
 
@@ -226,7 +198,7 @@ function getAttrValue(elem: HTMLElement, name: string): string | undefined {
 
 function getSiblings(elem: HTMLElement, doc: HTMLDocument): HTMLElement[] {
   if (elem.parent) return elem.parent.children;
-  return doc.elements.filter(e => !e.parent && e !== elem);
+  return doc.elements.filter(event => !event.parent && event !== elem);
 }
 
 function describeElement(elem: HTMLElement, sib: SiblingRule): string {

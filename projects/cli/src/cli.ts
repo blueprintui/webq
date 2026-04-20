@@ -63,7 +63,7 @@ async function validateManifestFile(path: string): Promise<boolean> {
   process.stderr.write(`Custom Elements: ${countElements(manifest)}\n`);
   if (validationErrors.length > 0) {
     process.stderr.write('Validation errors:\n');
-    for (const e of validationErrors) process.stderr.write(`  ✗ ${e.message}\n`);
+    for (const err of validationErrors) process.stderr.write(`  ✗ ${err.message}\n`);
     process.stderr.write('\n');
     return true;
   }
@@ -84,6 +84,28 @@ function printLintResult(result: LintResult): boolean {
   return result.errorCount > 0;
 }
 
+async function ensureSkillNotExists(skillFile: string, force: boolean): Promise<void> {
+  try {
+    await stat(skillFile);
+    if (!force) {
+      process.stderr.write(`skill file already exists at ${skillFile}\nUse --force to overwrite\n`);
+      process.exit(1);
+    }
+  } catch {
+    /* file doesn't exist yet, ok */
+  }
+}
+
+async function readSkillTemplate(): Promise<string> {
+  const templatePath = join(import.meta.dir, 'templates', 'skill-template.md');
+  try {
+    return await readFile(templatePath, 'utf-8');
+  } catch {
+    process.stderr.write(`warning: skill template not found at ${templatePath}, using default\n`);
+    return '# WebQ Skill\n';
+  }
+}
+
 async function buildElementContext(argv: Record<string, unknown>): Promise<ToolContext> {
   const store = await createStore(argv.path as string, argv.config as string);
   return { store };
@@ -99,8 +121,11 @@ async function buildFullContext(argv: Record<string, unknown>): Promise<ToolCont
   return { store, patternStore, customAttrStore, customStyleStore, validateCfg };
 }
 
-function elementHandler(tool: ToolModule, extractInput?: (argv: Record<string, unknown>) => Record<string, unknown>) {
-  return async (argv: Record<string, unknown>) => {
+function elementHandler(
+  tool: ToolModule,
+  extractInput?: (argv: Record<string, unknown>) => Record<string, unknown>
+): (argv: Record<string, unknown>) => Promise<void> {
+  return async (argv: Record<string, unknown>): Promise<void> => {
     const ctx = await buildElementContext(argv);
     const input = extractInput?.(argv);
     if (argv.json) {
@@ -111,20 +136,24 @@ function elementHandler(tool: ToolModule, extractInput?: (argv: Record<string, u
   };
 }
 
+interface OptionalStoreOptions {
+  readonly buildCtx: (argv: Record<string, unknown>) => Promise<ToolContext>;
+  readonly storeCheck: (ctx: ToolContext) => boolean;
+  readonly storeName: string;
+  readonly extractInput?: (argv: Record<string, unknown>) => Record<string, unknown>;
+}
+
 function optionalStoreHandler(
   tool: ToolModule,
-  buildCtx: (argv: Record<string, unknown>) => Promise<ToolContext>,
-  storeCheck: (ctx: ToolContext) => boolean,
-  storeName: string,
-  extractInput?: (argv: Record<string, unknown>) => Record<string, unknown>
-) {
-  return async (argv: Record<string, unknown>) => {
-    const ctx = await buildCtx(argv);
-    if (!storeCheck(ctx)) {
-      process.stderr.write(`No ${storeName} found\n`);
+  options: OptionalStoreOptions
+): (argv: Record<string, unknown>) => Promise<void> {
+  return async (argv: Record<string, unknown>): Promise<void> => {
+    const ctx = await options.buildCtx(argv);
+    if (!options.storeCheck(ctx)) {
+      process.stderr.write(`No ${options.storeName} found\n`);
       return;
     }
-    const input = extractInput?.(argv);
+    const input = options.extractInput?.(argv);
     if (argv.json) {
       printJSON(tool.toJSON(ctx, input));
       return;
@@ -133,10 +162,12 @@ function optionalStoreHandler(
   };
 }
 
-const tagNamePositional = (y: Argv) => y.positional('tag-name', { type: 'string', demandOption: true });
-const namePositional = (y: Argv) => y.positional('name', { type: 'string', demandOption: true });
-const extractTagName = (argv: Record<string, unknown>) => ({ tagName: argv['tag-name'] as string });
-const extractName = (argv: Record<string, unknown>) => ({ name: argv.name as string });
+const tagNamePositional = (yargs: Argv): Argv => yargs.positional('tag-name', { type: 'string', demandOption: true });
+const namePositional = (yargs: Argv): Argv => yargs.positional('name', { type: 'string', demandOption: true });
+const extractTagName = (argv: Record<string, unknown>): Record<string, unknown> => ({
+  tagName: argv['tag-name'] as string
+});
+const extractName = (argv: Record<string, unknown>): Record<string, unknown> => ({ name: argv.name as string });
 
 async function buildPatternContext(argv: Record<string, unknown>): Promise<ToolContext> {
   const cfg = await loadConfig(argv.config as string);
@@ -159,9 +190,9 @@ async function buildStyleContext(argv: Record<string, unknown>): Promise<ToolCon
   return { store, customStyleStore };
 }
 
-const hasPatterns = (ctx: ToolContext) => !!ctx.patternStore;
-const hasAttrs = (ctx: ToolContext) => !!ctx.customAttrStore;
-const hasStyles = (ctx: ToolContext) => !!ctx.customStyleStore;
+const hasPatterns = (ctx: ToolContext): boolean => Boolean(ctx.patternStore);
+const hasAttrs = (ctx: ToolContext): boolean => Boolean(ctx.customAttrStore);
+const hasStyles = (ctx: ToolContext): boolean => Boolean(ctx.customStyleStore);
 
 const cli = yargs(hideBin(process.argv))
   .scriptName('webq')
@@ -178,7 +209,7 @@ const cli = yargs(hideBin(process.argv))
     description: 'Output raw JSON instead of formatted markdown'
   })
   .option('config', { type: 'string', description: 'Path to webq.config.json' })
-  .command('$0', 'About WebQ', {}, async () => {
+  .command('$0', 'About WebQ', {}, async (): Promise<void> => {
     process.stderr.write(
       colorize.blue(`██     ██ ███████ ██████   ██████  
 ██     ██ ██      ██   ██ ██    ██ 
@@ -197,7 +228,7 @@ const cli = yargs(hideBin(process.argv))
     process.stderr.write(await cli.getHelp());
   })
   // MCP server
-  .command('mcp', 'Start the MCP server on STDIO transport', {}, async argv => {
+  .command('mcp', 'Start the MCP server on STDIO transport', {}, async (argv): Promise<void> => {
     const cfg = await loadConfig(argv.config as string);
     const store = await createStoreFromConfig(cfg, argv.path as string);
     const vcfg = buildValidateConfig(cfg);
@@ -218,8 +249,8 @@ const cli = yargs(hideBin(process.argv))
   .command(
     'setup-mcp',
     'Configure the webq MCP server in .mcp.json',
-    y => y.option('force', { type: 'boolean', default: false }),
-    async argv => {
+    (yargs: Argv): Argv => yargs.option('force', { type: 'boolean', default: false }),
+    async (argv): Promise<void> => {
       const mcpFile = '.mcp.json';
       const entry = {
         command: 'webq',
@@ -249,28 +280,13 @@ const cli = yargs(hideBin(process.argv))
   .command(
     'setup-skill',
     'Create a Claude Code skill for the webq CLI',
-    y => y.option('force', { type: 'boolean', default: false }),
-    async argv => {
+    (yargs: Argv): Argv => yargs.option('force', { type: 'boolean', default: false }),
+    async (argv): Promise<void> => {
       const skillDir = join('.claude', 'skills', 'webq');
       const skillFile = join(skillDir, 'SKILL.md');
-      try {
-        await stat(skillFile);
-        if (!argv.force) {
-          process.stderr.write(`skill file already exists at ${skillFile}\nUse --force to overwrite\n`);
-          process.exit(1);
-        }
-      } catch {
-        /* file doesn't exist yet, ok */
-      }
+      await ensureSkillNotExists(skillFile, Boolean(argv.force));
       await mkdir(skillDir, { recursive: true });
-      const templatePath = join(import.meta.dir, 'templates', 'skill-template.md');
-      let template: string;
-      try {
-        template = await readFile(templatePath, 'utf-8');
-      } catch {
-        process.stderr.write(`warning: skill template not found at ${templatePath}, using default\n`);
-        template = '# WebQ Skill\n';
-      }
+      const template = await readSkillTemplate();
       await writeFile(skillFile, template);
       process.stderr.write(`Created skill file at ${skillFile}\n`);
     }
@@ -336,29 +352,47 @@ const cli = yargs(hideBin(process.argv))
     attributeList.metadata.command,
     attributeList.metadata.summary,
     {},
-    optionalStoreHandler(attributeList, buildAttrContext, hasAttrs, 'custom-attributes.json')
+    optionalStoreHandler(attributeList, {
+      buildCtx: buildAttrContext,
+      storeCheck: hasAttrs,
+      storeName: 'custom-attributes.json'
+    })
   )
   .command(
     attributeGet.metadata.command,
     attributeGet.metadata.summary,
     namePositional,
-    optionalStoreHandler(attributeGet, buildAttrContext, hasAttrs, 'custom-attributes.json', extractName)
+    optionalStoreHandler(attributeGet, {
+      buildCtx: buildAttrContext,
+      storeCheck: hasAttrs,
+      storeName: 'custom-attributes.json',
+      extractInput: extractName
+    })
   )
   // Style commands
   .command(
     stylePropertyList.metadata.command,
     stylePropertyList.metadata.summary,
     {},
-    optionalStoreHandler(stylePropertyList, buildStyleContext, hasStyles, 'custom-styles.json')
+    optionalStoreHandler(stylePropertyList, {
+      buildCtx: buildStyleContext,
+      storeCheck: hasStyles,
+      storeName: 'custom-styles.json'
+    })
   )
   .command(
     stylePropertyGet.metadata.command,
     stylePropertyGet.metadata.summary,
     namePositional,
-    optionalStoreHandler(stylePropertyGet, buildStyleContext, hasStyles, 'custom-styles.json', argv => {
-      let name = argv.name as string;
-      if (!name.startsWith('--')) name = '--' + name;
-      return { name };
+    optionalStoreHandler(stylePropertyGet, {
+      buildCtx: buildStyleContext,
+      storeCheck: hasStyles,
+      storeName: 'custom-styles.json',
+      extractInput: (argv): Record<string, unknown> => {
+        let name = argv.name as string;
+        if (!name.startsWith('--')) name = '--' + name;
+        return { name };
+      }
     })
   )
   // Pattern commands
@@ -366,23 +400,32 @@ const cli = yargs(hideBin(process.argv))
     patternList.metadata.command,
     patternList.metadata.summary,
     {},
-    optionalStoreHandler(patternList, buildPatternContext, hasPatterns, 'custom-patterns.json')
+    optionalStoreHandler(patternList, {
+      buildCtx: buildPatternContext,
+      storeCheck: hasPatterns,
+      storeName: 'custom-patterns.json'
+    })
   )
   .command(
     patternGet.metadata.command,
     patternGet.metadata.summary,
     namePositional,
-    optionalStoreHandler(patternGet, buildPatternContext, hasPatterns, 'custom-patterns.json', extractName)
+    optionalStoreHandler(patternGet, {
+      buildCtx: buildPatternContext,
+      storeCheck: hasPatterns,
+      storeName: 'custom-patterns.json',
+      extractInput: extractName
+    })
   )
   // Validate HTML
   .command(
     validateHTML.metadata.command,
     validateHTML.metadata.summary,
-    y =>
-      y
+    (yargs: Argv): Argv =>
+      yargs
         .positional('html', { type: 'string', demandOption: true })
         .option('rule', { type: 'string', description: 'Run a specific rule' }),
-    async argv => {
+    async (argv): Promise<void> => {
       const ctx = await buildFullContext(argv);
       const input = { html: argv.html as string, rule: argv.rule as string | undefined };
       const result = validateHTML.toJSON(ctx, input) as LintResult;
@@ -395,7 +438,7 @@ const cli = yargs(hideBin(process.argv))
     }
   )
   // Validate manifest
-  .command('validate-manifest', 'Validate a Custom Elements Manifest file', {}, async argv => {
+  .command('validate-manifest', 'Validate a Custom Elements Manifest file', {}, async (argv): Promise<void> => {
     const cfg = await loadConfig(argv.config as string);
     const path = resolvedPath(cfg, argv.path as string);
     if (!path) {
@@ -408,8 +451,8 @@ const cli = yargs(hideBin(process.argv))
       process.exit(1);
     }
     let hasErrors = false;
-    for (const p of manifestPaths) {
-      if (await validateManifestFile(p)) hasErrors = true;
+    for (const manifestPath of manifestPaths) {
+      if (await validateManifestFile(manifestPath)) hasErrors = true;
     }
     if (hasErrors) process.exit(1);
   })

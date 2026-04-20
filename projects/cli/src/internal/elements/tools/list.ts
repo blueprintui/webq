@@ -1,4 +1,4 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatElementSummaries } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
 import type { ElementsOutput } from './tools.js';
@@ -14,18 +14,18 @@ export const metadata = {
     destructiveHint: false,
     openWorldHint: false
   },
-  inputSchema: z.object({})
+  inputSchema: zod.object({})
 };
 
-export function toMarkdown(ctx: ToolContext) {
+export function toMarkdown(ctx: ToolContext): string {
   return formatElementSummaries(ctx.store.getElementSummaries());
 }
 
 export function toJSON(ctx: ToolContext): ElementsOutput {
   return {
-    elements: ctx.store.getElementSummaries().map(s => ({
-      tagName: s.tagName,
-      description: s.description
+    elements: ctx.store.getElementSummaries().map(summary => ({
+      tagName: summary.tagName,
+      description: summary.description
     }))
   };
 }

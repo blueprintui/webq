@@ -22,26 +22,26 @@ export function validate(manifest: Manifest): Error[] {
   }
 
   if (manifest.modules) {
-    for (let i = 0; i < manifest.modules.length; i++) {
-      validateModule(manifest.modules[i], i, errs);
+    for (let moduleIdx = 0; moduleIdx < manifest.modules.length; moduleIdx++) {
+      validateModule(manifest.modules[moduleIdx], moduleIdx, errs);
     }
   }
 
   return errs;
 }
 
-function validateModule(module: Manifest['modules'][number], i: number, errs: Error[]): void {
+function validateModule(module: Manifest['modules'][number], moduleIdx: number, errs: Error[]): void {
   if (!module.path) {
-    errs.push(new Error(`module ${i}: missing path`));
+    errs.push(new Error(`module ${moduleIdx}: missing path`));
   }
   if (!module.kind) {
-    errs.push(new Error(`module ${i}: missing kind`));
+    errs.push(new Error(`module ${moduleIdx}: missing kind`));
   }
 
   if (module.declarations) {
-    for (let j = 0; j < module.declarations.length; j++) {
-      if (!module.declarations[j].name) {
-        errs.push(new Error(`module ${i}, declaration ${j}: missing name`));
+    for (let declIdx = 0; declIdx < module.declarations.length; declIdx++) {
+      if (!module.declarations[declIdx].name) {
+        errs.push(new Error(`module ${moduleIdx}, declaration ${declIdx}: missing name`));
       }
     }
   }

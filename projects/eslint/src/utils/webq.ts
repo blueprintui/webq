@@ -45,10 +45,12 @@ export function runWebqValidation(html: string, path: string): WebqMessage[] {
 
 function validateInProcess(html: string, path: string): WebqMessage[] {
   const ctx = getOrCreateStoreContext(path);
-  const result = verify(html, ctx.store, allRules(), undefined, {
-    patternStore: ctx.patternStore,
-    customStyleStore: ctx.customStyleStore,
-    customAttributeStore: ctx.customAttributeStore
+  const result = verify(html, ctx.store, allRules(), {
+    stores: {
+      patternStore: ctx.patternStore,
+      customStyleStore: ctx.customStyleStore,
+      customAttributeStore: ctx.customAttributeStore
+    }
   });
   return result.messages;
 }

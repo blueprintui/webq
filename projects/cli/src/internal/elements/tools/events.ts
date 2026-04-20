@@ -1,11 +1,11 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatEventsValue } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
 import type { EventsOutput } from './tools.js';
 import { getElementOrThrow, toTypeInfo } from './tools.js';
 
-const tagNameSchema = z.object({
-  tagName: z.string().describe("The tag name of the custom element (e.g. 'my-button')")
+const tagNameSchema = zod.object({
+  tagName: zod.string().describe("The tag name of the custom element (e.g. 'my-button')")
 });
 
 export const metadata = {
@@ -21,7 +21,7 @@ export const metadata = {
   inputSchema: tagNameSchema
 };
 
-export function toMarkdown(ctx: ToolContext, input: { tagName: string }) {
+export function toMarkdown(ctx: ToolContext, input: { tagName: string }): string {
   const element = getElementOrThrow(ctx, input.tagName);
   return formatEventsValue(element.events ?? [], input.tagName);
 }
@@ -30,11 +30,11 @@ export function toJSON(ctx: ToolContext, input: { tagName: string }): EventsOutp
   const element = getElementOrThrow(ctx, input.tagName);
   return {
     tagName: input.tagName,
-    events: (element.events ?? []).map(e => ({
-      name: e.name,
-      description: e.description,
-      type: toTypeInfo(e.type),
-      deprecated: e.deprecated
+    events: (element.events ?? []).map(event => ({
+      name: event.name,
+      description: event.description,
+      type: toTypeInfo(event.type),
+      deprecated: event.deprecated
     }))
   };
 }

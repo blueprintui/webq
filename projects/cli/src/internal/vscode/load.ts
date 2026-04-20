@@ -17,11 +17,11 @@ export async function load(pathsStr: string): Promise<VSCodeResult> {
   const allAttrs: CustomAttribute[] = [];
   const allStyles: CSSCustomProperty[] = [];
 
-  for (let dir of paths) {
-    dir = dir.trim();
-    if (!dir) continue;
+  for (const dir of paths) {
+    const trimmed = dir.trim();
+    if (!trimmed) continue;
 
-    const refs = await resolveDir(dir);
+    const refs = await resolveDir(trimmed);
     if (!refs) continue;
 
     for (const ref of refs) {
@@ -29,14 +29,17 @@ export async function load(pathsStr: string): Promise<VSCodeResult> {
     }
   }
 
+  finalizeResult(result, allAttrs, allStyles);
+  return result;
+}
+
+function finalizeResult(result: VSCodeResult, allAttrs: CustomAttribute[], allStyles: CSSCustomProperty[]): void {
   if (allAttrs.length > 0) {
     result.attributes = { schemaVersion: '1.0.0', attributes: allAttrs };
   }
   if (allStyles.length > 0) {
     result.styles = { schemaVersion: '1.0.0', cssCustomProperties: allStyles };
   }
-
-  return result;
 }
 
 async function resolveDir(dir: string): Promise<PackageJSONRef[] | undefined> {

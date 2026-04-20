@@ -7,55 +7,73 @@ import { formatSuggestion } from './suggestion.js';
 import { computeStylePosition, cssRuleBlockRegex, cssCustomPropRegex, extractTagName } from './css-helpers.js';
 
 export class NoUnknownCSSCustomProperty implements Rule {
-  readonly id = 'no-unknown-css-custom-property';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-unknown-css-custom-property';
+    this.severity = Severity.Error;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
+    const ctx: RuleMeta = { ruleId: this.id, severity: this.severity, store };
 
     for (const style of doc.styleTags) {
-      checkStyleTag(style, store, this.id, this.severity, msgs);
+      checkStyleTag(ctx, style, msgs);
     }
 
     for (const elem of doc.elements) {
-      checkInlineStyle(elem, store, this.id, this.severity, msgs);
+      checkInlineStyle(ctx, elem, msgs);
     }
 
     return msgs;
   }
 }
 
-function checkStyleTag(
-  style: HTMLStyleTag,
-  store: Store,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
+interface RuleMeta {
+  ruleId: string;
+  severity: Severity;
+  store: Store;
+}
+
+interface BlockContext {
+  style: HTMLStyleTag;
+  blockContent: string;
+  blockStart: number;
+  tagName: string;
+  decl: Declaration;
+  ruleId: string;
+  severity: Severity;
+}
+
+function checkStyleTag(ctx: RuleMeta, style: HTMLStyleTag, msgs: LintMessage[]): void {
   for (const ruleMatch of style.content.matchAll(cssRuleBlockRegex)) {
     const selector = ruleMatch[1];
     const blockContent = ruleMatch[2];
     const blockStart = ruleMatch.index + ruleMatch[0].indexOf(blockContent);
 
     const tagName = extractTagName(selector);
-    const decl = getCustomElementDecl(tagName, store);
+    const decl = getCustomElementDecl(tagName, ctx.store);
     if (!decl) continue;
 
-    collectBlockMessages(style, blockContent, blockStart, tagName, decl, ruleId, severity, msgs);
+    collectBlockMessages(
+      {
+        style,
+        blockContent,
+        blockStart,
+        tagName,
+        decl,
+        ruleId: ctx.ruleId,
+        severity: ctx.severity
+      },
+      msgs
+    );
   }
 }
 
-function collectBlockMessages(
-  style: HTMLStyleTag,
-  blockContent: string,
-  blockStart: number,
-  tagName: string,
-  decl: Declaration,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
+function collectBlockMessages(ctx: BlockContext, msgs: LintMessage[]): void {
+  const { style, blockContent, blockStart, tagName, decl, ruleId, severity } = ctx;
   const propSet = buildPropSet(decl);
   for (const propMatch of blockContent.matchAll(cssCustomPropRegex)) {
     const propName = propMatch[1];
@@ -73,19 +91,13 @@ function collectBlockMessages(
   }
 }
 
-function checkInlineStyle(
-  elem: HTMLElement,
-  store: Store,
-  ruleId: string,
-  severity: Severity,
-  msgs: LintMessage[]
-): void {
+function checkInlineStyle(ctx: RuleMeta, elem: HTMLElement, msgs: LintMessage[]): void {
   if (!isCustomElement(elem.tagName)) return;
 
   for (const attr of elem.attributes) {
     if (attr.name !== 'style' || !attr.hasValue) continue;
 
-    const decl = store.getElement(elem.tagName);
+    const decl = ctx.store.getElement(elem.tagName);
     if (!decl) continue;
 
     const propSet = buildPropSet(decl);
@@ -94,8 +106,8 @@ function checkInlineStyle(
       if (propSet.has(propName)) continue;
 
       msgs.push({
-        ruleId,
-        severity,
+        ruleId: ctx.ruleId,
+        severity: ctx.severity,
         message: `Unknown CSS custom property "${propName}" on <${elem.tagName}>. ${formatCSSPropNames(decl.cssProperties ?? [])}`,
         line: attr.line,
         column: attr.column
@@ -110,12 +122,12 @@ function getCustomElementDecl(tagName: string, store: Store): Declaration | unde
 }
 
 function buildPropSet(decl: Declaration): Set<string> {
-  return new Set((decl.cssProperties ?? []).map(p => p.name));
+  return new Set((decl.cssProperties ?? []).map(prop => prop.name));
 }
 
 function formatCSSPropNames(props: CSSProperty[]): string {
   return formatSuggestion(
-    props.map(p => p.name),
+    props.map(prop => prop.name),
     'CSS properties',
     'Valid CSS properties'
   );

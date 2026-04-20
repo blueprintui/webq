@@ -56,7 +56,7 @@ describe('verify', () => {
       ruleSeverities: new Map([['no-unknown-attr', Severity.Warning]]),
       ruleOptions: new Map()
     };
-    const result = verify('<bp-button unknown="x">Click</bp-button>', store, allRules(), cfg);
+    const result = verify('<bp-button unknown="x">Click</bp-button>', store, allRules(), { cfg });
     expect(result.errorCount).toBe(0);
     expect(result.warningCount).toBeGreaterThanOrEqual(1);
     const msg = result.messages.find(m => m.ruleId === 'no-unknown-attr');
@@ -69,7 +69,7 @@ describe('verify', () => {
       ruleSeverities: new Map([['no-unknown-attr', Severity.Off]]),
       ruleOptions: new Map()
     };
-    const result = verify('<bp-button unknown="x">Click</bp-button>', store, allRules(), cfg);
+    const result = verify('<bp-button unknown="x">Click</bp-button>', store, allRules(), { cfg });
     const msg = result.messages.find(m => m.ruleId === 'no-unknown-attr');
     expect(msg).toBeUndefined();
   });
@@ -80,7 +80,7 @@ describe('verify', () => {
       ruleSeverities: new Map(),
       ruleOptions: new Map([['no-unknown-element', { tags: ['bp-custom'] }]])
     };
-    const result = verify('<bp-custom>test</bp-custom>', store, allRules(), cfg);
+    const result = verify('<bp-custom>test</bp-custom>', store, allRules(), { cfg });
     const msg = result.messages.find(m => m.ruleId === 'no-unknown-element');
     expect(msg).toBeUndefined();
   });

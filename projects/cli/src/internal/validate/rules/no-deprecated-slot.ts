@@ -5,16 +5,20 @@ import { Severity, type Rule, type LintMessage, type HTMLDocument } from '../typ
 import { isCustomElement } from '../schema.js';
 
 export class NoDeprecatedSlot implements Rule {
-  readonly id = 'no-deprecated-slot';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Warning;
+  constructor() {
+    this.id = 'no-deprecated-slot';
+    this.severity = Severity.Warning;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
 
     for (const elem of doc.elements) {
       for (const attr of elem.attributes) {
-        const msg = checkSlotAttr(elem, attr, store, this.id, this.severity);
+        const msg = checkSlotAttr({ elem, attr, store }, this.id, this.severity);
         if (msg) msgs.push(msg);
       }
     }
@@ -23,13 +27,14 @@ export class NoDeprecatedSlot implements Rule {
   }
 }
 
-function checkSlotAttr(
-  elem: HTMLElement,
-  attr: HTMLAttribute,
-  store: Store,
-  ruleId: string,
-  severity: Severity
-): LintMessage | undefined {
+interface SlotAttrContext {
+  elem: HTMLElement;
+  attr: HTMLAttribute;
+  store: Store;
+}
+
+function checkSlotAttr(ctx: SlotAttrContext, ruleId: string, severity: Severity): LintMessage | undefined {
+  const { elem, attr, store } = ctx;
   if (attr.name !== 'slot') return undefined;
 
   const parent = elem.parent;
@@ -51,8 +56,8 @@ function checkSlotAttr(
 }
 
 function findDeprecatedSlot(slots: Slot[], name: string): Slot | undefined {
-  for (const s of slots) {
-    if (s.name === name && s.deprecated) return s;
+  for (const slot of slots) {
+    if (slot.name === name && slot.deprecated) return slot;
   }
   return undefined;
 }

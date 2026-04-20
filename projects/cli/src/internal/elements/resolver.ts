@@ -11,10 +11,10 @@ export async function resolvePaths(pathsStr: string): Promise<string[]> {
   const paths = pathsStr.split(',');
   const result: string[] = [];
 
-  for (let p of paths) {
-    p = p.trim();
-    if (!p) continue;
-    const resolved = await resolvePath(p);
+  for (const path of paths) {
+    const trimmed = path.trim();
+    if (!trimmed) continue;
+    const resolved = await resolvePath(trimmed);
     result.push(...resolved);
   }
 

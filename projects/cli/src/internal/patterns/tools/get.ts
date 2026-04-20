@@ -1,6 +1,7 @@
-import z from 'zod/v3';
+import { z as zod } from 'zod/v3';
 import { formatPattern } from '../../../cli/format.js';
 import type { ToolContext } from '../../tools.js';
+import type { Pattern } from '../types.js';
 
 export const metadata = {
   command: 'pattern <name>',
@@ -12,19 +13,19 @@ export const metadata = {
     destructiveHint: false as const,
     openWorldHint: false as const
   },
-  inputSchema: z.object({
-    name: z.string().describe('The name of the pattern')
+  inputSchema: zod.object({
+    name: zod.string().describe('The name of the pattern')
   })
 };
 
-export function toMarkdown(ctx: ToolContext, input: { name: string }) {
+export function toMarkdown(ctx: ToolContext, input: { name: string }): string {
   if (!ctx.patternStore) throw new Error('No patterns file loaded');
   const pattern = ctx.patternStore.getPattern(input.name);
   if (!pattern) throw new Error(`Pattern "${input.name}" not found`);
   return formatPattern(pattern);
 }
 
-export function toJSON(ctx: ToolContext, input: { name: string }) {
+export function toJSON(ctx: ToolContext, input: { name: string }): Pattern {
   if (!ctx.patternStore) throw new Error('No patterns file loaded');
   const pattern = ctx.patternStore.getPattern(input.name);
   if (!pattern) throw new Error(`Pattern "${input.name}" not found`);

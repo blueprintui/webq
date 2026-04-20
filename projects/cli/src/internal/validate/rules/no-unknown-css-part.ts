@@ -6,9 +6,13 @@ import { formatSuggestion } from './suggestion.js';
 import { computeStylePosition } from './css-helpers.js';
 
 export class NoUnknownCSSPart implements Rule {
-  readonly id = 'no-unknown-css-part';
+  readonly id: string;
+  readonly severity: Severity;
 
-  readonly severity = Severity.Error;
+  constructor() {
+    this.id = 'no-unknown-css-part';
+    this.severity = Severity.Error;
+  }
 
   check(doc: HTMLDocument, store: Store): LintMessage[] {
     const msgs: LintMessage[] = [];
@@ -23,7 +27,7 @@ export class NoUnknownCSSPart implements Rule {
         const decl = store.getElement(tagName);
         if (!decl) continue;
 
-        const partSet = new Set((decl.cssParts ?? []).map(p => p.name));
+        const partSet = new Set((decl.cssParts ?? []).map(part => part.name));
 
         if (!partSet.has(partName)) {
           const { line, col } = computeStylePosition(style, match.index);
@@ -45,7 +49,7 @@ export class NoUnknownCSSPart implements Rule {
 
 function formatCSSPartNames(parts: CSSPart[]): string {
   return formatSuggestion(
-    parts.map(p => p.name),
+    parts.map(part => part.name),
     'CSS parts',
     'Valid parts'
   );
