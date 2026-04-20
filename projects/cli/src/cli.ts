@@ -462,8 +462,10 @@ const cli = yargs(hideBin(process.argv))
 
 cli.wrap(MAX_WIDTH);
 
-cli.parseAsync().catch((err: unknown) => {
+try {
+  await cli.parseAsync();
+} catch (err: unknown) {
   const message = err instanceof Error ? err.message : String(err);
   process.stderr.write(`${colorize.error('error:')} ${message}\n`);
   process.exit(1);
-});
+}
