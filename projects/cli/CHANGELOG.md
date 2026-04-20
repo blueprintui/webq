@@ -1,3 +1,9 @@
+## [1.2.2](https://github.com/blueprintui/webq/compare/@webq/cli-v1.2.1...@webq/cli-v1.2.2) (2026-04-20)
+
+### Bug Fixes
+
+* **cli:** improve error handling in cli command parsing ([fb0e99f](https://github.com/blueprintui/webq/commit/fb0e99ff4461420fc8a4987690859cda3e4ca65c))
+
 ## [1.2.1](https://github.com/blueprintui/webq/compare/@webq/cli-v1.2.0...@webq/cli-v1.2.1) (2026-04-18)
 
 ### Features
