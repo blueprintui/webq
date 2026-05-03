@@ -127,7 +127,7 @@
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
-    "@html-eslint/parser": "0.54.0",
+    "@html-eslint/parser": "0.60.0",
     "@types/bun": "catalog:",
     "@types/node": "catalog:",
     "eslint": "catalog:",
