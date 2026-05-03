@@ -4,11 +4,11 @@ import { KindField, KindMethod } from '../types.js';
 import { ErrElementNotFound } from '../errors.js';
 
 // Output types
-export interface TypeInfo {
+interface TypeInfo {
   text: string;
 }
 
-export interface ElementSummaryOutput {
+interface ElementSummaryOutput {
   tagName: string;
   description?: string;
 }
@@ -17,7 +17,7 @@ export interface ElementsOutput {
   elements: ElementSummaryOutput[];
 }
 
-export interface AttributeInfo {
+interface AttributeInfo {
   name: string;
   description?: string;
   type?: TypeInfo;
@@ -32,7 +32,7 @@ export interface AttributesOutput {
   attributes: AttributeInfo[];
 }
 
-export interface PropertyInfo {
+interface PropertyInfo {
   name: string;
   description?: string;
   type?: TypeInfo;
@@ -46,7 +46,7 @@ export interface PropertiesOutput {
   properties: PropertyInfo[];
 }
 
-export interface ParameterInfo {
+interface ParameterInfo {
   name: string;
   description?: string;
   type?: TypeInfo;
@@ -54,7 +54,7 @@ export interface ParameterInfo {
   optional?: boolean;
 }
 
-export interface ReturnInfo {
+interface ReturnInfo {
   type?: TypeInfo;
   description?: string;
 }
@@ -72,7 +72,7 @@ export interface MethodsOutput {
   methods: MethodInfo[];
 }
 
-export interface EventInfo {
+interface EventInfo {
   name: string;
   description?: string;
   type?: TypeInfo;
@@ -84,7 +84,7 @@ export interface EventsOutput {
   events: EventInfo[];
 }
 
-export interface SlotInfo {
+interface SlotInfo {
   name: string;
   description?: string;
   deprecated?: string;
@@ -95,7 +95,7 @@ export interface SlotsOutput {
   slots: SlotInfo[];
 }
 
-export interface CommandInfo {
+interface CommandInfo {
   name: string;
   description?: string;
   deprecated?: string;
@@ -106,7 +106,7 @@ export interface CommandsOutput {
   commands: CommandInfo[];
 }
 
-export interface CSSPropertyInfo {
+interface CSSPropertyInfo {
   name: string;
   description?: string;
   default?: string;
@@ -118,7 +118,7 @@ export interface CSSPropertiesOutput {
   cssProperties: CSSPropertyInfo[];
 }
 
-export interface CSSPartInfo {
+interface CSSPartInfo {
   name: string;
   description?: string;
   deprecated?: string;

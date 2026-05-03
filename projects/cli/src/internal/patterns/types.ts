@@ -12,7 +12,7 @@ export interface Pattern {
   relatedPatterns?: string[];
 }
 
-export interface Structure {
+interface Structure {
   root?: ElementRef;
   children?: ChildRule[];
   siblings?: SiblingRule[];
@@ -55,7 +55,7 @@ export interface AttributeBinding {
   targetAttribute: string;
 }
 
-export interface Example {
+interface Example {
   name: string;
   description?: string;
   html: string;

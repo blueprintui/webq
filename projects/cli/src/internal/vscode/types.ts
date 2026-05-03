@@ -18,7 +18,7 @@ export interface TagAttribute {
   values?: Value[];
 }
 
-export interface Description {
+interface Description {
   text: string;
 }
 
@@ -44,7 +44,7 @@ export interface CSSCustomData {
   properties?: CSSProperty[];
 }
 
-export interface CSSProperty {
+interface CSSProperty {
   name: string;
   description?: Description | string;
 }

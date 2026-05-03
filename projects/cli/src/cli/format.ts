@@ -50,19 +50,6 @@ export const colorize = {
   pink: (msg: string): string => `${color('#e796e7')}${msg}\x1b[0m`
 };
 
-export const ansi = {
-  reset: '\x1b[0m',
-  bold: '\x1b[1m',
-  dim: '\x1b[2m',
-  italic: '\x1b[3m',
-  underline: '\x1b[4m',
-  colors: {
-    blue: color('#1888df'),
-    green: color('#51da51'),
-    pink: color('#e796e7')
-  }
-};
-
 const mdRenderer = marked.use(
   markedTerminal({
     firstHeading: (msg: string): string => colorize.green(msg),

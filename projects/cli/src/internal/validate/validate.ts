@@ -14,7 +14,7 @@ import { parseHTML } from './html.js';
 
 const defaultRules: Rule[] = [];
 
-export interface VerifyOptions {
+interface VerifyOptions {
   cfg?: ValidateConfig;
   stores?: VerifyStores;
 }

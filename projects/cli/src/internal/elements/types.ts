@@ -34,7 +34,7 @@ export interface Declaration {
   customElement?: boolean;
 }
 
-export interface Reference {
+interface Reference {
   name: string;
   package?: string;
   module?: string;
@@ -119,22 +119,22 @@ export interface Type {
   references?: Reference[];
 }
 
-export interface Source {
+interface Source {
   href?: string;
 }
 
-export interface Demo {
+interface Demo {
   url: string;
   description?: string;
 }
 
-export interface Export {
+interface Export {
   kind: string;
   name: string;
   declaration?: ExportDeclaration;
 }
 
-export interface ExportDeclaration {
+interface ExportDeclaration {
   name: string;
   module?: string;
   package?: string;

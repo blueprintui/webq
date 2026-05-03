@@ -3,7 +3,7 @@ import type { Declaration } from '../../elements/types.js';
 import type { HTMLDocument, HTMLElement, HTMLAttribute } from '../types.js';
 import { isCustomElement } from '../schema.js';
 
-export interface CommandPair {
+interface CommandPair {
   commandAttr: HTMLAttribute;
   targetTag: string;
   declaration: Declaration;

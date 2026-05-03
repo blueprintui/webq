@@ -9,7 +9,7 @@ export interface Config {
   'validate-html': ValidateHTMLConfig;
 }
 
-export interface GlobalConfig {
+interface GlobalConfig {
   path: string[];
   patternsPath?: string;
   attributesPath?: string;
@@ -17,16 +17,16 @@ export interface GlobalConfig {
   tokensPath?: string;
 }
 
-export interface ValidateHTMLConfig {
+interface ValidateHTMLConfig {
   rules: Record<string, RuleConfig>;
 }
 
-export interface RuleConfig {
+interface RuleConfig {
   severity: string;
   options: RuleOptions;
 }
 
-export interface RuleOptions {
+interface RuleOptions {
   tags?: string[];
   events?: string[];
 }

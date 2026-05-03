@@ -3,7 +3,7 @@ import { parseManifestFromString } from '../../elements/parser.js';
 import { PatternStore } from '../../patterns/store.js';
 import type { PatternsFile } from '../../patterns/types.js';
 
-export const manifestJSON = `{
+const manifestJSON = `{
   "schemaVersion": "1.0.0",
   "modules": [
     {

@@ -4,14 +4,14 @@ export interface DTCGFile {
 
 export type DTCGNode = DTCGToken | DTCGGroup;
 
-export interface DTCGToken {
+interface DTCGToken {
   $value: string | number | boolean | object;
   $type?: string;
   $description?: string;
   $extensions?: Record<string, unknown>;
 }
 
-export interface DTCGGroup {
+interface DTCGGroup {
   $type?: string;
   $description?: string;
   [key: string]: DTCGNode | string | undefined;

@@ -41,19 +41,19 @@ export interface RuleOptionSet {
   events?: string[];
 }
 
-export interface ConfigurableRule extends Rule {
+interface ConfigurableRule extends Rule {
   configure(opts: RuleOptionSet): void;
 }
 
-export interface PatternAwareRule extends Rule {
+interface PatternAwareRule extends Rule {
   setPatternStore(store: PatternStore | undefined): void;
 }
 
-export interface StyleAwareRule extends Rule {
+interface StyleAwareRule extends Rule {
   setCustomStyleStore(store: CustomStyleStore | undefined): void;
 }
 
-export interface CustomAttrAwareRule extends Rule {
+interface CustomAttrAwareRule extends Rule {
   setCustomAttributeStore(store: CustomAttributeStore | undefined): void;
 }
 

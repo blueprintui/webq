@@ -1,5 +1,6 @@
 import { Store } from '../internal/elements/store.js';
-import { parseManifest, resolvePaths } from '../internal/elements/index.js';
+import { parseManifest } from '../internal/elements/parser.js';
+import { resolvePaths } from '../internal/elements/resolver.js';
 import { load as loadConfigFile } from '../internal/config/config.js';
 import { parseSeverity } from '../internal/config/config.js';
 import type { Config } from '../internal/config/config.js';
@@ -32,7 +33,7 @@ export function resolvedPath(cfg: Config, pathFlag?: string): string {
   return process.env.WEBQ_PATH ?? process.cwd();
 }
 
-export async function parseManifestsFromPath(path: string): Promise<Manifest[]> {
+async function parseManifestsFromPath(path: string): Promise<Manifest[]> {
   if (!path) throw new Error(errPathRequired);
 
   const manifestPaths = await resolvePaths(path);

@@ -13,7 +13,7 @@ export interface ToolContext {
   validateCfg?: ValidateConfig;
 }
 
-export interface ToolMetadata {
+interface ToolMetadata {
   command: string;
   toolName: string;
   summary: string;

@@ -27,7 +27,7 @@ import * as stylePropertyList from '../styles/tools/list.js';
 import * as stylePropertyGet from '../styles/tools/get.js';
 import * as validateHTML from '../validate/tools/validate-html.js';
 
-export interface ServerConfig {
+interface ServerConfig {
   store: Store;
   version: string;
   validateCfg?: ValidateConfig;

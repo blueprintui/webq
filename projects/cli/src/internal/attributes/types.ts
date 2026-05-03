@@ -14,7 +14,7 @@ export interface CustomAttribute {
   tags?: string[];
 }
 
-export interface AppliesTo {
+interface AppliesTo {
   all: boolean;
   elements: string[];
 }
@@ -26,7 +26,7 @@ export function parseAppliesTo(raw: unknown): AppliesTo {
   return { all: false, elements: [] };
 }
 
-export interface TokenGroup {
+interface TokenGroup {
   name: string;
   description?: string;
   rule?: string;
@@ -35,7 +35,7 @@ export interface TokenGroup {
   values?: TokenValue[];
 }
 
-export interface TokenValue {
+interface TokenValue {
   value: string;
   description?: string;
 }
@@ -45,7 +45,7 @@ export function parseTokenValue(raw: unknown): TokenValue {
   return raw as TokenValue;
 }
 
-export interface Example {
+interface Example {
   name: string;
   description?: string;
   html: string;
