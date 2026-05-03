@@ -1,3 +1,9 @@
+## [1.2.3](https://github.com/blueprintui/webq/compare/@webq/cli-v1.2.2...@webq/cli-v1.2.3) (2026-05-03)
+
+### Bug Fixes
+
+* **cli:** enhance install script and recursive path resolve ([d683f3f](https://github.com/blueprintui/webq/commit/d683f3f383dd4ffaa0e6976bc80af654ef983e75))
+
 ## [1.2.2](https://github.com/blueprintui/webq/compare/@webq/cli-v1.2.1...@webq/cli-v1.2.2) (2026-04-20)
 
 ### Bug Fixes
