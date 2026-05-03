@@ -202,4 +202,21 @@ describe('loadCustomStylesStore', () => {
     const store = await loadCustomStylesStore(cfg, testdataPath);
     expect(store).toBeDefined();
   });
+
+  test('auto-discovers tokens.json from path when tokensPath is not set', async () => {
+    const cfg = emptyConfig();
+    const store = await loadCustomStylesStore(cfg, testdataPath);
+    if (!store) throw new Error('expected store to be defined');
+    const props = store.getCSSCustomProperties().map(p => p.name);
+    expect(props).toContain('--spacing-sm');
+  });
+
+  test('configured tokensPath wins over auto-discovery', async () => {
+    const cfg = emptyConfig();
+    cfg.global.tokensPath = join(testdataPath, 'tokens.json');
+    const store = await loadCustomStylesStore(cfg, '/nonexistent');
+    if (!store) throw new Error('expected store to be defined');
+    const props = store.getCSSCustomProperties().map(p => p.name);
+    expect(props).toContain('--spacing-sm');
+  });
 });

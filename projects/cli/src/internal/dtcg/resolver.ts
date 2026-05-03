@@ -1,7 +1,7 @@
 import { resolveFiles } from '../resolve/resolve.js';
 
-export const CustomStylesFilename = 'custom-styles.json';
+export const DTCGTokensFilename = 'tokens.json';
 
 export async function resolve(path: string): Promise<string[]> {
-  return resolveFiles(path, CustomStylesFilename);
+  return resolveFiles(path, DTCGTokensFilename);
 }

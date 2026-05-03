@@ -50,7 +50,7 @@ describe('stylePropertyGet', () => {
 
   test('toJSON throws when no store', () => {
     expect(() => stylePropertyGet.toJSON(makeCtx(false), { name: '--bp-color-blue-0' })).toThrow(
-      'No custom styles file loaded'
+      'No CSS custom properties found'
     );
   });
 

@@ -18,15 +18,17 @@ export const metadata = {
   })
 };
 
+const errNoStyleSources = 'No CSS custom properties found (no custom-styles.json or DTCG tokens.json)';
+
 export function toMarkdown(ctx: ToolContext, input: { name: string }): string {
-  if (!ctx.customStyleStore) throw new Error('No custom styles file loaded');
+  if (!ctx.customStyleStore) throw new Error(errNoStyleSources);
   const prop = ctx.customStyleStore.getCSSCustomProperty(input.name);
   if (!prop) throw new Error(`CSS custom property "${input.name}" not found`);
   return formatCSSCustomPropertyDetail(prop);
 }
 
 export function toJSON(ctx: ToolContext, input: { name: string }): CSSCustomProperty {
-  if (!ctx.customStyleStore) throw new Error('No custom styles file loaded');
+  if (!ctx.customStyleStore) throw new Error(errNoStyleSources);
   const prop = ctx.customStyleStore.getCSSCustomProperty(input.name);
   if (!prop) throw new Error(`CSS custom property "${input.name}" not found`);
   return prop;

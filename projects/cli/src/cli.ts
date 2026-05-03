@@ -299,54 +299,6 @@ const cli = yargs(hideBin(process.argv))
     tagNamePositional,
     elementHandler(elementGet, extractTagName)
   )
-  .command(
-    elementAttributes.metadata.command,
-    elementAttributes.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementAttributes, extractTagName)
-  )
-  .command(
-    elementProperties.metadata.command,
-    elementProperties.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementProperties, extractTagName)
-  )
-  .command(
-    elementMethods.metadata.command,
-    elementMethods.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementMethods, extractTagName)
-  )
-  .command(
-    elementEvents.metadata.command,
-    elementEvents.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementEvents, extractTagName)
-  )
-  .command(
-    elementSlots.metadata.command,
-    elementSlots.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementSlots, extractTagName)
-  )
-  .command(
-    elementCommands.metadata.command,
-    elementCommands.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementCommands, extractTagName)
-  )
-  .command(
-    elementCSSProperties.metadata.command,
-    elementCSSProperties.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementCSSProperties, extractTagName)
-  )
-  .command(
-    elementCSSParts.metadata.command,
-    elementCSSParts.metadata.summary,
-    tagNamePositional,
-    elementHandler(elementCSSParts, extractTagName)
-  )
   // Attribute commands
   .command(
     attributeList.metadata.command,
@@ -459,6 +411,58 @@ const cli = yargs(hideBin(process.argv))
   .strict()
   .fail(false)
   .help();
+
+if (process.env.WEBQ_EXTENDED) {
+  cli
+    .command(
+      elementAttributes.metadata.command,
+      elementAttributes.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementAttributes, extractTagName)
+    )
+    .command(
+      elementProperties.metadata.command,
+      elementProperties.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementProperties, extractTagName)
+    )
+    .command(
+      elementMethods.metadata.command,
+      elementMethods.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementMethods, extractTagName)
+    )
+    .command(
+      elementEvents.metadata.command,
+      elementEvents.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementEvents, extractTagName)
+    )
+    .command(
+      elementSlots.metadata.command,
+      elementSlots.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementSlots, extractTagName)
+    )
+    .command(
+      elementCommands.metadata.command,
+      elementCommands.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementCommands, extractTagName)
+    )
+    .command(
+      elementCSSProperties.metadata.command,
+      elementCSSProperties.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementCSSProperties, extractTagName)
+    )
+    .command(
+      elementCSSParts.metadata.command,
+      elementCSSParts.metadata.summary,
+      tagNamePositional,
+      elementHandler(elementCSSParts, extractTagName)
+    );
+}
 
 cli.wrap(MAX_WIDTH);
 

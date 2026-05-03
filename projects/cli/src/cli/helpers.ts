@@ -14,6 +14,7 @@ import { parseCustomStyles } from '../internal/styles/parser.js';
 import { resolve as resolveStyles } from '../internal/styles/resolver.js';
 import { load as loadVSCode } from '../internal/vscode/load.js';
 import { load as loadDTCG } from '../internal/dtcg/load.js';
+import { resolve as resolveTokens } from '../internal/dtcg/resolver.js';
 import type { VSCodeResult } from '../internal/vscode/load.js';
 import type { Manifest } from '../internal/elements/types.js';
 import type { ValidateConfig } from '../internal/validate/types.js';
@@ -64,33 +65,46 @@ export function printJSON(data: unknown): void {
   console.log(JSON.stringify(data, null, 2));
 }
 
-async function discoverOptionalFile(
+async function discoverOptionalFiles(
   cfg: Config,
-  resolveFn: (path: string) => Promise<string>,
+  resolveFn: (path: string) => Promise<string[]>,
   pathFlag?: string
-): Promise<string> {
+): Promise<string[]> {
   const path = resolvedPath(cfg, pathFlag);
-  if (!path) return '';
+  if (!path) return [];
 
+  const matches: string[] = [];
   for (const pathArg of path.split(',')) {
     const trimmed = pathArg.trim();
     if (!trimmed) continue;
-    const resolved = await resolveFn(trimmed);
-    if (resolved) return resolved;
+    matches.push(...(await resolveFn(trimmed)));
   }
+  return matches;
+}
 
-  return '';
+async function resolvePatternsPaths(cfg: Config, pathFlag?: string): Promise<string[]> {
+  const configured = cfg.global.patternsPath ?? '';
+  if (configured) return [configured];
+  return discoverOptionalFiles(cfg, resolvePatterns, pathFlag);
 }
 
 export async function loadPatternsStore(cfg: Config, pathFlag?: string): Promise<PatternStore | undefined> {
-  let path = cfg.global.patternsPath ?? '';
-  if (!path) {
-    path = await discoverOptionalFile(cfg, resolvePatterns, pathFlag);
-  }
-  if (!path) return undefined;
+  const paths = await resolvePatternsPaths(cfg, pathFlag);
+  if (paths.length === 0) return undefined;
 
-  const pf = await parsePatterns(path);
+  const [first, ...rest] = paths;
+  const pf = await parsePatterns(first);
+  for (const path of rest) {
+    const extra = await parsePatterns(path);
+    pf.patterns.push(...extra.patterns);
+  }
   return new PatternStore(pf);
+}
+
+async function resolveAttributesPaths(cfg: Config, pathFlag?: string): Promise<string[]> {
+  const configured = cfg.global.attributesPath ?? '';
+  if (configured) return [configured];
+  return discoverOptionalFiles(cfg, resolveAttributes, pathFlag);
 }
 
 export async function loadCustomAttributesStore(
@@ -99,12 +113,14 @@ export async function loadCustomAttributesStore(
 ): Promise<CustomAttributeStore | undefined> {
   let caf;
 
-  let path = cfg.global.attributesPath ?? '';
-  if (!path) {
-    path = await discoverOptionalFile(cfg, resolveAttributes, pathFlag);
-  }
-  if (path) {
-    caf = await parseCustomAttributes(path);
+  const paths = await resolveAttributesPaths(cfg, pathFlag);
+  for (const path of paths) {
+    const next = await parseCustomAttributes(path);
+    if (caf) {
+      caf.attributes.push(...next.attributes);
+    } else {
+      caf = next;
+    }
   }
 
   const vscodeData = await loadVSCodeData(cfg, pathFlag);
@@ -120,10 +136,10 @@ export async function loadCustomAttributesStore(
   return new CustomAttributeStore(caf);
 }
 
-async function resolveStylesPath(cfg: Config, pathFlag?: string): Promise<string> {
+async function resolveStylesPaths(cfg: Config, pathFlag?: string): Promise<string[]> {
   const configured = cfg.global.stylesPath ?? '';
-  if (configured) return configured;
-  return discoverOptionalFile(cfg, resolveStyles, pathFlag);
+  if (configured) return [configured];
+  return discoverOptionalFiles(cfg, resolveStyles, pathFlag);
 }
 
 type StylesFile = Awaited<ReturnType<typeof parseCustomStyles>>;
@@ -135,18 +151,29 @@ function mergeStyles(base: StylesFile | undefined, extra: StylesFile | undefined
   return base;
 }
 
-async function loadDTCGTokens(tokensPath?: string): Promise<StylesFile | undefined> {
-  if (!tokensPath) return undefined;
+async function resolveTokensPaths(cfg: Config, pathFlag?: string): Promise<string[]> {
+  const configured = cfg.global.tokensPath ?? '';
+  if (configured) return [configured];
+  return discoverOptionalFiles(cfg, resolveTokens, pathFlag);
+}
+
+async function loadDTCGTokens(tokensPath: string): Promise<StylesFile | undefined> {
   return (await loadDTCG(tokensPath)) ?? undefined;
 }
 
 export async function loadCustomStylesStore(cfg: Config, pathFlag?: string): Promise<CustomStyleStore | undefined> {
-  const path = await resolveStylesPath(cfg, pathFlag);
-  let csf: StylesFile | undefined = path ? await parseCustomStyles(path) : undefined;
+  let csf: StylesFile | undefined;
+
+  for (const path of await resolveStylesPaths(cfg, pathFlag)) {
+    csf = mergeStyles(csf, await parseCustomStyles(path));
+  }
 
   const vscodeData = await loadVSCodeData(cfg, pathFlag);
   csf = mergeStyles(csf, vscodeData?.styles);
-  csf = mergeStyles(csf, await loadDTCGTokens(cfg.global.tokensPath));
+
+  for (const path of await resolveTokensPaths(cfg, pathFlag)) {
+    csf = mergeStyles(csf, await loadDTCGTokens(path));
+  }
 
   if (!csf) return undefined;
   return new CustomStyleStore(csf);
