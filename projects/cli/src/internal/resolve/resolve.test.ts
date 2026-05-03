@@ -1,7 +1,7 @@
 import { describe, test, expect, afterEach } from 'bun:test';
-import { resolveFile } from './resolve.js';
+import { resolveFile, resolveFiles } from './resolve.js';
 import { join } from 'path';
-import { mkdtemp, writeFile, rm } from 'fs/promises';
+import { mkdir, mkdtemp, writeFile, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 
 const testdataPath = join(import.meta.dir, '../../../testdata');
@@ -47,5 +47,38 @@ describe('resolveFile', () => {
     await writeFile(join(dir, 'test.json'), '{}');
     const result = await resolveFile(dir, 'test.json');
     expect(result).toBe(join(dir, 'test.json'));
+  });
+});
+
+describe('resolveFiles', () => {
+  test('finds matches recursively', async () => {
+    const dir = await makeTempDir();
+    const nested = join(dir, 'a', 'b');
+    await mkdir(nested, { recursive: true });
+    await writeFile(join(dir, 'tokens.json'), '{}');
+    await writeFile(join(nested, 'tokens.json'), '{}');
+
+    const result = await resolveFiles(dir, 'tokens.json');
+    expect(result.sort()).toEqual([join(dir, 'tokens.json'), join(nested, 'tokens.json')].sort());
+  });
+
+  test('skips well-known build/cache dirs', async () => {
+    const dir = await makeTempDir();
+    const skipped = join(dir, '.git');
+    await mkdir(skipped, { recursive: true });
+    await writeFile(join(skipped, 'tokens.json'), '{}');
+
+    const result = await resolveFiles(dir, 'tokens.json');
+    expect(result).toEqual([]);
+  });
+
+  test('returns empty array for non-existent directory', async () => {
+    const result = await resolveFiles(join(testdataPath, 'no-such-dir'), 'tokens.json');
+    expect(result).toEqual([]);
+  });
+
+  test('throws when path is not a directory', async () => {
+    const filePath = join(testdataPath, 'custom-elements.json');
+    await expect(resolveFiles(filePath, 'tokens.json')).rejects.toThrow('is not a directory');
   });
 });

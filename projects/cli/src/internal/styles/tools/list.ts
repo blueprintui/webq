@@ -17,7 +17,7 @@ export const metadata = {
 };
 
 export function toMarkdown(ctx: ToolContext): string {
-  if (!ctx.customStyleStore) return 'No custom-styles.json found\n';
+  if (!ctx.customStyleStore) return 'No CSS custom properties found (no custom-styles.json or DTCG tokens.json)\n';
   return formatCSSCustomPropertySummaries(ctx.customStyleStore.getCSSCustomProperties());
 }
 

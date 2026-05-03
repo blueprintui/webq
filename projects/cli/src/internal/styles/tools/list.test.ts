@@ -50,6 +50,8 @@ describe('stylePropertyList', () => {
 
   test('toMarkdown returns message when no store', () => {
     const md = stylePropertyList.toMarkdown(makeCtx(false));
-    expect(md).toContain('No custom-styles.json found');
+    expect(md).toContain('No CSS custom properties found');
+    expect(md).toContain('custom-styles.json');
+    expect(md).toContain('tokens.json');
   });
 });

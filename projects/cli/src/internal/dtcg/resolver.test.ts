@@ -1,21 +1,21 @@
 import { describe, test, expect } from 'bun:test';
-import { resolve, PatternsFilename } from './resolver.js';
 import { join } from 'path';
+import { resolve, DTCGTokensFilename } from './resolver.js';
 
 const testdataPath = join(import.meta.dir, '../../../testdata');
 
-describe('patterns resolver', () => {
-  test('finds custom-patterns.json in testdata', async () => {
+describe('dtcg resolver', () => {
+  test('finds tokens.json in testdata', async () => {
     const result = await resolve(testdataPath);
-    expect(result).toContain(join(testdataPath, PatternsFilename));
+    expect(result).toContain(join(testdataPath, DTCGTokensFilename));
   });
 
   test('walks recursively', async () => {
     const result = await resolve(join(testdataPath, '..'));
-    expect(result.some(p => p.endsWith(PatternsFilename))).toBe(true);
+    expect(result.some(p => p.endsWith(DTCGTokensFilename))).toBe(true);
   });
 
-  test('returns empty array for directory without patterns file', async () => {
+  test('returns empty array for directory without tokens file', async () => {
     const result = await resolve(join(testdataPath, '..', 'src', 'internal', 'config'));
     expect(result).toEqual([]);
   });
