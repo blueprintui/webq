@@ -132,6 +132,6 @@
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "8.57.2"
+    "typescript-eslint": "8.59.1"
   }
 }
