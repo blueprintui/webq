@@ -48,6 +48,10 @@
         "typescript-eslint": "8.57.0",
       },
     },
+    "projects/docs": {
+      "name": "@webq/docs",
+      "version": "0.0.0",
+    },
     "projects/eslint": {
       "name": "@webq/eslint",
       "version": "1.1.0",
@@ -359,6 +363,8 @@
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.57.0", "", { "dependencies": { "@typescript-eslint/types": "8.57.0", "eslint-visitor-keys": "^5.0.0" } }, "sha512-zm6xx8UT/Xy2oSr2ZXD0pZo7Jx2XsCoID2IUh9YSTFRu7z+WdwYTRk6LhUftm1crwqbuoF6I8zAFeCMw0YjwDg=="],
 
     "@webq/cli": ["@webq/cli@workspace:projects/cli"],
+
+    "@webq/docs": ["@webq/docs@workspace:projects/docs"],
 
     "@webq/eslint": ["@webq/eslint@workspace:projects/eslint"],
 

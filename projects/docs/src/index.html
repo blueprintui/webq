@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>webq</title>
+    <meta
+      name="description"
+      content="Tools for querying and validating Web Components against Custom Elements Manifest files." />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #1a1a1a;
+        --muted: #5a5a5a;
+        --accent: #0a66c2;
+        --code-bg: #f4f4f5;
+        --border: #e4e4e7;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d0d0f;
+          --fg: #e8e8ea;
+          --muted: #a0a0a8;
+          --accent: #6ea8fe;
+          --code-bg: #1a1a1d;
+          --border: #2a2a2e;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.6;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+        margin: 0 0 0.5rem;
+      }
+      h2 {
+        font-size: 1.25rem;
+        margin: 2.5rem 0 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--border);
+      }
+      p.lead {
+        color: var(--muted);
+        font-size: 1.1rem;
+        margin: 0 0 1.5rem;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        background: var(--code-bg);
+        padding: 0.15em 0.35em;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--code-bg);
+        padding: 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+      pre code {
+        padding: 0;
+        background: none;
+      }
+      ul {
+        padding-left: 1.25rem;
+      }
+      ul.packages li {
+        margin-bottom: 0.5rem;
+      }
+      footer {
+        margin-top: 3rem;
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>webq</h1>
+      <p class="lead">
+        Tools for querying and validating Web Components against
+        <a href="https://github.com/webcomponents/custom-elements-manifest">Custom Elements Manifest</a> (CEM) files.
+      </p>
+
+      <h2>Install</h2>
+      <pre><code>curl -fsSL https://raw.githubusercontent.com/blueprintui/webq/main/projects/cli/install.sh | bash</code></pre>
+      <p>Or via npm:</p>
+      <pre><code>npm install -g @webq/cli</code></pre>
+
+      <h2>Packages</h2>
+      <ul class="packages">
+        <li>
+          <a href="https://github.com/blueprintui/webq/blob/main/projects/cli/README.md"><code>@webq/cli</code></a>
+          — CLI and MCP server for querying CEM files and validating HTML.
+        </li>
+        <li>
+          <a href="https://github.com/blueprintui/webq/blob/main/projects/eslint/README.md"
+            ><code>@webq/eslint</code></a
+          >
+          — ESLint plugin (18 rules) backed by the CLI's validation engine.
+        </li>
+        <li>
+          <a href="https://github.com/blueprintui/webq/tree/main/projects/schemas"><code>schemas</code></a>
+          — JSON schemas for custom-elements, custom-attributes, custom-patterns, custom-styles, DTCG tokens, and VSCode
+          custom data.
+        </li>
+      </ul>
+
+      <h2>Usage</h2>
+      <pre><code>webq element.list --path ./node_modules
+webq element bp-button --path ./node_modules
+webq validate-html '&lt;bp-button variant="primary"&gt;Click&lt;/bp-button&gt;' --path ./node_modules
+webq mcp --path ./node_modules</code></pre>
+
+      <h2>Develop</h2>
+      <pre><code>bun install
+bun run ci
+bun --filter @webq/cli run start</code></pre>
+
+      <h2>Links</h2>
+      <ul>
+        <li><a href="https://github.com/blueprintui/webq">Source on GitHub</a></li>
+        <li><a href="https://github.com/blueprintui/webq/releases">Releases</a></li>
+      </ul>
+
+      <footer>MIT &middot; <a href="https://github.com/blueprintui/webq">blueprintui/webq</a></footer>
+    </main>
+  </body>
+</html>
